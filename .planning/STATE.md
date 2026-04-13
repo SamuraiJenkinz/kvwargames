@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 1 of 8 (Foundation)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-04-13 — Completed 01-02-PLAN.md (EDIP config constant + tests)
+Last activity: 2026-04-13 — Completed 01-03-PLAN.md (Zustand store + tests)
 
-Progress: [██░░░░░░░░] 6% (2/32 plans)
+Progress: [███░░░░░░░] 9% (3/32 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 3m 32s
-- Total execution time: ~7 minutes
+- Total plans completed: 3
+- Average duration: 3m 27s
+- Total execution time: ~10 minutes
 
 **By Phase:**
 
 | Phase | Plans | Completed | Avg/Plan |
 |-------|-------|-----------|----------|
-| 01-foundation | 4 | 2 | 3m 32s |
+| 01-foundation | 4 | 3 | 3m 27s |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3m 44s), 01-02 (3m 19s)
-- Trend: Slightly faster on second plan
+- Last 5 plans: 01-01 (3m 44s), 01-02 (3m 19s), 01-03 (3m 19s)
+- Trend: Consistent ~3m 20s throughput
 
 *Updated after each plan completion*
 
@@ -50,6 +50,8 @@ Recent decisions affecting current work:
 - 01-01: TypeScript 6 deprecated `baseUrl` — added `ignoreDeprecations:"6.0"` to tsconfig.json and tsconfig.app.json; zero behavioral change, @/ alias intact
 - 01-01: Tailwind v4 CSS-first confirmed — `@import "tailwindcss"` + `@theme` in index.css, no tailwind.config.ts
 - 01-02: Used `as const satisfies GameConfig` for EDIP_CONFIG — provides literal type narrowing (e.g. CrisisState) while enforcing interface compliance at compile time
+- 01-03: Zustand v5 double-call mock requires `originalCreate<T>()(stateCreator)` — single-call pattern fails because `actualCreate<T>()` returns a factory, not a store
+- 01-03: `vi.mock('zustand')` must be explicit in test files — Vitest does not auto-apply `__mocks__/` without `automock: true` in vite.config
 
 ### Pending Todos
 
@@ -64,6 +66,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-13T18:53:52Z
-Stopped at: Completed 01-02-PLAN.md — EDIP config constant + 51 integrity tests committed
+Last session: 2026-04-13T19:00:16Z
+Stopped at: Completed 01-03-PLAN.md — Zustand store (useGameStore) + 62 behavior tests committed
 Resume file: None
