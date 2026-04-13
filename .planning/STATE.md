@@ -5,34 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 2 — FastAPI Backend
+**Current focus:** Phase 3 — Game State API
 
 ## Current Position
 
-Phase: 2 of 8 (FastAPI Backend)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-04-13 — Completed 02-03-PLAN.md (config generation endpoint)
+Phase: 2 of 8 (FastAPI Backend) — COMPLETE
+Plan: 4 of 4 in Phase 2 (complete)
+Status: Phase 2 complete — ready for Phase 3
+Last activity: 2026-04-13 — Completed 02-04-PLAN.md (SPA static serving + integration test)
 
-Progress: [████░░░░░░] 17% (6/35 plans)
+Progress: [████░░░░░░] 20% (7/35 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: ~2m
-- Total execution time: ~12 minutes
+- Total plans completed: 7
+- Average duration: ~2m 20s
+- Total execution time: ~15 minutes
 
 **By Phase:**
 
 | Phase | Plans | Completed | Avg/Plan |
 |-------|-------|-----------|----------|
 | 01-foundation | 4 | 3 | 3m 27s |
-| 02-fastapi-backend | 4 | 3 | ~1m 20s |
+| 02-fastapi-backend | 4 | 4 | ~2m |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (3m 19s), 02-01 (1m 30s), 02-02 (54s), 02-03 (1m 50s)
-- Trend: Backend plans consistently under 2m
+- Last 5 plans: 02-01 (1m 30s), 02-02 (54s), 02-03 (1m 50s), 02-04 (3m)
+- Trend: Backend phase complete, all plans under 4m
 
 *Updated after each plan completion*
 
@@ -62,6 +62,10 @@ Recent decisions affecting current work:
 - 02-03: No server-side JSON parsing of LLM config output — frontend owns validation so it can display meaningful errors to facilitators
 - 02-03: Error-handling chain in config_gen.py kept as explicit duplication of llm.py — refactor to shared helper deferred to future phase
 - 02-03: CONFIG_GEN_SYSTEM_PROMPT is a functional placeholder (~200 words); Phase 7 owns prompt refinement
+- 02-04: SPAStaticFiles subclasses StaticFiles, catches 404 and returns index.html — no third-party dep for SPA routing
+- 02-04: app.mount("/") is the final statement in main.py — enforced by comment; SPA catch-all must never precede API routers
+- 02-04: vite.config.ts must import defineConfig from vitest/config (not vite) for vitest 4.x — type augmentation approach removed in v4
+- 02-04: noUncheckedSideEffectImports set to false in tsconfig.app.json — CSS side-effect imports are valid in Vite projects
 
 ### Pending Todos
 
@@ -77,5 +81,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-13
-Stopped at: Completed 02-03-PLAN.md — config generation endpoint (POST /api/generate-config)
+Stopped at: Completed 02-04-PLAN.md — SPA static serving, integration tests, Phase 2 complete
 Resume file: None
