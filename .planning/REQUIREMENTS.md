@@ -106,13 +106,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### UI Design
 
-- [ ] **UI-01**: Dark themed UI designed via Google Stitch, directional from spec
-- [ ] **UI-02**: Persona colour identity preserved: Kent=blue (#5B9BD5), Finch=amber (#DFA02A), Chen=green (#2BC48A)
-- [ ] **UI-03**: Three Google fonts loaded: Syne (display), DM Sans (body), IBM Plex Mono (data/monospace)
-- [ ] **UI-04**: Custom scrollbars (thin, subtle)
-- [ ] **UI-05**: Card category colours mapped (Crisis State=red, Monitoring=blue, Prioritisation Soft=amber, Prioritisation Hard=coral, Demand Coordination=green, Production Acceleration=teal, Transfers=purple)
-- [ ] **UI-06**: Responsive layout functional at 1280px+, usable on tablet
-- [ ] **UI-07**: Crisis state badge colours: No Crisis=green, Supply Crisis=amber, Security-Related=red
+- [x] **UI-01**: Dark themed UI designed via Google Stitch, directional from spec
+- [x] **UI-02**: Persona colour identity preserved: Kent=blue (#5B9BD5), Finch=amber (#DFA02A), Chen=green (#2BC48A)
+- [x] **UI-03**: Three Google fonts loaded: Syne (display), DM Sans (body), IBM Plex Mono (data/monospace)
+- [x] **UI-04**: Custom scrollbars (thin, subtle)
+- [x] **UI-05**: Card category colours mapped (Crisis State=red, Monitoring=blue, Prioritisation Soft=amber, Prioritisation Hard=coral, Demand Coordination=green, Production Acceleration=teal, Transfers=purple)
+- [x] **UI-06**: Responsive layout functional at 1280px+, usable on tablet
+- [x] **UI-07**: Crisis state badge colours: No Crisis=green, Supply Crisis=amber, Security-Related=red
 
 ### Context Management
 
@@ -233,13 +233,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEB-01 | Phase 7 | Pending |
 | DEB-02 | Phase 7 | Pending |
 | DEB-03 | Phase 7 | Pending |
-| UI-01 | Phase 3 | Pending |
-| UI-02 | Phase 3 | Pending |
-| UI-03 | Phase 3 | Pending |
-| UI-04 | Phase 3 | Pending |
-| UI-05 | Phase 3 | Pending |
-| UI-06 | Phase 3 | Pending |
-| UI-07 | Phase 3 | Pending |
+| UI-01 | Phase 3 | Complete |
+| UI-02 | Phase 3 | Complete |
+| UI-03 | Phase 3 | Complete |
+| UI-04 | Phase 3 | Complete |
+| UI-05 | Phase 3 | Complete |
+| UI-06 | Phase 3 | Complete |
+| UI-07 | Phase 3 | Complete |
 | CTX-01 | Phase 6 | Pending |
 | CTX-02 | Phase 6 | Pending |
 | CTX-03 | Phase 6 | Pending |

@@ -12,7 +12,7 @@ Build a three-persona AI facilitation console for live policy tabletop exercises
 
 - [x] **Phase 1: Foundation** — TypeScript interfaces, EDIP data constant, Zustand store, dev scaffolding
 - [x] **Phase 2: FastAPI Backend** — Credential proxy, both LLM endpoints, static file serving
-- [ ] **Phase 3: UI Design System** — Google Stitch design, Tailwind v4 tokens, persona colours, fonts
+- [x] **Phase 3: UI Design System** — Google Stitch design, Tailwind v4 tokens, persona colours, fonts
 - [ ] **Phase 4: Setup Screen** — Home, load config, JSON validation, scenario launch (brief gen stubbed)
 - [ ] **Phase 5: Game Screen Layout** — Three-column layout, chat feed, state dashboard, reference panel (all mock data)
 - [ ] **Phase 6: LLM Integration** — Prompt builder, persona routing, state updater, response handling, context windowing (highest risk)
@@ -69,10 +69,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Google Stitch dark-themed layout directional (best-effort)
-- [ ] 03-02-PLAN.md — Complete Tailwind v4 @theme tokens, Google Fonts, custom scrollbars
-- [ ] 03-03-PLAN.md — TokenReference visual component reference page
-- [ ] 03-04-PLAN.md — Responsive breakpoint validation (1280px + 768px) with human verify
+- [x] 03-01-PLAN.md — Google Stitch dark-themed layout directional (best-effort)
+- [x] 03-02-PLAN.md — Complete Tailwind v4 @theme tokens, Google Fonts, custom scrollbars
+- [x] 03-03-PLAN.md — TokenReference visual component reference page
+- [x] 03-04-PLAN.md — Responsive breakpoint validation (1280px + 768px) with human verify
 
 ### Phase 4: Setup Screen
 **Goal**: A facilitator can load the EDIP default config, review the JSON, select a scenario, and launch into the game — the complete pre-game flow works end-to-end without a running LLM.
@@ -176,7 +176,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | ✓ Verified | 2026-04-13 |
 | 2. FastAPI Backend | 4/4 | ✓ Verified | 2026-04-13 |
-| 3. UI Design System | 0/4 | Not started | - |
+| 3. UI Design System | 4/4 | ✓ Verified | 2026-04-13 |
 | 4. Setup Screen | 0/4 | Not started | - |
 | 5. Game Screen Layout | 0/5 | Not started | - |
 | 6. LLM Integration | 0/6 | Not started | - |
