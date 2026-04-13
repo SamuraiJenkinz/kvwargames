@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 3 of 8 (UI Design System)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-04-13 — Completed 03-01 (Stitch Layout Directionals — skipped, tools unavailable)
+Last activity: 2026-04-13 — Completed 03-02 (Tailwind v4 Tokens + Google Fonts)
 
-Progress: [████░░░░░░] 23% (8/35 plans)
+Progress: [████░░░░░░] 26% (9/35 plans)
 
 ## Performance Metrics
 
@@ -29,11 +29,11 @@ Progress: [████░░░░░░] 23% (8/35 plans)
 |-------|-------|-----------|----------|
 | 01-foundation | 4 | 3 | 3m 27s |
 | 02-fastapi-backend | 4 | 4 | ~2m |
-| 03-ui-design-system | 4 | 1 | ~1m |
+| 03-ui-design-system | 4 | 2 | ~1m |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (54s), 02-03 (1m 50s), 02-04 (3m), 03-01 (~1m)
-- Trend: UI design phase started; 03-01 was best-effort (Stitch tools unavailable)
+- Last 5 plans: 02-03 (1m 50s), 02-04 (3m), 03-01 (~1m), 03-02 (~1m)
+- Trend: UI design phase fast-executing; CSS-only tasks complete under 2 minutes
 
 *Updated after each plan completion*
 
@@ -68,6 +68,8 @@ Recent decisions affecting current work:
 - 02-04: vite.config.ts must import defineConfig from vitest/config (not vite) for vitest 4.x — type augmentation approach removed in v4
 - 02-04: noUncheckedSideEffectImports set to false in tsconfig.app.json — CSS side-effect imports are valid in Vite projects
 - 03-01: Stitch MCP tools unavailable in execution environment — SKIPPED.md created per plan fallback; all tokens authoritative from spec
+- 03-02: @keyframes blink placed inside @theme alongside --animate-blink token — co-location is valid in Tailwind v4 and keeps animation self-contained
+- 03-02: Google Fonts loaded via HTML link tag (not CSS @import) — avoids render-blocking; preconnect links added for performance
 
 ### Pending Todos
 
@@ -83,5 +85,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-13T21:51Z
-Stopped at: Completed 03-01-PLAN.md (Stitch Layout Directionals)
+Stopped at: Completed 03-02-PLAN.md (Tailwind v4 Tokens + Google Fonts)
 Resume file: None
