@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 1 of 8 (Foundation)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-04-13 — Completed 01-01-PLAN.md (scaffold + types)
+Last activity: 2026-04-13 — Completed 01-02-PLAN.md (EDIP config constant + tests)
 
-Progress: [█░░░░░░░░░] 3% (1/32 plans)
+Progress: [██░░░░░░░░] 6% (2/32 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 3m 44s
-- Total execution time: ~4 minutes
+- Total plans completed: 2
+- Average duration: 3m 32s
+- Total execution time: ~7 minutes
 
 **By Phase:**
 
 | Phase | Plans | Completed | Avg/Plan |
 |-------|-------|-----------|----------|
-| 01-foundation | 4 | 1 | 3m 44s |
+| 01-foundation | 4 | 2 | 3m 32s |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3m 44s)
-- Trend: Establishing baseline
+- Last 5 plans: 01-01 (3m 44s), 01-02 (3m 19s)
+- Trend: Slightly faster on second plan
 
 *Updated after each plan completion*
 
@@ -49,6 +49,7 @@ Recent decisions affecting current work:
 - Roadmap: SETUP-04/05 (generate-from-brief wiring) moved to Phase 7, not Phase 4 — setup screen ships with stubbed brief panel
 - 01-01: TypeScript 6 deprecated `baseUrl` — added `ignoreDeprecations:"6.0"` to tsconfig.json and tsconfig.app.json; zero behavioral change, @/ alias intact
 - 01-01: Tailwind v4 CSS-first confirmed — `@import "tailwindcss"` + `@theme` in index.css, no tailwind.config.ts
+- 01-02: Used `as const satisfies GameConfig` for EDIP_CONFIG — provides literal type narrowing (e.g. CrisisState) while enforcing interface compliance at compile time
 
 ### Pending Todos
 
@@ -63,6 +64,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-13T18:48:26Z
-Stopped at: Completed 01-01-PLAN.md — scaffold + all TypeScript types committed
+Last session: 2026-04-13T18:53:52Z
+Stopped at: Completed 01-02-PLAN.md — EDIP config constant + 51 integrity tests committed
 Resume file: None
