@@ -66,13 +66,13 @@ Plans:
   3. A rendered component reference page shows all token-dependent primitives — persona colour swatches, crisis state badges, card category colour chips — all resolving from Tailwind tokens, not hardcoded values
   4. Custom scrollbars (thin, subtle) are applied globally
   5. Layout renders at 1280px without horizontal scroll; a 768px browser viewport is usable (no overlap or cut-off content)
-**Plans**: TBD
+**Plans:** 4 plans
 
 Plans:
-- [ ] 03-01: Google Stitch session — generate dark-themed game layout screens directional from spec; extract design tokens
-- [ ] 03-02: Tailwind v4 `@theme {}` token block — all colours, fonts (Syne, DM Sans, IBM Plex Mono), custom scrollbars
-- [ ] 03-03: Primitive component reference — StatusBadge, TrackBar shell, persona colour chips, category colour chips
-- [ ] 03-04: Responsive breakpoint validation — 1280px and 768px visual review
+- [ ] 03-01-PLAN.md — Google Stitch dark-themed layout directional (best-effort)
+- [ ] 03-02-PLAN.md — Complete Tailwind v4 @theme tokens, Google Fonts, custom scrollbars
+- [ ] 03-03-PLAN.md — TokenReference visual component reference page
+- [ ] 03-04-PLAN.md — Responsive breakpoint validation (1280px + 768px) with human verify
 
 ### Phase 4: Setup Screen
 **Goal**: A facilitator can load the EDIP default config, review the JSON, select a scenario, and launch into the game — the complete pre-game flow works end-to-end without a running LLM.
