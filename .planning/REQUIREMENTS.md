@@ -172,87 +172,97 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | TBD | Pending |
-| FOUND-02 | TBD | Pending |
-| FOUND-03 | TBD | Pending |
-| FOUND-04 | TBD | Pending |
-| FOUND-05 | TBD | Pending |
-| LLM-01 | TBD | Pending |
-| LLM-02 | TBD | Pending |
-| LLM-03 | TBD | Pending |
-| LLM-04 | TBD | Pending |
-| LLM-05 | TBD | Pending |
-| LLM-06 | TBD | Pending |
-| PROMPT-01 | TBD | Pending |
-| PROMPT-02 | TBD | Pending |
-| PROMPT-03 | TBD | Pending |
-| PROMPT-04 | TBD | Pending |
-| PROMPT-05 | TBD | Pending |
-| STATE-01 | TBD | Pending |
-| STATE-02 | TBD | Pending |
-| STATE-03 | TBD | Pending |
-| STATE-04 | TBD | Pending |
-| RESP-01 | TBD | Pending |
-| RESP-02 | TBD | Pending |
-| RESP-03 | TBD | Pending |
-| RESP-04 | TBD | Pending |
-| RESP-05 | TBD | Pending |
-| SETUP-01 | TBD | Pending |
-| SETUP-02 | TBD | Pending |
-| SETUP-03 | TBD | Pending |
-| SETUP-04 | TBD | Pending |
-| SETUP-05 | TBD | Pending |
-| SETUP-06 | TBD | Pending |
-| LAYOUT-01 | TBD | Pending |
-| LAYOUT-02 | TBD | Pending |
-| LAYOUT-03 | TBD | Pending |
-| LAYOUT-04 | TBD | Pending |
-| LAYOUT-05 | TBD | Pending |
-| CHAT-01 | TBD | Pending |
-| CHAT-02 | TBD | Pending |
-| CHAT-03 | TBD | Pending |
-| CHAT-04 | TBD | Pending |
-| CHAT-05 | TBD | Pending |
-| CHAT-06 | TBD | Pending |
-| CHAT-07 | TBD | Pending |
-| DASH-01 | TBD | Pending |
-| DASH-02 | TBD | Pending |
-| DASH-03 | TBD | Pending |
-| DASH-04 | TBD | Pending |
-| DASH-05 | TBD | Pending |
-| DASH-06 | TBD | Pending |
-| REF-01 | TBD | Pending |
-| REF-02 | TBD | Pending |
-| REF-03 | TBD | Pending |
-| REF-04 | TBD | Pending |
-| FLOW-01 | TBD | Pending |
-| FLOW-02 | TBD | Pending |
-| FLOW-03 | TBD | Pending |
-| FLOW-04 | TBD | Pending |
-| FLOW-05 | TBD | Pending |
-| DEB-01 | TBD | Pending |
-| DEB-02 | TBD | Pending |
-| DEB-03 | TBD | Pending |
-| UI-01 | TBD | Pending |
-| UI-02 | TBD | Pending |
-| UI-03 | TBD | Pending |
-| UI-04 | TBD | Pending |
-| UI-05 | TBD | Pending |
-| UI-06 | TBD | Pending |
-| UI-07 | TBD | Pending |
-| CTX-01 | TBD | Pending |
-| CTX-02 | TBD | Pending |
-| CTX-03 | TBD | Pending |
-| INFRA-01 | TBD | Pending |
-| INFRA-02 | TBD | Pending |
-| INFRA-03 | TBD | Pending |
-| INFRA-04 | TBD | Pending |
+| FOUND-01 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Pending |
+| FOUND-04 | Phase 1 | Pending |
+| FOUND-05 | Phase 1 | Pending |
+| LLM-01 | Phase 2 | Pending |
+| LLM-02 | Phase 2 | Pending |
+| LLM-03 | Phase 2 | Pending |
+| LLM-04 | Phase 2 | Pending |
+| LLM-05 | Phase 2 | Pending |
+| LLM-06 | Phase 2 | Pending |
+| PROMPT-01 | Phase 6 | Pending |
+| PROMPT-02 | Phase 6 | Pending |
+| PROMPT-03 | Phase 6 | Pending |
+| PROMPT-04 | Phase 6 | Pending |
+| PROMPT-05 | Phase 6 | Pending |
+| STATE-01 | Phase 6 | Pending |
+| STATE-02 | Phase 6 | Pending |
+| STATE-03 | Phase 6 | Pending |
+| STATE-04 | Phase 6 | Pending |
+| RESP-01 | Phase 6 | Pending |
+| RESP-02 | Phase 6 | Pending |
+| RESP-03 | Phase 6 | Pending |
+| RESP-04 | Phase 6 | Pending |
+| RESP-05 | Phase 6 | Pending |
+| SETUP-01 | Phase 4 | Pending |
+| SETUP-02 | Phase 4 | Pending |
+| SETUP-03 | Phase 4 | Pending |
+| SETUP-04 | Phase 7 | Pending |
+| SETUP-05 | Phase 7 | Pending |
+| SETUP-06 | Phase 4 | Pending |
+| LAYOUT-01 | Phase 5 | Pending |
+| LAYOUT-02 | Phase 5 | Pending |
+| LAYOUT-03 | Phase 5 | Pending |
+| LAYOUT-04 | Phase 5 | Pending |
+| LAYOUT-05 | Phase 5 | Pending |
+| CHAT-01 | Phase 5 | Pending |
+| CHAT-02 | Phase 5 | Pending |
+| CHAT-03 | Phase 5 | Pending |
+| CHAT-04 | Phase 5 | Pending |
+| CHAT-05 | Phase 5 | Pending |
+| CHAT-06 | Phase 5 | Pending |
+| CHAT-07 | Phase 5 | Pending |
+| DASH-01 | Phase 5 | Pending |
+| DASH-02 | Phase 5 | Pending |
+| DASH-03 | Phase 5 | Pending |
+| DASH-04 | Phase 5 | Pending |
+| DASH-05 | Phase 5 | Pending |
+| DASH-06 | Phase 5 | Pending |
+| REF-01 | Phase 5 | Pending |
+| REF-02 | Phase 5 | Pending |
+| REF-03 | Phase 5 | Pending |
+| REF-04 | Phase 5 | Pending |
+| FLOW-01 | Phase 6 | Pending |
+| FLOW-02 | Phase 6 | Pending |
+| FLOW-03 | Phase 6 | Pending |
+| FLOW-04 | Phase 6 | Pending |
+| FLOW-05 | Phase 6 | Pending |
+| DEB-01 | Phase 7 | Pending |
+| DEB-02 | Phase 7 | Pending |
+| DEB-03 | Phase 7 | Pending |
+| UI-01 | Phase 3 | Pending |
+| UI-02 | Phase 3 | Pending |
+| UI-03 | Phase 3 | Pending |
+| UI-04 | Phase 3 | Pending |
+| UI-05 | Phase 3 | Pending |
+| UI-06 | Phase 3 | Pending |
+| UI-07 | Phase 3 | Pending |
+| CTX-01 | Phase 6 | Pending |
+| CTX-02 | Phase 6 | Pending |
+| CTX-03 | Phase 6 | Pending |
+| INFRA-01 | Phase 1 | Pending |
+| INFRA-02 | Phase 2 | Pending |
+| INFRA-03 | Phase 1 | Pending |
+| INFRA-04 | Phase 1 | Pending |
 
 **Coverage:**
-- v1 requirements: 68 total
-- Mapped to phases: 0
-- Unmapped: 68
+- v1 requirements: 75 total
+- Mapped to phases: 75
+- Unmapped: 0
+
+**Phase breakdown:**
+- Phase 1 (Foundation): FOUND-01..05, INFRA-01, INFRA-03, INFRA-04 — 8 requirements
+- Phase 2 (FastAPI Backend): LLM-01..06, INFRA-02 — 7 requirements
+- Phase 3 (UI Design System): UI-01..07 — 7 requirements
+- Phase 4 (Setup Screen): SETUP-01..03, SETUP-06 — 4 requirements
+- Phase 5 (Game Screen Layout): LAYOUT-01..05, CHAT-01..07, DASH-01..06, REF-01..04 — 22 requirements
+- Phase 6 (LLM Integration): PROMPT-01..05, STATE-01..04, RESP-01..05, FLOW-01..05, CTX-01..03 — 22 requirements
+- Phase 7 (Debrief, Export & Config Generation): DEB-01..03, SETUP-04..05 — 5 requirements
+- Phase 8 (QA & Credential Audit): 0 new requirements (validates all prior phases)
 
 ---
 *Requirements defined: 2026-04-13*
-*Last updated: 2026-04-13 after initial definition*
+*Last updated: 2026-04-13 — traceability populated after roadmap creation*
