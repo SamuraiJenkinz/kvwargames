@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 2 of 8 (FastAPI Backend)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-04-13 — Completed 02-01-PLAN.md (FastAPI project structure)
+Last activity: 2026-04-13 — Completed 02-02-PLAN.md (LLM proxy endpoint)
 
-Progress: [████░░░░░░] 11% (4/35 plans)
+Progress: [████░░░░░░] 14% (5/35 plans)
 
 ## Performance Metrics
 
@@ -28,11 +28,11 @@ Progress: [████░░░░░░] 11% (4/35 plans)
 | Phase | Plans | Completed | Avg/Plan |
 |-------|-------|-----------|----------|
 | 01-foundation | 4 | 3 | 3m 27s |
-| 02-fastapi-backend | 4 | 1 | 1m 30s |
+| 02-fastapi-backend | 4 | 2 | ~1m |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3m 44s), 01-02 (3m 19s), 01-03 (3m 19s), 02-01 (1m 30s)
-- Trend: Consistent ~2-3m throughput
+- Last 5 plans: 01-02 (3m 19s), 01-03 (3m 19s), 02-01 (1m 30s), 02-02 (54s)
+- Trend: Accelerating — simpler implementation tasks running under 1m
 
 *Updated after each plan completion*
 
@@ -57,6 +57,8 @@ Recent decisions affecting current work:
 - 02-01: RequestValidationError overridden to 400 (not 422) for consistent {error: {code, message}} shape across all endpoints
 - 02-01: llm_extra_headers parsed lazily in get_extra_headers() method — avoids pydantic validator complexity
 - 02-01: No CORS middleware — Vite proxy handles dev; production same-origin via Plan 02-04 static mount
+- 02-02: httpx.TimeoutException caught before httpx.RequestError — TimeoutException is a subclass; order ensures 504 not 502 for timeouts
+- 02-02: JSONResponse used for all returns (success and error) — gives full control over status code and body shape
 
 ### Pending Todos
 
@@ -72,5 +74,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-13
-Stopped at: Completed 02-01-PLAN.md — FastAPI project structure, settings, lifespan, router stubs
+Stopped at: Completed 02-02-PLAN.md — LLM proxy endpoint with credential injection and error handling
 Resume file: None
