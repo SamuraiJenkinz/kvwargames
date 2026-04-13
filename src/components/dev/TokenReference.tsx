@@ -1,6 +1,6 @@
 const TokenReference = () => {
   return (
-    <div className="max-w-4xl mx-auto px-8 py-12 bg-bg-base min-h-screen">
+    <div className="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-12 bg-bg-base min-h-screen">
 
       {/* Page Header */}
       <div className="mb-8">
@@ -13,11 +13,11 @@ const TokenReference = () => {
       </div>
 
       {/* ── Persona Colours ─────────────────────────────────────────────── */}
-      <section className="border-t border-border-subtle pt-8 mt-8">
+      <section className="border-t border-border-subtle pt-6 sm:pt-8 mt-6 sm:mt-8">
         <h2 className="font-mono uppercase tracking-widest text-text-secondary text-xs mb-4">
           Persona Colours
         </h2>
-        <div className="flex gap-6">
+        <div className="flex flex-wrap gap-6">
 
           {/* Kent */}
           <div className="flex flex-col gap-2">
@@ -50,11 +50,11 @@ const TokenReference = () => {
       </section>
 
       {/* ── Card Category Colours ────────────────────────────────────────── */}
-      <section className="border-t border-border-subtle pt-8 mt-8">
+      <section className="border-t border-border-subtle pt-6 sm:pt-8 mt-6 sm:mt-8">
         <h2 className="font-mono uppercase tracking-widest text-text-secondary text-xs mb-4">
           Card Category Colours
         </h2>
-        <div className="flex gap-3 flex-wrap">
+        <div className="flex flex-wrap gap-3">
 
           <div className="flex flex-col items-center gap-1">
             <div className="w-10 h-6 rounded-sm bg-category-crisis" />
@@ -109,11 +109,11 @@ const TokenReference = () => {
       </section>
 
       {/* ── Crisis State Badges ──────────────────────────────────────────── */}
-      <section className="border-t border-border-subtle pt-8 mt-8">
+      <section className="border-t border-border-subtle pt-6 sm:pt-8 mt-6 sm:mt-8">
         <h2 className="font-mono uppercase tracking-widest text-text-secondary text-xs mb-4">
           Crisis State Badges
         </h2>
-        <div className="flex gap-3 flex-wrap">
+        <div className="flex flex-wrap gap-3">
 
           <span className="bg-crisis-none/20 text-crisis-none border border-crisis-none/30 rounded-sm px-2 py-0.5 font-mono text-xs uppercase">
             No Crisis
@@ -131,7 +131,7 @@ const TokenReference = () => {
       </section>
 
       {/* ── Track Bar Shells ─────────────────────────────────────────────── */}
-      <section className="border-t border-border-subtle pt-8 mt-8">
+      <section className="border-t border-border-subtle pt-6 sm:pt-8 mt-6 sm:mt-8">
         <h2 className="font-mono uppercase tracking-widest text-text-secondary text-xs mb-4">
           Track Bar Shells
         </h2>
@@ -161,7 +161,7 @@ const TokenReference = () => {
       </section>
 
       {/* ── Typography Samples ───────────────────────────────────────────── */}
-      <section className="border-t border-border-subtle pt-8 mt-8">
+      <section className="border-t border-border-subtle pt-6 sm:pt-8 mt-6 sm:mt-8">
         <h2 className="font-mono uppercase tracking-widest text-text-secondary text-xs mb-4">
           Typography Samples
         </h2>
@@ -179,11 +179,11 @@ const TokenReference = () => {
       </section>
 
       {/* ── Background & Border Samples ─────────────────────────────────── */}
-      <section className="border-t border-border-subtle pt-8 mt-8">
+      <section className="border-t border-border-subtle pt-6 sm:pt-8 mt-6 sm:mt-8">
         <h2 className="font-mono uppercase tracking-widest text-text-secondary text-xs mb-4">
           Background &amp; Border Samples
         </h2>
-        <div className="flex gap-3 flex-wrap">
+        <div className="flex flex-wrap gap-3">
 
           <div className="flex flex-col gap-1">
             <div className="w-16 h-10 rounded-sm bg-bg-base border border-border-default" />
@@ -209,11 +209,11 @@ const TokenReference = () => {
       </section>
 
       {/* ── Resource Colours ─────────────────────────────────────────────── */}
-      <section className="border-t border-border-subtle pt-8 mt-8">
+      <section className="border-t border-border-subtle pt-6 sm:pt-8 mt-6 sm:mt-8">
         <h2 className="font-mono uppercase tracking-widest text-text-secondary text-xs mb-4">
           Resource Colours
         </h2>
-        <div className="flex gap-4 flex-wrap">
+        <div className="flex flex-wrap gap-4">
 
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-full bg-resource-pc" />
