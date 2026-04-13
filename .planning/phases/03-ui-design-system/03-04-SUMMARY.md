@@ -48,7 +48,7 @@ completed: 2026-04-13
 1. **Task 1: Validate and fix responsive layout** — `f1fe281` (fix)
 2. **Task 2: Human verify** — approved by user (no commit)
 
-**Plan metadata:** [this commit] (docs: complete responsive-breakpoint-validation plan)
+**Plan metadata:** `0b3f431` (docs: complete responsive-breakpoint-validation plan)
 
 ## Files Created/Modified
 - `src/components/dev/TokenReference.tsx` — responsive padding, flex-wrap on persona row, responsive section spacing
