@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 3 of 8 (UI Design System)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-04-13 — Completed 03-02 (Tailwind v4 Tokens + Google Fonts)
+Last activity: 2026-04-13 — Completed 03-03 (TokenReference Visual Dev Page)
 
-Progress: [████░░░░░░] 26% (9/35 plans)
+Progress: [███░░░░░░░] 28% (10/35 plans)
 
 ## Performance Metrics
 
@@ -29,11 +29,11 @@ Progress: [████░░░░░░] 26% (9/35 plans)
 |-------|-------|-----------|----------|
 | 01-foundation | 4 | 3 | 3m 27s |
 | 02-fastapi-backend | 4 | 4 | ~2m |
-| 03-ui-design-system | 4 | 2 | ~1m |
+| 03-ui-design-system | 4 | 3 | ~1m |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (1m 50s), 02-04 (3m), 03-01 (~1m), 03-02 (~1m)
-- Trend: UI design phase fast-executing; CSS-only tasks complete under 2 minutes
+- Last 5 plans: 02-04 (3m), 03-01 (~1m), 03-02 (~1m), 03-03 (~1m)
+- Trend: UI design phase fast-executing; React component tasks complete under 2 minutes
 
 *Updated after each plan completion*
 
@@ -70,6 +70,9 @@ Recent decisions affecting current work:
 - 03-01: Stitch MCP tools unavailable in execution environment — SKIPPED.md created per plan fallback; all tokens authoritative from spec
 - 03-02: @keyframes blink placed inside @theme alongside --animate-blink token — co-location is valid in Tailwind v4 and keeps animation self-contained
 - 03-02: Google Fonts loaded via HTML link tag (not CSS @import) — avoids render-blocking; preconnect links added for performance
+- 03-03: Zero hardcoded hex rule enforced at component level — all colours from Tailwind utility classes resolving @theme tokens
+- 03-03: Opacity modifiers (/8, /20, /30, /50) on custom @theme colours work natively in Tailwind v4 — no configuration needed
+- 03-03: Dev components isolated to src/components/dev/ — kept separate from production game/setup component trees
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-13T21:51Z
-Stopped at: Completed 03-02-PLAN.md (Tailwind v4 Tokens + Google Fonts)
+Last session: 2026-04-13T21:55Z
+Stopped at: Completed 03-03-PLAN.md (TokenReference Visual Dev Page)
 Resume file: None
