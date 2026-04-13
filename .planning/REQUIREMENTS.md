@@ -9,11 +9,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Foundation
 
-- [ ] **FOUND-01**: TypeScript interfaces define all data models (GameConfig, GameState, TeamState, ChatMessage, PersonaResponse, LLMRequest/Response)
-- [ ] **FOUND-02**: EDIP game config exists as canonical hardcoded constant matching GameConfig interface (2 scenarios, 4 teams, 11 cards, 4 national actions)
-- [ ] **FOUND-03**: Zustand store manages all session state (app phase, game config, game state, chat messages, LLM history, UI state)
-- [ ] **FOUND-04**: Store initializes game from config + scenario index (team starting values, round 1, clear messages/history)
-- [ ] **FOUND-05**: Store resets cleanly when starting a new game
+- [x] **FOUND-01**: TypeScript interfaces define all data models (GameConfig, GameState, TeamState, ChatMessage, PersonaResponse, LLMRequest/Response)
+- [x] **FOUND-02**: EDIP game config exists as canonical hardcoded constant matching GameConfig interface (2 scenarios, 4 teams, 11 cards, 4 national actions)
+- [x] **FOUND-03**: Zustand store manages all session state (app phase, game config, game state, chat messages, LLM history, UI state)
+- [x] **FOUND-04**: Store initializes game from config + scenario index (team starting values, round 1, clear messages/history)
+- [x] **FOUND-05**: Store resets cleanly when starting a new game
 
 ### LLM Proxy
 
@@ -122,10 +122,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: .env.example file documents all required environment variables with descriptions
+- [x] **INFRA-01**: .env.example file documents all required environment variables with descriptions
 - [ ] **INFRA-02**: FastAPI serves React/Vite dist/ build as static files for single-process production deployment
-- [ ] **INFRA-03**: Vite dev server proxies /api/* to FastAPI for local development (no CORS issues)
-- [ ] **INFRA-04**: Tailwind v4 CSS-first configuration with custom design tokens
+- [x] **INFRA-03**: Vite dev server proxies /api/* to FastAPI for local development (no CORS issues)
+- [x] **INFRA-04**: Tailwind v4 CSS-first configuration with custom design tokens
 
 ## v2 Requirements
 
@@ -172,11 +172,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
-| FOUND-02 | Phase 1 | Pending |
-| FOUND-03 | Phase 1 | Pending |
-| FOUND-04 | Phase 1 | Pending |
-| FOUND-05 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Complete |
+| FOUND-02 | Phase 1 | Complete |
+| FOUND-03 | Phase 1 | Complete |
+| FOUND-04 | Phase 1 | Complete |
+| FOUND-05 | Phase 1 | Complete |
 | LLM-01 | Phase 2 | Pending |
 | LLM-02 | Phase 2 | Pending |
 | LLM-03 | Phase 2 | Pending |
@@ -243,10 +243,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CTX-01 | Phase 6 | Pending |
 | CTX-02 | Phase 6 | Pending |
 | CTX-03 | Phase 6 | Pending |
-| INFRA-01 | Phase 1 | Pending |
+| INFRA-01 | Phase 1 | Complete |
 | INFRA-02 | Phase 2 | Pending |
-| INFRA-03 | Phase 1 | Pending |
-| INFRA-04 | Phase 1 | Pending |
+| INFRA-03 | Phase 1 | Complete |
+| INFRA-04 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 75 total

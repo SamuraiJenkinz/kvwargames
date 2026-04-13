@@ -10,7 +10,7 @@ Build a three-persona AI facilitation console for live policy tabletop exercises
 - Integer phases (1–8): Planned milestone work
 - Decimal phases (N.N): Urgent insertions via `/gsd:insert-phase`
 
-- [ ] **Phase 1: Foundation** — TypeScript interfaces, EDIP data constant, Zustand store, dev scaffolding
+- [x] **Phase 1: Foundation** — TypeScript interfaces, EDIP data constant, Zustand store, dev scaffolding
 - [ ] **Phase 2: FastAPI Backend** — Credential proxy, both LLM endpoints, static file serving
 - [ ] **Phase 3: UI Design System** — Google Stitch design, Tailwind v4 tokens, persona colours, fonts
 - [ ] **Phase 4: Setup Screen** — Home, load config, JSON validation, scenario launch (brief gen stubbed)
@@ -34,9 +34,9 @@ Build a three-persona AI facilitation console for live policy tabletop exercises
 **Plans:** 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Scaffold Vite/React/TS project, all config, Tailwind v4 tokens, TypeScript interfaces
-- [ ] 01-02-PLAN.md — EDIP canonical game config constant with validation tests
-- [ ] 01-03-PLAN.md — Zustand store with all state slices, actions, and comprehensive tests
+- [x] 01-01-PLAN.md — Scaffold Vite/React/TS project, all config, Tailwind v4 tokens, TypeScript interfaces
+- [x] 01-02-PLAN.md — EDIP canonical game config constant with validation tests
+- [x] 01-03-PLAN.md — Zustand store with all state slices, actions, and comprehensive tests
 
 ### Phase 2: FastAPI Backend
 **Goal**: The credential proxy backend is running, tested with curl, and ready for the frontend to wire against — LLM API keys never leave the server.
@@ -174,7 +174,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Planning complete | - |
+| 1. Foundation | 3/3 | ✓ Verified | 2026-04-13 |
 | 2. FastAPI Backend | 0/4 | Not started | - |
 | 3. UI Design System | 0/4 | Not started | - |
 | 4. Setup Screen | 0/4 | Not started | - |
