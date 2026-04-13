@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 1 of 8 (Foundation)
-Plan: 0 of 4 in current phase
-Status: Ready to plan
-Last activity: 2026-04-13 — Roadmap created, 75 v1 requirements mapped to 8 phases
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-04-13 — Completed 01-01-PLAN.md (scaffold + types)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 3% (1/32 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 3m 44s
+- Total execution time: ~4 minutes
 
 **By Phase:**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| — | — | — | — |
+| Phase | Plans | Completed | Avg/Plan |
+|-------|-------|-----------|----------|
+| 01-foundation | 4 | 1 | 3m 44s |
 
 **Recent Trend:**
-- Last 5 plans: —
-- Trend: —
+- Last 5 plans: 01-01 (3m 44s)
+- Trend: Establishing baseline
 
 *Updated after each plan completion*
 
@@ -47,10 +47,12 @@ Recent decisions affecting current work:
 - Roadmap: UI layout against mock data (Phase 5) before LLM wiring (Phase 6) — decouples visual development from LLM iteration
 - Roadmap: Config generation deferred to Phase 7 — its prompt-engineering risk is independent of the core game loop
 - Roadmap: SETUP-04/05 (generate-from-brief wiring) moved to Phase 7, not Phase 4 — setup screen ships with stubbed brief panel
+- 01-01: TypeScript 6 deprecated `baseUrl` — added `ignoreDeprecations:"6.0"` to tsconfig.json and tsconfig.app.json; zero behavioral change, @/ alias intact
+- 01-01: Tailwind v4 CSS-first confirmed — `@import "tailwindcss"` + `@theme` in index.css, no tailwind.config.ts
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
@@ -61,6 +63,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-13
-Stopped at: Roadmap written, STATE.md initialized, REQUIREMENTS.md traceability updated — ready to run `/gsd:plan-phase 1`
+Last session: 2026-04-13T18:48:26Z
+Stopped at: Completed 01-01-PLAN.md — scaffold + all TypeScript types committed
 Resume file: None
