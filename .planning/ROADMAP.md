@@ -31,13 +31,12 @@ Build a three-persona AI facilitation console for live policy tabletop exercises
   3. Zustand store initializes a game from the EDIP config and a scenario index — team resources, round, and message history are all in expected starting state
   4. Store resets cleanly: a second `initGame` call from a different scenario produces correct fresh state with no residue from the first
   5. `vite.config.ts` proxy routes `/api/*` to FastAPI dev server with zero CORS errors; `.env.example` documents all required environment variables
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 01-01: TypeScript interfaces and type definitions (`src/types/game.ts`, `src/types/llm.ts`)
-- [ ] 01-02: EDIP canonical game config constant (`src/data/edipConfig.ts`)
-- [ ] 01-03: Zustand store with all state slices and actions (`src/lib/gameStore.ts`)
-- [ ] 01-04: Project scaffolding — Vite/React/TypeScript/Tailwind v4 setup, Vite proxy config, `.env.example`
+- [ ] 01-01-PLAN.md — Scaffold Vite/React/TS project, all config, Tailwind v4 tokens, TypeScript interfaces
+- [ ] 01-02-PLAN.md — EDIP canonical game config constant with validation tests
+- [ ] 01-03-PLAN.md — Zustand store with all state slices, actions, and comprehensive tests
 
 ### Phase 2: FastAPI Backend
 **Goal**: The credential proxy backend is running, tested with curl, and ready for the frontend to wire against — LLM API keys never leave the server.
@@ -175,7 +174,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/4 | Not started | - |
+| 1. Foundation | 0/3 | Planning complete | - |
 | 2. FastAPI Backend | 0/4 | Not started | - |
 | 3. UI Design System | 0/4 | Not started | - |
 | 4. Setup Screen | 0/4 | Not started | - |
