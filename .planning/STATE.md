@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 2 of 8 (FastAPI Backend)
-Plan: 0 of 4 in current phase
-Status: Ready to plan
-Last activity: 2026-04-13 — Phase 1 (Foundation) complete and verified (5/5 must-haves)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-04-13 — Completed 02-01-PLAN.md (FastAPI project structure)
 
-Progress: [███░░░░░░░] 9% (3/35 plans)
+Progress: [████░░░░░░] 11% (4/35 plans)
 
 ## Performance Metrics
 
@@ -28,10 +28,11 @@ Progress: [███░░░░░░░] 9% (3/35 plans)
 | Phase | Plans | Completed | Avg/Plan |
 |-------|-------|-----------|----------|
 | 01-foundation | 4 | 3 | 3m 27s |
+| 02-fastapi-backend | 4 | 1 | 1m 30s |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3m 44s), 01-02 (3m 19s), 01-03 (3m 19s)
-- Trend: Consistent ~3m 20s throughput
+- Last 5 plans: 01-01 (3m 44s), 01-02 (3m 19s), 01-03 (3m 19s), 02-01 (1m 30s)
+- Trend: Consistent ~2-3m throughput
 
 *Updated after each plan completion*
 
@@ -52,6 +53,10 @@ Recent decisions affecting current work:
 - 01-02: Used `as const satisfies GameConfig` for EDIP_CONFIG — provides literal type narrowing (e.g. CrisisState) while enforcing interface compliance at compile time
 - 01-03: Zustand v5 double-call mock requires `originalCreate<T>()(stateCreator)` — single-call pattern fails because `actualCreate<T>()` returns a factory, not a store
 - 01-03: `vi.mock('zustand')` must be explicit in test files — Vitest does not auto-apply `__mocks__/` without `automock: true` in vite.config
+- 02-01: asynccontextmanager lifespan preferred over deprecated @app.on_event in FastAPI 0.93+
+- 02-01: RequestValidationError overridden to 400 (not 422) for consistent {error: {code, message}} shape across all endpoints
+- 02-01: llm_extra_headers parsed lazily in get_extra_headers() method — avoids pydantic validator complexity
+- 02-01: No CORS middleware — Vite proxy handles dev; production same-origin via Plan 02-04 static mount
 
 ### Pending Todos
 
@@ -67,5 +72,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-13
-Stopped at: Phase 1 (Foundation) complete and verified — ready for /gsd:plan-phase 2
+Stopped at: Completed 02-01-PLAN.md — FastAPI project structure, settings, lifespan, router stubs
 Resume file: None
