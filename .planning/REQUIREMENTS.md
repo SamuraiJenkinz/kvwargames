@@ -17,12 +17,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### LLM Proxy
 
-- [ ] **LLM-01**: FastAPI backend serves POST /api/llm endpoint that proxies requests to corporate OpenAI-compatible endpoint
-- [ ] **LLM-02**: API keys and LLM credentials are read from environment variables server-side, never sent to browser
-- [ ] **LLM-03**: LLM endpoint URL, API key, model name, max tokens, and extra headers are all configurable via .env
-- [ ] **LLM-04**: LLM proxy returns raw text response; JSON parsing happens client-side
-- [ ] **LLM-05**: LLM proxy returns meaningful error responses (status code + error text) on failure
-- [ ] **LLM-06**: FastAPI backend serves POST /api/generate-config endpoint for config generation from text brief
+- [x] **LLM-01**: FastAPI backend serves POST /api/llm endpoint that proxies requests to corporate OpenAI-compatible endpoint
+- [x] **LLM-02**: API keys and LLM credentials are read from environment variables server-side, never sent to browser
+- [x] **LLM-03**: LLM endpoint URL, API key, model name, max tokens, and extra headers are all configurable via .env
+- [x] **LLM-04**: LLM proxy returns raw text response; JSON parsing happens client-side
+- [x] **LLM-05**: LLM proxy returns meaningful error responses (status code + error text) on failure
+- [x] **LLM-06**: FastAPI backend serves POST /api/generate-config endpoint for config generation from text brief
 
 ### Prompt Engineering
 
@@ -123,7 +123,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Infrastructure
 
 - [x] **INFRA-01**: .env.example file documents all required environment variables with descriptions
-- [ ] **INFRA-02**: FastAPI serves React/Vite dist/ build as static files for single-process production deployment
+- [x] **INFRA-02**: FastAPI serves React/Vite dist/ build as static files for single-process production deployment
 - [x] **INFRA-03**: Vite dev server proxies /api/* to FastAPI for local development (no CORS issues)
 - [x] **INFRA-04**: Tailwind v4 CSS-first configuration with custom design tokens
 
@@ -177,12 +177,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 1 | Complete |
 | FOUND-05 | Phase 1 | Complete |
-| LLM-01 | Phase 2 | Pending |
-| LLM-02 | Phase 2 | Pending |
-| LLM-03 | Phase 2 | Pending |
-| LLM-04 | Phase 2 | Pending |
-| LLM-05 | Phase 2 | Pending |
-| LLM-06 | Phase 2 | Pending |
+| LLM-01 | Phase 2 | Complete |
+| LLM-02 | Phase 2 | Complete |
+| LLM-03 | Phase 2 | Complete |
+| LLM-04 | Phase 2 | Complete |
+| LLM-05 | Phase 2 | Complete |
+| LLM-06 | Phase 2 | Complete |
 | PROMPT-01 | Phase 6 | Pending |
 | PROMPT-02 | Phase 6 | Pending |
 | PROMPT-03 | Phase 6 | Pending |
@@ -244,7 +244,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CTX-02 | Phase 6 | Pending |
 | CTX-03 | Phase 6 | Pending |
 | INFRA-01 | Phase 1 | Complete |
-| INFRA-02 | Phase 2 | Pending |
+| INFRA-02 | Phase 2 | Complete |
 | INFRA-03 | Phase 1 | Complete |
 | INFRA-04 | Phase 1 | Complete |
 
