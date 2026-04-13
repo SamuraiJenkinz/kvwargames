@@ -11,7 +11,7 @@ Build a three-persona AI facilitation console for live policy tabletop exercises
 - Decimal phases (N.N): Urgent insertions via `/gsd:insert-phase`
 
 - [x] **Phase 1: Foundation** — TypeScript interfaces, EDIP data constant, Zustand store, dev scaffolding
-- [ ] **Phase 2: FastAPI Backend** — Credential proxy, both LLM endpoints, static file serving
+- [x] **Phase 2: FastAPI Backend** — Credential proxy, both LLM endpoints, static file serving
 - [ ] **Phase 3: UI Design System** — Google Stitch design, Tailwind v4 tokens, persona colours, fonts
 - [ ] **Phase 4: Setup Screen** — Home, load config, JSON validation, scenario launch (brief gen stubbed)
 - [ ] **Phase 5: Game Screen Layout** — Three-column layout, chat feed, state dashboard, reference panel (all mock data)
@@ -51,10 +51,10 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 02-01: FastAPI project structure, settings (`config.py` with pydantic-settings), main application entry point
-- [ ] 02-02: LLM proxy router (`routers/llm.py`) — `/api/llm` endpoint with httpx async client
-- [ ] 02-03: Config generation router (`routers/config_gen.py`) — `/api/generate-config` endpoint
-- [ ] 02-04: Static file serving, error handling, `.env.example` backend section, curl integration test
+- [x] 02-01: FastAPI project structure, settings (`config.py` with pydantic-settings), main application entry point
+- [x] 02-02: LLM proxy router (`routers/llm.py`) — `/api/llm` endpoint with httpx async client
+- [x] 02-03: Config generation router (`routers/config_gen.py`) — `/api/generate-config` endpoint
+- [x] 02-04: Static file serving, error handling, `.env.example` backend section, curl integration test
 
 ### Phase 3: UI Design System
 **Goal**: The design system is defined in Tailwind v4 CSS tokens and validated in a component reference — all subsequent phases build against a coherent visual language without guessing hex values or font names.
@@ -175,7 +175,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | ✓ Verified | 2026-04-13 |
-| 2. FastAPI Backend | 0/4 | Not started | - |
+| 2. FastAPI Backend | 4/4 | ✓ Verified | 2026-04-13 |
 | 3. UI Design System | 0/4 | Not started | - |
 | 4. Setup Screen | 0/4 | Not started | - |
 | 5. Game Screen Layout | 0/5 | Not started | - |
