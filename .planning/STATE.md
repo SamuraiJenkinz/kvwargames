@@ -100,6 +100,10 @@ Recent decisions affecting current work:
 - 05-03: gameConfig.name used as game title (not .title) — GameConfig interface has 'name' not 'title'; plan pseudocode was illustrative
 - 05-03: vi.stubEnv('DEV', false) pattern for production-path tests — isolates redirect invariant test from DEV seed without global env changes
 - 05-03: Three-column layout uses h-screen flex-col + min-h-0 overflow-hidden on column row — prevents page scroll, enables per-column independent scroll
+- 05-04: No cn/clsx utility in project — Array.join(' ') used for conditional class concatenation in message renderers
+- 05-04: getLoadingSpeaker is a module-level pure function (not a hook) — first PERSONA_ORDER member absent from getPersonasThisRound; defaults to 'chen'
+- 05-04: scrollIntoView not in jsdom — stubbed via beforeEach in ChatFeed.test.tsx; 05-05 moved to setup.ts globally
+- 05-04: DEBRIEF amber class assertion uses querySelectorAll + toContain — avoids fragile first-match when Finch name spans also carry text-persona-finch
 - 05-05: useGameStore(s => s.gameConfig) not s.gameConfig?.cards ?? [] as selector — unstable [] reference causes Zustand infinite rerender loop when gameConfig is null
 - 05-05: setSelectedId(null) never called inside render — call in onClick handler only; calling setState in render body triggers React's max update depth protection
 - 05-05: scrollIntoView global mock in src/test/setup.ts — jsdom doesn't implement scrollIntoView; affects any test that renders ChatFeed (useStickyBottomScroll hook)
@@ -118,6 +122,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14T11:34:44Z
+Last session: 2026-04-14T11:18:22Z (05-04); 2026-04-14T11:34:44Z (05-05)
 Stopped at: Completed 05-05-PLAN.md (ReferencePanel) — Phase 5 Wave 2 progress: 05-04 + 05-05 done (5/7 plans)
 Resume file: None
