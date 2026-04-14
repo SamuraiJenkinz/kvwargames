@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 7 (Debrief, Export & Config Generation) — COMPLETE. 07-01 debrief export foundation, 07-02 debrief UI wiring, 07-03 config generation from brief, 07-04 config validator all complete. 507/507 tests green. Phase 8 (QA, polish, ops) remaining.
+**Current focus:** Phase 7 (Debrief, Export & Config Generation) — ✓ VERIFIED. All 4 plans + verifier (4/4 must-haves, concrete code evidence) + human verification (Download Debrief live test: .md saved, structure correct; Generate from Brief 3/3 smoke test passed; validator banner gate verified by code + tests). User approved 2026-04-14. Phase 8 (QA & Credential Audit — final phase) remaining.
 
 ## Current Position
 
-Phase: 7 of 8 (Debrief, Export & Config Generation) — COMPLETE
+Phase: 7 of 8 (Debrief, Export & Config Generation) — ✓ VERIFIED
 Plan: 4 of 4 in current phase (07-01, 07-02, 07-03, 07-04 all complete)
-Status: 07-04 complete — validateGameConfig schema validator + LoadConfigPanel field-error banner + Launch button gate. 507/507 tests green. Typecheck clean. Build clean.
-Last activity: 2026-04-14 — 07-04 complete (config validator: SETUP-05 satisfied)
+Status: Phase 7 verifier PASSED 4/4 must-haves with concrete code evidence. User approved human-verification checklist 2026-04-14 after live test: Download Debrief saved `.md` file with all six required sections (H1, metadata, per-round + GFM table, Debrief, Final State, Appendix); non-canonical `crisisState: "Alert"` rendered gracefully as ALERT badge. 507/507 tests + 8/8 backend + typecheck + build all clean. Requirements DEB-01..03, SETUP-04, SETUP-05 marked Complete. Two Phase 8 follow-ups logged: (1) debrief messages appear in BOTH round transcript AND Debrief section because round-bucketing only splits on round_divider (polish — filter messages after last debrief_divider out of their round bucket); (2) DEV-mode GuardedGameScreen re-seeds mock EDIP on New Game instead of /setup navigation. Ready for Phase 8.
+Last activity: 2026-04-14 — Phase 7 verifier passed 4/4; user approved; all 22 requirements marked Complete.
 
 Progress: [█████████████░] 97% (34/35 plans)
 
@@ -214,9 +214,11 @@ None.
 - Phase 6 research flag (MEASURED 06-04, RESOLVED 06-08): Token budget for system prompt is **5124 tokens** on the EDIP config. 06-08 Task 1 reduced HISTORY_WINDOW_N 6 → 2 against gpt-4 8k assumption (total 6724 / 7500 safe ceiling). See .planning/phases/06-llm-integration/06-08-BUDGET.md. Remaining Phase 8 follow-up: confirm actual corporate context window with ops; if >8k, raise SAFE_CONTEXT_CEILING_TOKENS + HISTORY_WINDOW_N accordingly
 - Phase 6 research flag: Corporate proxy timeout (est. 30s) vs LLM generation time (25–35s) — verify actual timeout with ops team before Phase 6 completes
 - Phase 8 follow-up: DEV-mode GuardedGameScreen re-seeds mock EDIP state on New Game from /game — clicking New Game while on /game re-runs seedMockState() instead of redirecting to /setup. Workaround: navigate to / directly or use pnpm build && pnpm preview for smoke testing. Root: DEV && gameState === null guard does not distinguish initial load from intentional new-game reset.
+- Phase 8 polish: debrief export renders persona messages in BOTH the Round-N transcript AND the `## Debrief` section because message-to-round bucketing only splits on `round_divider`, not `debrief_divider`. Observed on live debrief 2026-04-14 — 0-turn end-game produced visible duplication. Fix: in `debriefExporter.ts renderRound()`, filter out messages with index > lastDebriefIdx from their round bucket. Out of scope for Phase 7 (matches spec as written); Phase 8 nice-to-have.
+- Phase 8 ops note: OpenAI API key rotated between Phase 6 smoke test and Phase 7 smoke test (appeared in chat logs both times). STATE backends should never source key from env files without a key-rotation checklist per phase smoke test.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Plan 07-04 complete (config validator + LoadConfigPanel integration)
-Stopped at: Plan 07-04 complete — configValidator.ts + tests (6448f5a); LoadConfigPanel validation banner + Launch gate + tests (aca31bb). 507/507 tests passing; typecheck clean; build clean. Phase 7 fully complete. Ready for Phase 8.
+Last session: 2026-04-14 — Phase 7 complete + verified + user-approved
+Stopped at: Phase 7 closed. Verifier passed 4/4 must-haves; user approved 2026-04-14 after live Download Debrief test (.md saved to downloads with all 6 required sections: H1, metadata, per-round + GFM table, Debrief, Final State, Appendix). Bonus finding: non-canonical `crisisState` renders gracefully as fallback badge. 507/507 tests green; 8/8 backend; typecheck + build clean. REQUIREMENTS.md: DEB-01..03, SETUP-04, SETUP-05 all Complete. Resume: Phase 8 (QA & Credential Audit) — `/gsd:discuss-phase 8` for context gathering, or `/gsd:plan-phase 8` to skip discussion. Note: Phase 8 should pick up the two follow-ups logged above (GuardedGameScreen DEV behaviour; debrief transcript/debrief duplication).
 Resume file: None
