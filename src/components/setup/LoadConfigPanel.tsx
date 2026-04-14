@@ -23,6 +23,7 @@ export default function LoadConfigPanel() {
   const configJson = useGameStore((s) => s.configJson)
   const setConfigJson = useGameStore((s) => s.setConfigJson)
   const setSetupMode = useGameStore((s) => s.setSetupMode)
+  const draftSource = useGameStore((s) => s.draftSource)
   const initGame = useGameStore((s) => s.initGame)
   const navigate = useNavigate()
 
@@ -76,12 +77,23 @@ export default function LoadConfigPanel() {
     <main className="min-h-screen bg-[var(--color-bg-base)] p-6 text-[var(--color-text-primary)]">
       {/* Header */}
       <header className="mb-4 flex items-center justify-between">
-        <button
-          onClick={() => setSetupMode('home')}
-          className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-        >
-          ← Back
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setSetupMode('home')}
+            className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+          >
+            ← Back
+          </button>
+          {draftSource === 'brief' && (
+            <button
+              type="button"
+              onClick={() => setSetupMode('brief')}
+              className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+            >
+              ← Back to Brief
+            </button>
+          )}
+        </div>
         <h1 className="text-xl font-semibold">Load Configuration</h1>
         {/* Spacer to keep heading centered */}
         <div className="w-12" />

@@ -1,6 +1,7 @@
 import { useGameStore } from '@/lib/gameStore'
 import HomeScreen from './HomeScreen'
 import LoadConfigPanel from './LoadConfigPanel'
+import GenerateBriefPanel from './GenerateBriefPanel'
 
 export default function SetupScreen() {
   const setupMode = useGameStore((s) => s.setupMode)
@@ -13,17 +14,11 @@ export default function SetupScreen() {
       return <LoadConfigPanel />
 
     case 'brief':
-      return (
-        <div className="p-8 text-text-secondary">
-          Brief generation — Phase 7
-        </div>
-      )
+      return <GenerateBriefPanel />
 
     case 'review':
-      return (
-        <div className="p-8 text-text-secondary">
-          Review — Phase 7
-        </div>
-      )
+      // 'review' is effectively redundant — the flow lands on 'load' mode after brief generation.
+      // Kept for forward compatibility but redirect to 'load' for safety.
+      return <LoadConfigPanel />
   }
 }
