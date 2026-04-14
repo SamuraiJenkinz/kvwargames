@@ -6,6 +6,24 @@ import type { GameConfig, GameState } from '@/types/game'
 import { EDIP_CONFIG } from '@/data/edipConfig'
 import FacilitatorInput from './FacilitatorInput'
 
+// Phase 6: mock the LLM pipeline so store actions (advanceRound / triggerDebrief
+// / sendFacilitatorMessage) don't try to fetch the real backend. We never await
+// the async turn in these tests — we assert the synchronous effects only.
+vi.mock('@/lib/llmClient', () => ({
+  LLM_FRONTEND_TIMEOUT_MS: 45000,
+  callLLMProxy: vi.fn(() => new Promise(() => {})), // pending forever
+}))
+vi.mock('@/lib/responseParser', () => ({
+  parsePersonaResponse: vi.fn(() => ({ ok: true, value: { responses: [] } })),
+}))
+vi.mock('@/lib/promptBuilder', () => ({
+  buildSystemPrompt: vi.fn(() => 'SYS'),
+}))
+vi.mock('@/lib/contextWindow', () => ({
+  HISTORY_WINDOW_N: 6,
+  windowHistory: vi.fn((h) => h),
+}))
+
 vi.mock('zustand')
 
 // Seed gameState with round=2 (Advance button label should say "Advance to Round 3")
@@ -53,14 +71,23 @@ describe('FacilitatorInput', () => {
     expect(screen.getByRole('button', { name: /advance to round 3/i })).toBeInTheDocument()
   })
 
-  it('shows "Trigger Debrief" button', () => {
+  it('shows "Request Debrief Now" button (LAYOUT-04)', () => {
     render(<FacilitatorInput />)
-    expect(screen.getByRole('button', { name: /trigger debrief/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /request debrief now/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('shows "End Game + Debrief" button', () => {
+    render(<FacilitatorInput />)
+    expect(
+      screen.getByRole('button', { name: /end game \+ debrief/i }),
+    ).toBeInTheDocument()
   })
 
   // ─── advanceRound action ─────────────────────────────────────────────────────
 
-  it('clicking Advance button increments round, adds 2 messages, and updates button label', async () => {
+  it('clicking Advance button increments round, inserts round_divider, sets loading, updates label', async () => {
     const user = userEvent.setup()
     render(<FacilitatorInput />)
 
@@ -69,25 +96,28 @@ describe('FacilitatorInput', () => {
 
     // Round incremented
     expect(useGameStore.getState().gameState?.round).toBe(3)
-    // Two messages added: round_divider + stub kent
-    expect(useGameStore.getState().messages).toHaveLength(2)
-    // Button label updated to Round 4
-    expect(screen.getByRole('button', { name: /advance to round 4/i })).toBeInTheDocument()
+    // Exactly one round_divider synchronously; persona messages arrive later via LLM turn.
+    const msgs = useGameStore.getState().messages
+    const dividers = msgs.filter((m) => m.type === 'round_divider')
+    expect(dividers).toHaveLength(1)
+    expect(dividers[0].label).toBe('Round 3')
+    // loading=true while LLM turn is pending (fetch is mocked as never-resolving).
+    expect(useGameStore.getState().loading).toBe(true)
   })
 
   // ─── triggerDebrief action ───────────────────────────────────────────────────
 
-  it('clicking Trigger Debrief adds 2 messages: debrief_divider + facilitator stub', async () => {
+  it('clicking Request Debrief Now inserts debrief_divider and fires LLM turn', async () => {
     const user = userEvent.setup()
     render(<FacilitatorInput />)
 
-    await user.click(screen.getByRole('button', { name: /trigger debrief/i }))
+    await user.click(screen.getByRole('button', { name: /request debrief now/i }))
 
     const messages = useGameStore.getState().messages
-    expect(messages).toHaveLength(2)
     const divider = messages.find((m) => m.type === 'debrief_divider')
     expect(divider).toBeDefined()
     expect(divider?.label).toBe('DEBRIEF')
+    expect(useGameStore.getState().loading).toBe(true)
   })
 
   // ─── Enter submits ───────────────────────────────────────────────────────────
@@ -165,13 +195,14 @@ describe('FacilitatorInput', () => {
     expect(screen.getByRole('textbox')).toBeDisabled()
   })
 
-  it('when loading=true, Advance and Trigger Debrief buttons are disabled', () => {
+  it('when loading=true, Advance and debrief buttons are disabled', () => {
     act(() => {
       useGameStore.setState({ loading: true })
     })
     render(<FacilitatorInput />)
     expect(screen.getByRole('button', { name: /advance to round/i })).toBeDisabled()
-    expect(screen.getByRole('button', { name: /trigger debrief/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /request debrief now/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /end game \+ debrief/i })).toBeDisabled()
   })
 
   it('when loading=true, Send button is disabled', () => {
@@ -180,6 +211,37 @@ describe('FacilitatorInput', () => {
     })
     render(<FacilitatorInput />)
     expect(screen.getByRole('button', { name: /send/i })).toBeDisabled()
+  })
+
+  // ─── ControlBanner mount ─────────────────────────────────────────────────────
+
+  it('mounts ControlBanner — renders nothing when pendingControlBanner is null', () => {
+    render(<FacilitatorInput />)
+    expect(screen.queryByTestId('control-banner')).not.toBeInTheDocument()
+  })
+
+  it('mounts ControlBanner — renders advance-round banner when pendingControlBanner is set', () => {
+    act(() => {
+      useGameStore.setState({
+        pendingControlBanner: { kind: 'advanceRound', targetRound: 3 },
+      })
+    })
+    render(<FacilitatorInput />)
+    const banner = screen.getByTestId('control-banner')
+    expect(banner).toBeInTheDocument()
+    expect(banner.getAttribute('data-kind')).toBe('advanceRound')
+    expect(screen.getByText(/advance to round 3\?/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^advance$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /dismiss/i })).toBeInTheDocument()
+  })
+
+  it('mounts ControlBanner — renders debrief banner when pendingControlBanner.kind is triggerDebrief', () => {
+    act(() => {
+      useGameStore.setState({ pendingControlBanner: { kind: 'triggerDebrief' } })
+    })
+    render(<FacilitatorInput />)
+    expect(screen.getByText(/enter debrief\?/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /enter debrief/i })).toBeInTheDocument()
   })
 
   // ─── Quick-insert select ─────────────────────────────────────────────────────
