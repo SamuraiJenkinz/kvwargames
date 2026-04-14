@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 8 (QA & Credential Audit — final phase) — in progress. Plan 08-01 complete (stateUpdater boundary coverage). Remaining: 08-02 live run, 08-03 credential audit, 08-04 error-injection tests, 08-05 debrief duplication fix.
+**Current focus:** Phase 8 (QA & Credential Audit — final phase) — in progress. Plans 08-01 (stateUpdater boundary coverage), 08-04 (backend error-injection tests), and 08-05 (debrief bucketing fix + multi-trigger static prompt coverage) complete. Remaining: 08-02 live run, 08-03 credential audit.
 
 ## Current Position
 
 Phase: 8 of 8 (QA & Credential Audit) — in progress
-Plan: 1 of 5 complete in current phase (08-01 done; 08-02..08-05 pending)
-Status: Plan 08-01 complete. Added 3 describe blocks / 6 it blocks to src/lib/stateUpdater.test.ts closing the Phase 8 success-criterion-#4 coverage gap (crisisSeverity 0/5/6, edipLegitimacy -2/+2/+3, team-field null/undefined no-op). Test count 507 → 513. `pnpm typecheck` clean. Additions-only — no production code changes. One deviation: used `teamUpdates` (correct StateUpdate key) instead of plan's pseudocode `teams` so the null/undefined no-op test actually exercises applyTeamUpdate's short-circuit branch. Ready for Plan 08-02 (live run).
-Last activity: 2026-04-14 — Plan 08-01 complete; commit 7e2428f.
+Plan: 3 of 5 complete in current phase (08-01, 08-04, 08-05 done; 08-02, 08-03 pending)
+Status: Plan 08-05 complete. `debriefExporter.ts` bucketing loop now halts at `lastDebriefIdx` via an index-based for + `break` (STATE.md line 217 duplication bug RESOLVED). Regression guard added to debriefExporter.test.ts Group 3 that would have caught the original bug. Block-8 routing-rule text-presence test added to promptBuilder.test.ts asserting multi-trigger keywords (Round start, Card play, National action, Dispute, Threshold warning, Debrief) + fixed Kent → Finch → Chen order + 1-3 personas cap — static-side half of Phase 8 success criterion #5 (behavioural half deferred to 08-02-LIVE-RUN.md). 515/515 frontend tests + typecheck + build all clean. 3 atomic commits (17ff1a0, 8aaf7dd, 949d135).
+Last activity: 2026-04-14 — Plan 08-05 complete; commits 17ff1a0, 8aaf7dd, 949d135.
 
-Progress: [████████████░░] 90% (35/39 plans) — Phase 8 has 5 plans total (08-01 done; 08-02..08-05 pending)
+Progress: [█████████████░] 95% (37/39 plans) — Phase 8 has 5 plans total (08-01, 08-04, 08-05 done; 08-02, 08-03 pending)
 
 ## Performance Metrics
 
@@ -206,6 +206,12 @@ Recent decisions affecting current work:
 - 08-01: Plan pseudocode `update = { teams: [{ id: 'A', pc: null }] }` corrected to `{ teamUpdates: [...] }` in Block 3 — StateUpdate interface has no `teams` key; literal pseudocode shape would be a vacuous no-op test. Correction exercises applyTeamUpdate's `if (value == null) continue` branch which is the actual production path being asserted. Plan decisions #1–#4 (file location, naming style, clampLog assertion shape, no-production-code-changes) all preserved.
 - 08-01: Additions-only confirmed — new Phase 8 boundary coverage section appended at EOF of stateUpdater.test.ts; zero edits to existing describe blocks. Test count 28 → 34 (stateUpdater), 507 → 513 (full frontend suite). All 513 pass. Typecheck clean.
 - 08-01: `describe('applyStateUpdatePure — team-field null/undefined no-op', …)` closes the success-criterion-#4 gap for team-scoped null/undefined — existing top-level tests at lines 109/118 covered the top-level path only.
+- 08-05: debriefExporter bucketing bug fix — `lastDebriefIdx` reduce() moved from ~line 228 to ~line 202 (before the round-bucketing loop); loop rewritten from `for..of` to index-based `for (let i = 0; ...)` with `if (lastDebriefIdx !== -1 && i >= lastDebriefIdx) break`. `!== -1` sentinel preserves no-debrief-session behaviour unchanged.
+- 08-05: Bucketing halt shape chosen is "index-based for + break" (not "filter-before-bucket") — preserves the existing forward-scan `currentRound` state machine with minimal diff and zero allocation overhead.
+- 08-05: Regression test `regression: post-debrief persona message does NOT appear in any Round transcript section` added to debriefExporter.test.ts Group 3 — slices markdown at `## Debrief` header, asserts absence in before-half + presence in from-half. Would fail against pre-fix code.
+- 08-05: Block-8 routing-rule presence test added to promptBuilder.test.ts — asserts verbatim substrings (Round start, Card play, National action, Dispute, Threshold warning, Debrief, Kent → Finch → Chen, 1-3 personas cap). Isolates Block 8 via `indexOf('## 8. Routing Rules')` + `indexOf('## 9. JSON Output Schema')` slice. Read buildBlock8() before writing assertions to avoid string drift.
+- 08-05: Behavioural multi-trigger assertion (single facilitator message → 2-3 distinct personas, no duplicates, additive state updates) explicitly deferred to 08-02-LIVE-RUN.md. Test file comment cross-references 08-02.
+- 08-05: Group 3b multi-divider Pitfall 4 verified (no new test) — `lastDebriefIdx = 4`; INTERIM_DEBRIEF_MSG (idx 1) and R2_PLAY_MSG (idx 3) correctly remain bucketed in their rounds; FINAL_DEBRIEF_MSG (idx 5) correctly in `## Debrief` only.
 
 ### Pending Todos
 
@@ -217,11 +223,11 @@ None.
 - Phase 6 research flag (MEASURED 06-04, RESOLVED 06-08): Token budget for system prompt is **5124 tokens** on the EDIP config. 06-08 Task 1 reduced HISTORY_WINDOW_N 6 → 2 against gpt-4 8k assumption (total 6724 / 7500 safe ceiling). See .planning/phases/06-llm-integration/06-08-BUDGET.md. Remaining Phase 8 follow-up: confirm actual corporate context window with ops; if >8k, raise SAFE_CONTEXT_CEILING_TOKENS + HISTORY_WINDOW_N accordingly
 - Phase 6 research flag: Corporate proxy timeout (est. 30s) vs LLM generation time (25–35s) — verify actual timeout with ops team before Phase 6 completes
 - Phase 8 follow-up: DEV-mode GuardedGameScreen re-seeds mock EDIP state on New Game from /game — clicking New Game while on /game re-runs seedMockState() instead of redirecting to /setup. Workaround: navigate to / directly or use pnpm build && pnpm preview for smoke testing. Root: DEV && gameState === null guard does not distinguish initial load from intentional new-game reset.
-- Phase 8 polish: debrief export renders persona messages in BOTH the Round-N transcript AND the `## Debrief` section because message-to-round bucketing only splits on `round_divider`, not `debrief_divider`. Observed on live debrief 2026-04-14 — 0-turn end-game produced visible duplication. Fix: in `debriefExporter.ts renderRound()`, filter out messages with index > lastDebriefIdx from their round bucket. Out of scope for Phase 7 (matches spec as written); Phase 8 nice-to-have.
+- ~~Phase 8 polish: debrief export renders persona messages in BOTH the Round-N transcript AND the `## Debrief` section~~ — **RESOLVED 08-05** (2026-04-14). debriefExporter.ts bucketing loop now halts at lastDebriefIdx; regression guard in place.
 - Phase 8 ops note: OpenAI API key rotated between Phase 6 smoke test and Phase 7 smoke test (appeared in chat logs both times). STATE backends should never source key from env files without a key-rotation checklist per phase smoke test.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Plan 08-01 complete
-Stopped at: Plan 08-01 closed. Added Phase 8 boundary coverage section (3 describe blocks / 6 it blocks) at EOF of src/lib/stateUpdater.test.ts — crisisSeverity 0/5/6, edipLegitimacy -2/+2/+3, team-field null/undefined no-op. All 513 frontend tests pass; typecheck clean; additions-only. Commit 7e2428f. Phase 8 success criterion #4 now satisfied by direct, grep-able evidence. Resume: Plan 08-02 (live-run artifact capture for Scenario 2 at 5 rounds against real corporate LLM).
+Last session: 2026-04-14 — Plan 08-05 complete
+Stopped at: Plan 08-05 closed. debriefExporter.ts bucketing loop halts at lastDebriefIdx (fix 17ff1a0); regression test added to debriefExporter.test.ts Group 3 (test 8aaf7dd); block-8 multi-trigger routing-rule text-presence test added to promptBuilder.test.ts (test 949d135). STATE.md line 217 follow-up RESOLVED. Phase 8 success criterion #5 static-side coverage complete; behavioural half deferred to 08-02-LIVE-RUN.md. 515/515 frontend tests + typecheck + build all clean. Three of five Phase 8 plans complete (08-01, 08-04, 08-05). Resume: Plan 08-02 (live-run artifact capture for Scenario 2 at 5 rounds against real corporate LLM — behavioural multi-trigger assertion is a deliverable here) or Plan 08-03 (credential audit).
 Resume file: None
