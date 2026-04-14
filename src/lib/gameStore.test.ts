@@ -17,10 +17,15 @@ import { HISTORY_WINDOW_N } from '@/lib/contextWindow'
 
 vi.mock('@/lib/promptBuilder', () => ({
   buildSystemPrompt: vi.fn(() => 'SYSTEM PROMPT'),
+  // Plan 06-08: promptBudget.reportPromptBudget() (wired into initGame in DEV)
+  // calls measurePromptTokens — mock must export it.
+  measurePromptTokens: vi.fn(() => 100),
 }))
 
 vi.mock('@/lib/contextWindow', () => ({
-  HISTORY_WINDOW_N: 6,
+  // Post-06-08: N reduced to 2 (see contextWindow.ts). Mirror the real value
+  // so 2*N+1 slicing semantics in runLLMTurn are exercised faithfully.
+  HISTORY_WINDOW_N: 2,
   windowHistory: vi.fn((h) => h),
 }))
 
@@ -848,12 +853,12 @@ describe('gameStore', () => {
     })
   })
 
-  // ─── llmHistory invariant: ≤ 2N+1 = 13 entries ──────────────────────────────
+  // ─── llmHistory invariant: ≤ 2N+1 entries (N=2 post-06-08, so 5) ────────────
 
   describe('llmHistory length invariant', () => {
-    it('after 10 consecutive successful turns, llmHistory.length stays ≤ 2*HISTORY_WINDOW_N+1 = 13', async () => {
+    it('after 10 consecutive successful turns, llmHistory.length stays ≤ 2*HISTORY_WINDOW_N+1', async () => {
       initS1()
-      const MAX = 2 * HISTORY_WINDOW_N + 1 // 13 when N=6
+      const MAX = 2 * HISTORY_WINDOW_N + 1 // 5 at N=2 (post-06-08); was 13 at N=6
 
       for (let i = 0; i < 10; i++) {
         getState().sendFacilitatorMessage(`turn ${i}`)
@@ -861,7 +866,7 @@ describe('gameStore', () => {
         expect(getState().llmHistory.length).toBeLessThanOrEqual(MAX)
       }
 
-      // After 10 turns (20 entries appended raw), length should stabilise at exactly 13.
+      // After 10 turns (20 entries appended raw), length should stabilise at exactly MAX.
       expect(getState().llmHistory.length).toBe(MAX)
     })
   })

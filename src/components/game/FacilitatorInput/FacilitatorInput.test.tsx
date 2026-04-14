@@ -18,9 +18,13 @@ vi.mock('@/lib/responseParser', () => ({
 }))
 vi.mock('@/lib/promptBuilder', () => ({
   buildSystemPrompt: vi.fn(() => 'SYS'),
+  // Plan 06-08: promptBudget.reportPromptBudget() (wired into initGame in DEV)
+  // calls measurePromptTokens — mock must export it.
+  measurePromptTokens: vi.fn(() => 100),
 }))
 vi.mock('@/lib/contextWindow', () => ({
-  HISTORY_WINDOW_N: 6,
+  // Post-06-08: N reduced from 6 → 2 (see contextWindow.ts).
+  HISTORY_WINDOW_N: 2,
   windowHistory: vi.fn((h) => h),
 }))
 
