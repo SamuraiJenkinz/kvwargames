@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 7 (Debrief, Export & Config Generation) — In progress. 07-01 debrief export foundation complete. 07-03 config generation from brief complete (smoke test 3/3 briefs passed). 07-02 (debrief button wiring) and 07-04 (config validator) remain.
+**Current focus:** Phase 7 (Debrief, Export & Config Generation) — In progress. 07-01 debrief export foundation complete. 07-02 debrief UI wiring complete (endGame + Download Debrief button). 07-03 config generation from brief complete (smoke test 3/3 briefs passed). 07-04 (config validator) remains.
 
 ## Current Position
 
 Phase: 7 of 8 (Debrief, Export & Config Generation) — In progress
-Plan: 3 of 4 in current phase (07-01 and 07-03 complete; 07-02 and 07-04 remaining)
-Status: 07-03 complete — CONFIG_GEN rewrite + json_object mode, draftSource store plumbing, GenerateBriefPanel full implementation, 3/3 smoke test briefs passed. 458/458 tests green. Typecheck clean. Build clean.
-Last activity: 2026-04-14 — 07-03 complete (backend prompt rewrite + GenerateBriefPanel + smoke test approved)
+Plan: 4 of 4 in current phase (07-01, 07-02, 07-03 complete; 07-04 remaining)
+Status: 07-02 complete — endGame() action, Download Debrief button, four gameEnded-gated UI primitives. 475/475 tests green. Typecheck clean. Build clean.
+Last activity: 2026-04-14 — 07-02 complete (debrief UI wiring: endGame + Download Debrief button)
 
-Progress: [█████████████░] 91% (32/35 plans)
+Progress: [█████████████░] 94% (33/35 plans)
 
 ## Performance Metrics
 
@@ -193,6 +193,11 @@ Recent decisions affecting current work:
 - 07-03: System prompt uses condensed EDIP single-scenario/single-team exemplar (not full 194-line config). Literal 'JSON' in both prompt header and RULES section (OpenAI json_object requirement).
 - 07-03: Post-success triple store write order: setConfigJson → setDraftSource('brief') → setSetupMode('load') — panel unmounts naturally on mode switch.
 - 07-03: PARSE_FAILURE handled frontend-side — if JSON.parse(data.text) throws, inline error shown, raw logged to console.error, brief preserved. Schema validation deferred to 07-04.
+- 07-02: endGame() cannot delegate to triggerDebrief() — triggerDebrief's gameEnded guard rejects the call after endGame flips the flag. Inline-duplicate the divider-push + runLLMTurn sequence; comment documents the constraint.
+- 07-02: handleDownload uses useGameStore.getState() in onClick — reads store once per click, avoids subscription overhead and stale-snapshot risk.
+- 07-02: All four gated UI primitives confirmed: Send (disabled={disabled||gameEnded||value.trim()===''} in MessageInput), Advance to Round (disabled={disabled||gameEnded}), Request Debrief Now (disabled={loading||gameEnded}), End Game + Debrief (disabled={loading||gameEnded}).
+- 07-02: Pre-existing 07-01 tests that called advanceRound() after setGameEnded(true) fixed by reordering — advanceRound correctly bails on gameEnded now.
+- 07-02: Download button conditionally rendered (not just disabled) — avoids flash of disabled→enabled state when first debrief_divider appears.
 
 ### Pending Todos
 
@@ -207,6 +212,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Plan 07-03 complete (config generation from brief — smoke test 3/3 briefs passed)
-Stopped at: Plan 07-03 complete — Backend CONFIG_GEN rewrite + json_object mode (3ad65e3); store draftSource + setDraftSource (64a106c); GenerateBriefPanel + HomeScreen enable + SetupScreen wire + LoadConfigPanel back-nav (13dabd4). Smoke test: 3/3 briefs passed (cyber grid, EU energy, pandemic). 458/458 tests passing; typecheck clean; build clean. Ready for 07-02 (debrief button wiring) and 07-04 (config validator).
+Last session: 2026-04-14 — Plan 07-02 complete (debrief UI wiring)
+Stopped at: Plan 07-02 complete — endGame() store action + gameEnded gating (71ed279); Download Debrief button + UI wiring (11a2a78). 475/475 tests passing; typecheck clean; build clean. Ready for 07-04 (config validator).
 Resume file: None
