@@ -1,8 +1,6 @@
 import { useGameStore } from '@/lib/gameStore'
 import HomeScreen from './HomeScreen'
-
-// TODO(04-03): replace placeholder with real LoadConfigPanel import
-// import LoadConfigPanel from './LoadConfigPanel'
+import LoadConfigPanel from './LoadConfigPanel'
 
 export default function SetupScreen() {
   const setupMode = useGameStore((s) => s.setupMode)
@@ -12,12 +10,7 @@ export default function SetupScreen() {
       return <HomeScreen />
 
     case 'load':
-      // TODO(04-03): replace with <LoadConfigPanel />
-      return (
-        <div className="p-8 text-text-secondary">
-          Load Config Panel — arriving in plan 04-03
-        </div>
-      )
+      return <LoadConfigPanel />
 
     case 'brief':
       return (
