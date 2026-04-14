@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 5 (Game Screen Layout) — Plan 2 of 7 complete
+**Current focus:** Phase 5 (Game Screen Layout) — Wave 1 complete (05-01, 05-02, 05-03)
 
 ## Current Position
 
 Phase: 5 of 8 (Game Screen Layout)
-Plan: 2 of 7 in current phase
-Status: In progress — 05-02 complete; ready for 05-03
-Last activity: 2026-04-14 — Completed 05-02-PLAN.md (Store Stubs + Utility Modules)
+Plan: 3 of 7 in current phase
+Status: In progress — 05-03 complete; Wave 1 complete; ready for Wave 2 (05-04 ChatFeed)
+Last activity: 2026-04-14 — Completed 05-03-PLAN.md (Game Screen Shell)
 
-Progress: [██████░░░░] 49% (17/35 plans)
+Progress: [██████░░░░] 51% (18/35 plans)
 
 ## Performance Metrics
 
@@ -97,6 +97,9 @@ Recent decisions affecting current work:
 - 05-02: PERSONA_META bubbleClass pre-baked as literal Tailwind strings (not template-literal generation) — Tailwind v4 purges non-literal class references
 - 05-02: advanceRound captures newRound before calling get().addMessages — avoids reading from immer draft after set() completes
 - 05-02: sendFacilitatorMessage does NOT trigger LLM call — Phase 6 replaces this stub; signature is the stable Phase 6 entry point
+- 05-03: gameConfig.name used as game title (not .title) — GameConfig interface has 'name' not 'title'; plan pseudocode was illustrative
+- 05-03: vi.stubEnv('DEV', false) pattern for production-path tests — isolates redirect invariant test from DEV seed without global env changes
+- 05-03: Three-column layout uses h-screen flex-col + min-h-0 overflow-hidden on column row — prevents page scroll, enables per-column independent scroll
 
 ### Pending Todos
 
@@ -111,6 +114,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14
-Stopped at: Completed 05-02-PLAN.md (Store Stubs + Utility Modules) — Phase 5 in progress (2/7 plans)
+Last session: 2026-04-14T11:10:50Z
+Stopped at: Completed 05-03-PLAN.md (Game Screen Shell) — Phase 5 Wave 1 complete (3/7 plans)
 Resume file: None
