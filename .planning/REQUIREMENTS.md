@@ -49,12 +49,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Setup Screen
 
-- [ ] **SETUP-01**: Home screen offers two paths: "Load Config / EDIP Default" and "Generate from Brief"
-- [ ] **SETUP-02**: Load panel shows editable JSON textarea pre-loaded with EDIP config
-- [ ] **SETUP-03**: Valid JSON shows parsed summary with "Launch Scenario N" buttons for each scenario
+- [x] **SETUP-01**: Home screen offers two paths: "Load Config / EDIP Default" and "Generate from Brief"
+- [x] **SETUP-02**: Load panel shows editable JSON textarea pre-loaded with EDIP config
+- [x] **SETUP-03**: Valid JSON shows parsed summary with "Launch Scenario N" buttons for each scenario
 - [ ] **SETUP-04**: Brief panel accepts free-text description and calls /api/generate-config to produce JSON config
 - [ ] **SETUP-05**: Generated config goes to review mode (same as load panel, pre-populated)
-- [ ] **SETUP-06**: Invalid JSON shows clear validation error
+- [x] **SETUP-06**: Invalid JSON shows clear validation error
 
 ### Game Layout
 
@@ -197,12 +197,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RESP-03 | Phase 6 | Pending |
 | RESP-04 | Phase 6 | Pending |
 | RESP-05 | Phase 6 | Pending |
-| SETUP-01 | Phase 4 | Pending |
-| SETUP-02 | Phase 4 | Pending |
-| SETUP-03 | Phase 4 | Pending |
+| SETUP-01 | Phase 4 | Complete |
+| SETUP-02 | Phase 4 | Complete |
+| SETUP-03 | Phase 4 | Complete |
 | SETUP-04 | Phase 7 | Pending |
 | SETUP-05 | Phase 7 | Pending |
-| SETUP-06 | Phase 4 | Pending |
+| SETUP-06 | Phase 4 | Complete |
 | LAYOUT-01 | Phase 5 | Pending |
 | LAYOUT-02 | Phase 5 | Pending |
 | LAYOUT-03 | Phase 5 | Pending |
