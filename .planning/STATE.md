@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 6 (LLM Integration) — types seeding complete, downstream wiring plans queued
+**Current focus:** Phase 6 (LLM Integration) — backend Azure auth unblocked, types seeded, downstream wiring plans queued
 
 ## Current Position
 
 Phase: 6 of 8 (LLM Integration)
-Plan: 2 of 9 in current phase
-Status: In progress — plan 06-02 complete (additive type extensions for downstream Phase 6 plans)
-Last activity: 2026-04-14 — Completed 06-02-types-extension-PLAN.md; pnpm typecheck + 212/212 tests pass
+Plan: 2 of 9 in current phase (06-01 + 06-02 both complete)
+Status: In progress — 06-01 (backend configurable auth header) + 06-02 (type extensions) complete
+Last activity: 2026-04-14 — Completed 06-01-backend-azure-auth-fix-PLAN.md; pytest 2/2 passing, default auth behaviour byte-identical to previous hardcoded path
 
-Progress: [████████░░] 66% (23/35 plans)
+Progress: [█████████░] 69% (24/35 plans)
 
 ## Performance Metrics
 
@@ -114,6 +114,12 @@ Recent decisions affecting current work:
 - 05-07: @testing-library/user-event installed via pnpm (npm fails on workspace: protocol) — required for keyboard interaction tests (Shift+Enter newline)
 - 05-07: insertRef bridge pattern — useRef stores insert-at-cursor closure from MessageInput; parent passes it to ActionToolbar via handleInsert; avoids lifting textarea value state
 - 05-07: registerInsert prop uses useEffect with [registerInsert] dependency — closure captured once on mount; stable reference from parent inline function
+- 06-01: LLM auth header configurable via `LLM_AUTH_HEADER_NAME` + `LLM_AUTH_VALUE_PREFIX` env vars — default `Authorization` + `Bearer ` (trailing space intentional) preserves OpenAI behaviour byte-identically; Azure flip is `api-key` + empty prefix
+- 06-01: Trailing-space Bearer default + `.strip()` produces a single branchless code path for both auth styles — `f"{prefix}{key}".strip()` yields `"Bearer <key>"` when prefix is `"Bearer "` and `"<key>"` when prefix is `""`
+- 06-01: `LLM_API_VERSION` query-string injection NOT added this plan — Research flagged, but deferred; operators embed `?api-version=...` directly in `LLM_ENDPOINT_URL` for now
+- 06-01: Backend test harness uses `httpx.MockTransport` (built-in) not `respx`/`pytest-httpx` — zero new deps; pattern: `with TestClient(app)` swap `app.state.http_client` inside block, restore before exit so lifespan shutdown closes cleanly
+- 06-01: `backend/tests/conftest.py` provides `env_base` fixture + autouse `get_settings.cache_clear()` — template for all future backend tests; pydantic-settings lru_cache would otherwise leak env state between tests
+- 06-01: `backend/.env.example` created (did not exist previously) — documents every backend env var with commented Azure OpenAI example block; ops can flip without reading code
 - 06-02: HistoryEntry defined in src/types/llm.ts (not contextWindow.ts) — sibling modules 06-05 and 06-06 both import from shared types module, breaking would-be type-level dependency between them
 - 06-02: All new ChatMessage fields (rawResponse, errorCode, retryInput, revealDelay) are optional — Phase 5 callers satisfy the interface unchanged; only Phase 6 producers set the new fields
 - 06-02: ParseResult and LLMCallResult use discriminated { ok: true | false } unions rather than throwing — consumers pattern-match without try/catch and error metadata rides the value channel
@@ -133,6 +139,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Completed Phase 6 plan 06-02 (types extension)
-Stopped at: 06-02 types seeded; downstream plans (06-03 through 06-09) can now import ParseResult, LLMCallResult, HistoryEntry and use new ChatMessage error metadata fields
+Last session: 2026-04-14 — Completed Phase 6 plan 06-01 (backend Azure auth fix)
+Stopped at: 06-01 + 06-02 both done; backend proxy can target Azure OpenAI via env vars, Phase 6 types seeded. Next: 06-03 (state updater) or 06-04 (prompt builder).
 Resume file: None
