@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 4 complete — ready for Phase 5 (Game Screen Layout)
+**Current focus:** Phase 5 (Game Screen Layout) — Plan 1 of 7 complete
 
 ## Current Position
 
-Phase: 4 of 8 (Setup Screen) — ✓ VERIFIED
-Plan: 4 of 4 in current phase
-Status: Phase goal verified, 5/5 must-haves met; ready for Phase 5
-Last activity: 2026-04-14 — Phase 4 verifier passed 5/5; SETUP-01..03+06 marked Complete in REQUIREMENTS.md
+Phase: 5 of 8 (Game Screen Layout)
+Plan: 1 of 7 in current phase
+Status: In progress — 05-01 complete; ready for 05-02
+Last activity: 2026-04-14 — Completed 05-01-PLAN.md (Mock Game State)
 
-Progress: [█████░░░░░] 43% (15/35 plans)
+Progress: [█████░░░░░] 46% (16/35 plans)
 
 ## Performance Metrics
 
@@ -90,6 +90,9 @@ Recent decisions affecting current work:
 - 04-04: useRef (not useState) for lastValidScenarioCount — preserves button count across invalid states without extra re-renders; purely display value
 - 04-04: AppRoutes split from App.tsx (option a) — exported named component with no Router wrapper; enables MemoryRouter in tests without BrowserRouter conflict; App delegates to AppRoutes
 - 04-04: Launch buttons are disabled-not-hidden on invalid JSON — CONTEXT.md locked decision corrected from 04-03's hide-on-invalid starting point
+- 05-01: DEV guard excluded from seedMockState() — gate lives at call site (GuardedGameScreen in 05-03) for testability; seeder is unconditional
+- 05-01: EDIP_CONFIG cast as GameConfig in seeder — required because 'as const satisfies GameConfig' gives narrower literal type incompatible with setGameConfig parameter
+- 05-01: No chen message after Round 2 round_divider in MOCK_MESSAGES — intentional; exercises 2-lit/1-dim persona indicator dot state
 
 ### Pending Todos
 
@@ -105,5 +108,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-14
-Stopped at: Completed 04-04-PLAN.md (Validation Polish) — Phase 4 complete (4/4 plans), ready for Phase 5
+Stopped at: Completed 05-01-PLAN.md (Mock Game State) — Phase 5 in progress (1/7 plans)
 Resume file: None
