@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 7 (Debrief, Export & Config Generation) — In progress. 07-01 debrief export foundation complete. 07-02 debrief UI wiring complete (endGame + Download Debrief button). 07-03 config generation from brief complete (smoke test 3/3 briefs passed). 07-04 (config validator) remains.
+**Current focus:** Phase 7 (Debrief, Export & Config Generation) — COMPLETE. 07-01 debrief export foundation, 07-02 debrief UI wiring, 07-03 config generation from brief, 07-04 config validator all complete. 507/507 tests green. Phase 8 (QA, polish, ops) remaining.
 
 ## Current Position
 
-Phase: 7 of 8 (Debrief, Export & Config Generation) — In progress
-Plan: 4 of 4 in current phase (07-01, 07-02, 07-03 complete; 07-04 remaining)
-Status: 07-02 complete — endGame() action, Download Debrief button, four gameEnded-gated UI primitives. 475/475 tests green. Typecheck clean. Build clean.
-Last activity: 2026-04-14 — 07-02 complete (debrief UI wiring: endGame + Download Debrief button)
+Phase: 7 of 8 (Debrief, Export & Config Generation) — COMPLETE
+Plan: 4 of 4 in current phase (07-01, 07-02, 07-03, 07-04 all complete)
+Status: 07-04 complete — validateGameConfig schema validator + LoadConfigPanel field-error banner + Launch button gate. 507/507 tests green. Typecheck clean. Build clean.
+Last activity: 2026-04-14 — 07-04 complete (config validator: SETUP-05 satisfied)
 
-Progress: [█████████████░] 94% (33/35 plans)
+Progress: [█████████████░] 97% (34/35 plans)
 
 ## Performance Metrics
 
@@ -193,6 +193,11 @@ Recent decisions affecting current work:
 - 07-03: System prompt uses condensed EDIP single-scenario/single-team exemplar (not full 194-line config). Literal 'JSON' in both prompt header and RULES section (OpenAI json_object requirement).
 - 07-03: Post-success triple store write order: setConfigJson → setDraftSource('brief') → setSetupMode('load') — panel unmounts naturally on mode switch.
 - 07-03: PARSE_FAILURE handled frontend-side — if JSON.parse(data.text) throws, inline error shown, raw logged to console.error, brief preserved. Schema validation deferred to 07-04.
+- 07-04: validateGameConfig is hand-rolled, zero new deps — matches parseConfigJson discriminated-union pattern in jsonValidation.ts. v1 scope: type-only check for team numerics (pc/po/readiness); range validation deferred to Phase 8.
+- 07-04: crisisState enum NOT validated — LLM briefs emit non-canonical strings that render as fallback badges; lenient by design, tighten in Phase 8 if needed.
+- 07-04: Field-error banner shown ONLY when draftSource === 'brief' — regular Load path (user-pasted JSON) keeps existing parse-error-only behaviour. Banner copy: "Structure OK but N fields need attention".
+- 07-04: launchDisabled = !parseResult.ok || validationErrors.length > 0 — two-layer gate. isValid variable removed (dead code after gate refactor).
+- 07-04: validateGameConfig chained inside the existing 300ms debounce in LoadConfigPanel — no second setTimeout created. On parse failure, validationErrors cleared (parse error takes precedence).
 - 07-02: endGame() cannot delegate to triggerDebrief() — triggerDebrief's gameEnded guard rejects the call after endGame flips the flag. Inline-duplicate the divider-push + runLLMTurn sequence; comment documents the constraint.
 - 07-02: handleDownload uses useGameStore.getState() in onClick — reads store once per click, avoids subscription overhead and stale-snapshot risk.
 - 07-02: All four gated UI primitives confirmed: Send (disabled={disabled||gameEnded||value.trim()===''} in MessageInput), Advance to Round (disabled={disabled||gameEnded}), Request Debrief Now (disabled={loading||gameEnded}), End Game + Debrief (disabled={loading||gameEnded}).
@@ -212,6 +217,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Plan 07-02 complete (debrief UI wiring)
-Stopped at: Plan 07-02 complete — endGame() store action + gameEnded gating (71ed279); Download Debrief button + UI wiring (11a2a78). 475/475 tests passing; typecheck clean; build clean. Ready for 07-04 (config validator).
+Last session: 2026-04-14 — Plan 07-04 complete (config validator + LoadConfigPanel integration)
+Stopped at: Plan 07-04 complete — configValidator.ts + tests (6448f5a); LoadConfigPanel validation banner + Launch gate + tests (aca31bb). 507/507 tests passing; typecheck clean; build clean. Phase 7 fully complete. Ready for Phase 8.
 Resume file: None
