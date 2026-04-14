@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+import { current } from 'immer'
 import type {
   SetupMode,
   GameConfig,
@@ -58,6 +59,23 @@ export interface GameStore {
   setLoading: (loading: boolean) => void
   activeTab: 'cards' | 'actions' | 'guide'
   setActiveTab: (tab: 'cards' | 'actions' | 'guide') => void
+
+  // ─── Phase 7 debrief export ──────────────────────────────────────────────
+  /**
+   * Round-boundary state snapshots for debrief export.
+   * Key semantics: `stateSnapshots[N]` = state at the START of Round N.
+   *   - Seeded at initGame for key 1.
+   *   - Captured inside advanceRound under the key of the round being ENTERED
+   *     (newRound), AFTER round-advance mutations are applied.
+   * Contract: the exporter reads `stateSnapshots[n]` directly to render
+   * "### State at start of Round N" — no off-by-one adjustment anywhere.
+   */
+  stateSnapshots: Record<number, GameState>
+  setStateSnapshot: (round: number, state: GameState) => void
+
+  /** Session-level flag set only by `End Game + Debrief` action. When true, the send button and round-advance are disabled. Reset to false on newGame/resetGame. NOT part of GameState (simulation state) — it is session UI state. */
+  gameEnded: boolean
+  setGameEnded: (ended: boolean) => void
 
   // ─── Phase 6 LLM wiring ──────────────────────────────────────────────────
   /** AbortController for the in-flight LLM call; null when idle. */
@@ -300,9 +318,9 @@ export const useGameStore = create<GameStore>()(
           // Compute nextState outside of set() so structuredClone operates on a
           // plain GameState rather than an immer draft (drafts are proxies and
           // DataCloneError out of structuredClone).
-          const current = get().gameState
-          if (!current) return
-          const { nextState, clampLog } = applyStateUpdatePure(current, update)
+          const liveState = get().gameState
+          if (!liveState) return
+          const { nextState, clampLog } = applyStateUpdatePure(liveState, update)
           set((state) => {
             state.gameState = nextState
           })
@@ -345,6 +363,18 @@ export const useGameStore = create<GameStore>()(
             state.activeTab = tab
           }),
 
+        // ─── Phase 7 debrief export state ───────────────────────────────────
+        stateSnapshots: {},
+        gameEnded: false,
+        setStateSnapshot: (round, state) =>
+          set((s) => {
+            s.stateSnapshots[round] = state
+          }),
+        setGameEnded: (ended) =>
+          set((s) => {
+            s.gameEnded = ended
+          }),
+
         // ─── Phase 6 LLM wiring state ────────────────────────────────────────
         currentAbortController: null,
         lastFacilitatorInput: null,
@@ -376,7 +406,20 @@ export const useGameStore = create<GameStore>()(
             }
             state.messages = []
             state.llmHistory = []
+            state.stateSnapshots = {}
+            state.gameEnded = false
           })
+          // Seed start-of-round-1 snapshot after the set() completes so we read a
+          // plain (non-proxy) GameState via get() — immer.current() only accepts
+          // drafts, and a freshly assigned plain object inside set() is not yet
+          // re-proxied as a draft in Zustand/immer middleware.
+          // structuredClone is safe here because get().gameState is a plain object.
+          const freshState = get().gameState
+          if (freshState) {
+            set((s) => {
+              s.stateSnapshots[1] = structuredClone(freshState)
+            })
+          }
           // CTX-03: surface prompt budget in DEV. `console.error` on over-budget
           // so a broken deployment context is impossible to miss in DevTools.
           if (import.meta.env.DEV) {
@@ -408,6 +451,8 @@ export const useGameStore = create<GameStore>()(
             state.llmHistory = []
             state.loading = false
             state.activeTab = 'cards'
+            state.stateSnapshots = {}
+            state.gameEnded = false
           }),
 
         /**
@@ -434,6 +479,9 @@ export const useGameStore = create<GameStore>()(
             state.messages = []
             state.loading = false
             state.activeTab = 'cards'
+            // Phase 7 debrief slices.
+            state.stateSnapshots = {}
+            state.gameEnded = false
           })
         },
 
@@ -469,6 +517,12 @@ export const useGameStore = create<GameStore>()(
             })
             s.loading = true
             s.lastFacilitatorInput = prefixedInput
+            // Capture the state the NEW round starts with, keyed by the round being
+            // ENTERED. current() strips the Proxy wrapper so the snapshot is a plain
+            // object — structuredClone would throw DataCloneError on an Immer draft.
+            // Reading contract: stateSnapshots[N] = "state at start of Round N"
+            // (see initGame for the N=1 seed).
+            s.stateSnapshots[newRound] = current(s.gameState)
           })
 
           void runLLMTurn(prefixedInput)
