@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useGameStore } from '@/lib/gameStore'
 import { parseConfigJson } from '@/lib/jsonValidation'
@@ -13,8 +13,10 @@ import ScenarioSummary from './ScenarioSummary'
  *
  * - Reads configJson from store; changes update the store immediately.
  * - 300ms debounced parse feeds the right-side ScenarioSummary.
- * - Launch buttons re-parse at click time (debounce window is ~300ms;
- *   the user may click before the debounced state settles).
+ * - Launch buttons are always rendered once a valid parse has established a
+ *   scenario count. When parse is invalid they appear disabled (not hidden).
+ * - Launch handler re-parses synchronously at click time (guards against the
+ *   300ms debounce window where debounced parseResult may be stale).
  * - Back button returns to 'home' setupMode.
  */
 export default function LoadConfigPanel() {
@@ -29,6 +31,19 @@ export default function LoadConfigPanel() {
   const [parseResult, setParseResult] = useState<ParseResult>(() =>
     parseConfigJson(configJson),
   )
+
+  // Track the last successfully-parsed scenario count so we can render
+  // disabled (not hidden) Launch buttons even when JSON is currently invalid.
+  const lastValidScenarioCount = useRef<number | null>(
+    parseResult.ok ? parseResult.value.scenarios.length : null,
+  )
+
+  // Keep lastValidScenarioCount in sync whenever parse succeeds
+  useEffect(() => {
+    if (parseResult.ok) {
+      lastValidScenarioCount.current = parseResult.value.scenarios.length
+    }
+  }, [parseResult])
 
   // 300ms debounced re-parse whenever configJson changes
   useEffect(() => {
@@ -49,6 +64,13 @@ export default function LoadConfigPanel() {
     initGame(fresh.value, scenarioIndex)
     navigate('/game')
   }
+
+  // Derive scenario count: use live valid parse, or fall back to last known count
+  const scenarioCount = parseResult.ok
+    ? parseResult.value.scenarios.length
+    : lastValidScenarioCount.current
+
+  const isValid = parseResult.ok
 
   return (
     <main className="min-h-screen bg-[var(--color-bg-base)] p-6 text-[var(--color-text-primary)]">
@@ -82,39 +104,63 @@ export default function LoadConfigPanel() {
             }
             ariaLabel="Game configuration JSON"
           />
-          {/* Inline validation error — minimal display; plan 04-04 polishes */}
+          {/* Structured inline validation error alert */}
           {parseResult && !parseResult.ok && (
-            <p
+            <div
               role="alert"
-              className="text-sm text-[var(--color-category-crisis)]"
+              className="rounded-md border border-[var(--color-category-crisis)]/50 bg-[var(--color-category-crisis)]/10 p-3"
             >
-              Line {parseResult.error.line}, col {parseResult.error.col}:{' '}
-              {parseResult.error.message}
-            </p>
+              <div className="text-sm font-semibold text-[var(--color-category-crisis)]">
+                JSON parse error
+              </div>
+              <div className="mt-1 text-sm text-[var(--color-text-primary)]">
+                {parseResult.error.message}
+              </div>
+              <div className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                Line {parseResult.error.line}, column {parseResult.error.col}
+              </div>
+            </div>
           )}
         </section>
 
         {/* Right: scenario summary + launch buttons */}
         <section>
           {parseResult?.ok ? (
-            <>
-              <ScenarioSummary config={parseResult.value} />
-              <div className="mt-4 flex flex-wrap gap-3">
-                {parseResult.value.scenarios.map((s, i) => (
-                  <button
-                    key={s.id ?? i}
-                    onClick={() => handleLaunch(i)}
-                    className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-panel)] px-4 py-2 text-[var(--color-text-primary)] hover:border-[var(--color-border-muted)]"
-                  >
-                    Launch Scenario {i + 1}
-                  </button>
-                ))}
-              </div>
-            </>
+            <ScenarioSummary config={parseResult.value} />
           ) : (
             <p className="text-sm text-[var(--color-text-secondary)]">
               Fix the JSON to see the scenario summary.
             </p>
+          )}
+
+          {/* Launch buttons — always rendered once scenarioCount is known;
+              disabled (not hidden) when JSON is invalid */}
+          {scenarioCount !== null && (
+            <div className="mt-4 flex flex-wrap gap-3">
+              {Array.from({ length: scenarioCount }, (_, i) => {
+                // Use scenario id from live parse if available
+                const scenarioId =
+                  parseResult.ok
+                    ? (parseResult.value.scenarios[i]?.id ?? i)
+                    : i
+                return (
+                  <button
+                    key={scenarioId}
+                    onClick={() => handleLaunch(i)}
+                    disabled={!isValid}
+                    aria-disabled={!isValid}
+                    title={isValid ? undefined : 'Fix JSON errors to launch'}
+                    className={
+                      isValid
+                        ? 'rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-panel)] px-4 py-2 text-[var(--color-text-primary)] transition hover:border-[var(--color-border-muted)]'
+                        : 'cursor-not-allowed rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-bg-panel)]/50 px-4 py-2 text-[var(--color-text-muted)] transition'
+                    }
+                  >
+                    Launch Scenario {i + 1}
+                  </button>
+                )
+              })}
+            </div>
           )}
         </section>
       </div>
