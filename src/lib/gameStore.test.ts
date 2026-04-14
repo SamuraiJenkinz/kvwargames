@@ -871,6 +871,115 @@ describe('gameStore', () => {
     })
   })
 
+  // ─── Phase 7: stateSnapshots + gameEnded ────────────────────────────────────
+
+  describe('stateSnapshots and gameEnded (Phase 7)', () => {
+    // Test A: initGame seeds stateSnapshots[1]
+    it('initGame seeds stateSnapshots[1] with round-1 starting state as a plain object', () => {
+      initS1()
+      const snapshot = getState().stateSnapshots[1]
+      expect(snapshot).toBeDefined()
+      expect(snapshot.round).toBe(1)
+      // Plain object assertion — not an Immer Proxy
+      expect(Object.getPrototypeOf(snapshot)).toBe(Object.prototype)
+      // Verify team resources match EDIP scenario 0 start (Team A: pc=3 etc)
+      const teamA = snapshot.teams.find((t) => t.id === 'A')
+      expect(teamA).toMatchObject({ pc: 3, po: 0, readiness: 3, stock: 2, crm: 2, ic: 2 })
+      // stateSnapshots[2] does NOT exist yet
+      expect(getState().stateSnapshots[2]).toBeUndefined()
+    })
+
+    // Test B: advanceRound captures snapshot keyed by round ENTERED (newRound)
+    it('advanceRound captures stateSnapshots keyed by the round ENTERED (Option A keying)', async () => {
+      initS1()
+      // Initial state: round 1 exists, round 2 does not
+      expect(getState().stateSnapshots[1]).toBeDefined()
+      expect(getState().stateSnapshots[2]).toBeUndefined()
+      expect(getState().gameState?.round).toBe(1)
+
+      getState().advanceRound()
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      // After advancing: round = 2, stateSnapshots[2] now exists, [1] untouched
+      expect(getState().gameState?.round).toBe(2)
+      expect(getState().stateSnapshots[1]).toBeDefined()
+      expect(getState().stateSnapshots[2]).toBeDefined()
+      // Snapshot reflects state AFTER round bump (round 2 starts at round=2)
+      expect(getState().stateSnapshots[2].round).toBe(2)
+
+      // Second advance — stateSnapshots[3] now exists, [1] and [2] still present
+      getState().advanceRound()
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      expect(getState().stateSnapshots[3]).toBeDefined()
+      expect(getState().stateSnapshots[3].round).toBe(3)
+      expect(getState().stateSnapshots[1]).toBeDefined()
+      expect(getState().stateSnapshots[2]).toBeDefined()
+    })
+
+    // Test C: advanceRound does not throw DataCloneError (regression guard)
+    it('advanceRound does not throw DataCloneError (immer.current() is used, not structuredClone)', () => {
+      initS1()
+      expect(() => {
+        getState().advanceRound()
+      }).not.toThrow()
+    })
+
+    // Test D: newGame clears stateSnapshots and gameEnded
+    it('newGame clears stateSnapshots and resets gameEnded to false', async () => {
+      initS1()
+      getState().setGameEnded(true)
+      getState().advanceRound()
+      await waitFor(() => expect(getState().loading).toBe(false))
+      // Verify we have snapshots before newGame
+      expect(getState().stateSnapshots[2]).toBeDefined()
+      expect(getState().gameEnded).toBe(true)
+
+      getState().newGame()
+
+      expect(getState().stateSnapshots).toEqual({})
+      expect(getState().gameEnded).toBe(false)
+    })
+
+    // Test E: setGameEnded toggles the flag
+    it('setGameEnded(true) sets gameEnded; setGameEnded(false) clears it', () => {
+      initS1()
+      expect(getState().gameEnded).toBe(false)
+      getState().setGameEnded(true)
+      expect(getState().gameEnded).toBe(true)
+      getState().setGameEnded(false)
+      expect(getState().gameEnded).toBe(false)
+    })
+
+    // Test F: stateSnapshots[1] is decoupled from live gameState (current() produced a real copy)
+    it('stateSnapshots[1] is decoupled from live gameState — mutation of live state does not affect snapshot', () => {
+      initS1()
+      const snapshotBefore = getState().stateSnapshots[1]
+      const originalPc = snapshotBefore.teams.find((t) => t.id === 'A')?.pc ?? -1
+
+      // Mutate live gameState via applyStateUpdate
+      getState().applyStateUpdate({ teamUpdates: [{ id: 'A', pc: 0 }] })
+
+      // Live state changed
+      expect(getState().gameState?.teams.find((t) => t.id === 'A')?.pc).toBe(0)
+      // Snapshot is unchanged (plain object copy, decoupled from live proxy)
+      expect(getState().stateSnapshots[1].teams.find((t) => t.id === 'A')?.pc).toBe(originalPc)
+    })
+
+    // resetGame also clears stateSnapshots and gameEnded
+    it('resetGame clears stateSnapshots and resets gameEnded to false', async () => {
+      initS1()
+      getState().setGameEnded(true)
+      getState().advanceRound()
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      getState().resetGame()
+
+      expect(getState().stateSnapshots).toEqual({})
+      expect(getState().gameEnded).toBe(false)
+    })
+  })
+
   // ─── newGame: FLOW-05 in-flight abort + Phase 6 transient reset ─────────────
 
   describe('newGame (FLOW-05)', () => {
