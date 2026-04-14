@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import type {
-  AppPhase,
   SetupMode,
   GameConfig,
   GameState,
@@ -14,10 +13,8 @@ import { EDIP_CONFIG } from '@/data/edipConfig'
 // ─── Store Interface ─────────────────────────────────────────────────────────
 
 export interface GameStore {
-  // App phase
-  phase: AppPhase
+  // Setup navigation (intra-/setup distinction; URL owns /setup vs /game)
   setupMode: SetupMode
-  setPhase: (phase: AppPhase) => void
   setSetupMode: (mode: SetupMode) => void
 
   // Configuration
@@ -63,13 +60,8 @@ const initialConfigJson = JSON.stringify(EDIP_CONFIG, null, 2)
 export const useGameStore = create<GameStore>()(
   devtools(
     immer((set) => ({
-      // App phase
-      phase: 'setup',
+      // Setup navigation (intra-/setup distinction; URL owns /setup vs /game)
       setupMode: 'home',
-      setPhase: (phase) =>
-        set((state) => {
-          state.phase = phase
-        }),
       setSetupMode: (mode) =>
         set((state) => {
           state.setupMode = mode
@@ -188,14 +180,12 @@ export const useGameStore = create<GameStore>()(
             })),
             cardsThisRound: [],
           }
-          state.phase = 'game'
           state.messages = []
           state.llmHistory = []
         }),
 
       resetGame: () =>
         set((state) => {
-          state.phase = 'setup'
           state.setupMode = 'home'
           state.gameConfig = null
           state.configJson = JSON.stringify(EDIP_CONFIG, null, 2)

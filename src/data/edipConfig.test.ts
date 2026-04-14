@@ -27,53 +27,53 @@ describe('EDIP_CONFIG scenario validation', () => {
   it('S1 has rounds === 4', () => {
     const s1 = EDIP_CONFIG.scenarios.find(s => s.id === 'S1')
     expect(s1).toBeDefined()
-    expect(s1!.rounds).toBe(4)
+    expect(s1?.rounds).toBe(4)
   })
 
   it('S1 has 4 injects', () => {
     const s1 = EDIP_CONFIG.scenarios.find(s => s.id === 'S1')
-    expect(s1!.injects).toHaveLength(4)
+    expect(s1?.injects).toHaveLength(4)
   })
 
   it('S2 has rounds === 5', () => {
     const s2 = EDIP_CONFIG.scenarios.find(s => s.id === 'S2')
     expect(s2).toBeDefined()
-    expect(s2!.rounds).toBe(5)
+    expect(s2?.rounds).toBe(5)
   })
 
   it('S2 has 5 injects', () => {
     const s2 = EDIP_CONFIG.scenarios.find(s => s.id === 'S2')
-    expect(s2!.injects).toHaveLength(5)
+    expect(s2?.injects).toHaveLength(5)
   })
 
   it('S1 startState: crisisSeverity === 0', () => {
     const s1 = EDIP_CONFIG.scenarios.find(s => s.id === 'S1')
-    expect(s1!.startState.crisisSeverity).toBe(0)
+    expect(s1?.startState.crisisSeverity).toBe(0)
   })
 
   it('S1 startState: crisisState === "No Crisis"', () => {
     const s1 = EDIP_CONFIG.scenarios.find(s => s.id === 'S1')
-    expect(s1!.startState.crisisState).toBe('No Crisis')
+    expect(s1?.startState.crisisState).toBe('No Crisis')
   })
 
   it('S1 startState: edipLegitimacy === 0', () => {
     const s1 = EDIP_CONFIG.scenarios.find(s => s.id === 'S1')
-    expect(s1!.startState.edipLegitimacy).toBe(0)
+    expect(s1?.startState.edipLegitimacy).toBe(0)
   })
 
   it('S2 startState: crisisSeverity === 0', () => {
     const s2 = EDIP_CONFIG.scenarios.find(s => s.id === 'S2')
-    expect(s2!.startState.crisisSeverity).toBe(0)
+    expect(s2?.startState.crisisSeverity).toBe(0)
   })
 
   it('S2 startState: crisisState === "No Crisis"', () => {
     const s2 = EDIP_CONFIG.scenarios.find(s => s.id === 'S2')
-    expect(s2!.startState.crisisState).toBe('No Crisis')
+    expect(s2?.startState.crisisState).toBe('No Crisis')
   })
 
   it('S2 startState: edipLegitimacy === 0', () => {
     const s2 = EDIP_CONFIG.scenarios.find(s => s.id === 'S2')
-    expect(s2!.startState.edipLegitimacy).toBe(0)
+    expect(s2?.startState.edipLegitimacy).toBe(0)
   })
 })
 
@@ -88,12 +88,12 @@ describe('EDIP_CONFIG team starting resource values', () => {
   ])('Team $id has correct starting resources', ({ id, pc, po, readiness, stock, crm, ic }) => {
     const team = EDIP_CONFIG.teams.find(t => t.id === id)
     expect(team).toBeDefined()
-    expect(team!.pc).toBe(pc)
-    expect(team!.po).toBe(po)
-    expect(team!.readiness).toBe(readiness)
-    expect(team!.stock).toBe(stock)
-    expect(team!.crm).toBe(crm)
-    expect(team!.ic).toBe(ic)
+    expect(team?.pc).toBe(pc)
+    expect(team?.po).toBe(po)
+    expect(team?.readiness).toBe(readiness)
+    expect(team?.stock).toBe(stock)
+    expect(team?.crm).toBe(crm)
+    expect(team?.ic).toBe(ic)
   })
 })
 
