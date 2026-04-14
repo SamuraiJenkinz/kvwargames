@@ -8,8 +8,18 @@ interface Props {
 export default function PersonaMessage({ message }: Props) {
   const meta = PERSONA_META[message.speaker as PersonaId]
 
+  // Staggered reveal is driven by CSS animation-delay applied inline — the
+  // store pushes all persona messages in a single addMessages([...]) call
+  // (CONTEXT.md sticky-scroll pitfall #3). When revealDelay is not set, no
+  // style is applied so the animation runs immediately.
+  const animationDelay =
+    message.revealDelay != null ? `${message.revealDelay}ms` : undefined
+
   return (
-    <div className="flex gap-3 items-start animate-[messageIn_180ms_ease-out_both] motion-reduce:animate-none">
+    <div
+      className="flex gap-3 items-start animate-[messageIn_180ms_ease-out_both] motion-reduce:animate-none"
+      style={animationDelay ? { animationDelay } : undefined}
+    >
       {/* Avatar */}
       <div
         className={[
@@ -42,10 +52,16 @@ export default function PersonaMessage({ message }: Props) {
           {message.text}
         </div>
 
-        {/* Facilitator-facing flag note (REF-05) */}
-        {message.flag && (
-          <div className="text-xs text-persona-finch mt-1">{message.flag}</div>
-        )}
+        {/*
+          Facilitator-facing flag (RESP-05). Only rendered when flag is a
+          non-empty string — null / undefined / '' produce no element at all
+          (not an empty <p>). `text-amber-400` is a Tailwind literal: the
+          `text-persona-amber` @theme token does not yet exist. See SUMMARY
+          for the later token-consolidation note.
+        */}
+        {message.flag ? (
+          <p className="mt-2 text-sm italic text-amber-400">{message.flag}</p>
+        ) : null}
       </div>
     </div>
   )
