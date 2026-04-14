@@ -13,8 +13,16 @@ export type { HistoryEntry }
  * Single tunable constant so Plan 06-08 can adjust it after empirical token
  * budget measurement. Changing this value is the only knob needed to re-tune
  * history length — all callers derive their cap from here.
+ *
+ * **Plan 06-08 empirical reduction (N: 6 → 2):** EDIP system prompt measured
+ * at 5124 tokens against `SAFE_CONTEXT_CEILING_TOKENS = 7500` (gpt-4 8k
+ * assumption). With `TOKENS_PER_TURN_ESTIMATE = 800`, only `(7500 - 5124) / 800
+ * ≈ 2.97` turn-pairs fit — rounded down to 2. See
+ * `.planning/phases/06-llm-integration/06-08-BUDGET.md` for the decision trail.
+ * Raise this value once the corporate context window is confirmed larger than
+ * 8k (e.g. to 6 for a 16k deployment, 12 for 32k).
  */
-export const HISTORY_WINDOW_N = 6
+export const HISTORY_WINDOW_N = 2
 
 /**
  * Returns the last N message-pairs (2N entries max) from history.
