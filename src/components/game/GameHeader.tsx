@@ -36,7 +36,7 @@ export default function GameHeader() {
     gameConfig?.scenarios?.[gameState?.scenarioIndex ?? 0]?.name ?? null
   const round = gameState?.round ?? null
   const crisisState = gameState?.crisisState ?? 'No Crisis'
-  const gameTitle = gameConfig?.title ?? gameConfig?.name ?? 'Untitled Game'
+  const gameTitle = gameConfig?.name ?? 'Untitled Game'
 
   return (
     <header className="flex-none h-14 bg-bg-panel border-b border-border-subtle px-4 flex items-center justify-between">
