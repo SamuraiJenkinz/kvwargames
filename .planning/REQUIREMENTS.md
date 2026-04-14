@@ -200,8 +200,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SETUP-01 | Phase 4 | Complete |
 | SETUP-02 | Phase 4 | Complete |
 | SETUP-03 | Phase 4 | Complete |
-| SETUP-04 | Phase 7 | Pending |
-| SETUP-05 | Phase 7 | Pending |
+| SETUP-04 | Phase 7 | Complete |
+| SETUP-05 | Phase 7 | Complete |
 | SETUP-06 | Phase 4 | Complete |
 | LAYOUT-01 | Phase 5 | Complete |
 | LAYOUT-02 | Phase 5 | Complete |
@@ -230,9 +230,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FLOW-03 | Phase 6 | Complete |
 | FLOW-04 | Phase 6 | Complete |
 | FLOW-05 | Phase 6 | Complete |
-| DEB-01 | Phase 7 | Pending |
-| DEB-02 | Phase 7 | Pending |
-| DEB-03 | Phase 7 | Pending |
+| DEB-01 | Phase 7 | Complete |
+| DEB-02 | Phase 7 | Complete |
+| DEB-03 | Phase 7 | Complete |
 | UI-01 | Phase 3 | Complete |
 | UI-02 | Phase 3 | Complete |
 | UI-03 | Phase 3 | Complete |

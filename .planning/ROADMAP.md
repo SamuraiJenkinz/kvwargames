@@ -16,7 +16,7 @@ Build a three-persona AI facilitation console for live policy tabletop exercises
 - [x] **Phase 4: Setup Screen** — Home, load config, JSON validation, scenario launch (brief gen stubbed)
 - [x] **Phase 5: Game Screen Layout** — Three-column layout, chat feed, state dashboard, reference panel (all mock data)
 - [x] **Phase 6: LLM Integration** — Prompt builder, persona routing, state updater, response handling, context windowing (highest risk)
-- [ ] **Phase 7: Debrief, Export & Config Generation** — Markdown debrief export, wire generate-from-brief to backend
+- [x] **Phase 7: Debrief, Export & Config Generation** — Markdown debrief export, wire generate-from-brief to backend
 - [ ] **Phase 8: QA & Credential Audit** — Full 5-round scenario run, credential audit, boundary value testing
 
 ## Phase Details
@@ -148,10 +148,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — debriefExporter.ts (pure markdown + download) + store additions (stateSnapshots, gameEnded)
-- [ ] 07-02-PLAN.md — Wire Download Debrief button; split endGame() from triggerDebrief(); gameEnded gates Send/Advance
-- [ ] 07-03-PLAN.md — Backend CONFIG_GEN prompt rewrite + json_object + GenerateBriefPanel + live 3-brief smoke test
-- [ ] 07-04-PLAN.md — configValidator.ts field-level schema validation + LoadConfigPanel error banner (SETUP-05)
+- [x] 07-01-PLAN.md — debriefExporter.ts (pure markdown + download) + store additions (stateSnapshots, gameEnded)
+- [x] 07-02-PLAN.md — Wire Download Debrief button; split endGame() from triggerDebrief(); gameEnded gates Send/Advance
+- [x] 07-03-PLAN.md — Backend CONFIG_GEN prompt rewrite + json_object + GenerateBriefPanel + live 3-brief smoke test
+- [x] 07-04-PLAN.md — configValidator.ts field-level schema validation + LoadConfigPanel error banner (SETUP-05)
 
 ### Phase 8: QA & Credential Audit
 **Goal**: The tool survives a full 5-round live scenario without context degradation, persona drift, or credential leakage — confirmed by structured tests, not assumption.
@@ -185,5 +185,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Setup Screen | 4/4 | ✓ Verified | 2026-04-13 |
 | 5. Game Screen Layout | 7/7 | ✓ Verified | 2026-04-14 |
 | 6. LLM Integration | 9/9 | ✓ Verified | 2026-04-14 |
-| 7. Debrief, Export & Config Generation | 0/4 | Not started | - |
+| 7. Debrief, Export & Config Generation | 4/4 | ✓ Verified | 2026-04-14 |
 | 8. QA & Credential Audit | 0/5 | Not started | - |
