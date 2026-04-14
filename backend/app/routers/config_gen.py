@@ -30,24 +30,112 @@ router = APIRouter()
 # System prompt
 # ---------------------------------------------------------------------------
 
-CONFIG_GEN_SYSTEM_PROMPT = """You are a war-game scenario designer. Given a facilitator's
-brief, produce a complete JSON game configuration that can be loaded directly into the
-KV War Game engine.
+CONFIG_GEN_SYSTEM_PROMPT = """You are a war-game scenario designer for the KV War Game engine.
+Given a facilitator's brief, produce a complete JSON game configuration.
 
-Rules:
+RULES:
 - Output ONLY valid JSON. No markdown code fences, no prose, no comments.
-- The root object must contain: "scenarioName", "teams", "injectCards",
-  "nationalActions", and "winConditions".
-- "teams" is an array of objects with fields: "id", "name", "country", "role".
-- "injectCards" is an array of crisis/inject events, each with: "id", "title",
-  "description", "severity" (low|medium|high|critical), "affectedTeams" (array of team ids).
-- "nationalActions" is an array of actions available to teams, each with: "id", "label",
-  "description", "availableTo" (array of team ids or "all").
-- "winConditions" is a string describing how the exercise concludes successfully.
+- The word JSON must appear in your output (engine requirement).
+- Every field below is required. Do not omit or rename any field.
+- Invent plausible domain-appropriate content from the brief; do not leave placeholder strings.
 
-Generate enough content to make the scenario playable (minimum 3 teams, 5 inject cards,
-4 national actions). Infer plausible details from the brief. If the brief is ambiguous,
-make reasonable assumptions consistent with a cyber-defence war game context."""
+REQUIRED SHAPE:
+{
+  "name": string,
+  "domain": string,
+  "description": string,
+  "objective": string,
+  "redLines": string,
+  "pcThresholds": string,
+  "votingRule": string,
+  "eoMechanic": string,
+  "resourceLogic": string,
+  "facilitation": string,
+  "scenarios": [
+    {
+      "id": string,
+      "name": string,
+      "description": string,
+      "rounds": number,
+      "startState": { "crisisSeverity": 0, "crisisState": "No Crisis", "edipLegitimacy": 0 },
+      "injects": [string]
+    }
+  ],
+  "teams": [
+    {
+      "id": string,
+      "name": string,
+      "description": string,
+      "personas": [string, string],
+      "uniqueAction": string,
+      "pc": number,
+      "po": number,
+      "readiness": number,
+      "stock": number,
+      "crm": number,
+      "ic": number
+    }
+  ],
+  "nationalActions": [
+    { "id": string, "name": string, "summary": string, "cost": string }
+  ],
+  "cards": [
+    { "id": string, "name": string, "cat": string, "timing": string, "req": string, "effect": string }
+  ]
+}
+
+NUMERIC RANGES (hard clamps):
+- pc: 0-6
+- po: -2 to 2
+- readiness: 0-5
+- stock, crm, ic: 0-9 (plausible starting values)
+
+STRUCTURAL EXEMPLAR (follow this shape exactly -- invent domain-appropriate content):
+{
+  "name": "EDIP Security of Supply Wargame",
+  "domain": "European Defence Technological and Industrial Base",
+  "description": "A 4-round tabletop exercise exploring coordinated response to a critical raw materials supply crisis.",
+  "objective": "Teams balance national interest with EDIP cohesion under supply pressure.",
+  "redLines": "No military escalation. No unilateral export bans without EDIP coordination.",
+  "pcThresholds": "PC 1 = STRAINED warning; PC 0 = CRISIS -- team loses one unique action.",
+  "votingRule": "Simple majority of teams present; ties resolved by the Chair team.",
+  "eoMechanic": "Executive Orders require PC >= 2 and trigger a Chen integrity check.",
+  "resourceLogic": "PC regenerates +1 per round up to cap 6; STK depletes when production falters.",
+  "facilitation": "Facilitator inputs round injects and Crisis State transitions.",
+  "scenarios": [
+    {
+      "id": "S1",
+      "name": "CRM Supply Crisis",
+      "description": "A sudden 40% drop in critical raw materials triggers cascading industrial stress.",
+      "rounds": 4,
+      "startState": { "crisisSeverity": 0, "crisisState": "No Crisis", "edipLegitimacy": 0 },
+      "injects": [
+        "Round 1: market intelligence signals the CRM shortfall.",
+        "Round 2: allied industries begin production slowdowns.",
+        "Round 3: strategic stocks approach national minimums.",
+        "Round 4: emergency coordination window closes."
+      ]
+    }
+  ],
+  "teams": [
+    {
+      "id": "A",
+      "name": "Team A: Frontline Member State",
+      "description": "Industrially exposed, politically pragmatic.",
+      "personas": ["Industry minister focused on production continuity", "Foreign policy advisor balancing alliance signals"],
+      "uniqueAction": "INDUSTRIAL_SURGE (once per round): accelerate one production chain. Cost: PC -1.",
+      "pc": 3, "po": 0, "readiness": 3, "stock": 2, "crm": 2, "ic": 2
+    }
+  ],
+  "nationalActions": [
+    { "id": "NA-01", "name": "Emergency Procurement", "summary": "Secure short-term supply via bilateral deal.", "cost": "PC -1, IC -1" }
+  ],
+  "cards": [
+    { "id": "C-01", "name": "Strategic Reserve Release", "cat": "Crisis State", "timing": "This Round", "req": "CrisisSeverity >= 2", "effect": "All teams +1 STK." }
+  ]
+}
+
+MINIMUM OUTPUT: 2 scenarios, 4 teams (IDs A/B/C/D), 4 national actions, 6 cards. Infer plausible details from the brief to make the exercise playable."""
 
 
 # ---------------------------------------------------------------------------
@@ -92,6 +180,12 @@ async def generate_config(body: ConfigGenRequest, request: Request) -> JSONRespo
             {"role": "user", "content": body.brief},
         ],
         "max_tokens": settings.llm_max_tokens,
+        # json_object mode: upstream guarantees syntactically-valid JSON (no prose, no
+        # markdown fences). Schema adherence is separately enforced by the frontend
+        # validateGameConfig. If the deployed LLM endpoint is NOT OpenAI-compatible
+        # and rejects this field with 400, remove this line -- the rest of the pipeline
+        # still works without it (the system prompt already forbids prose output).
+        "response_format": {"type": "json_object"},
     }
 
     headers = {
