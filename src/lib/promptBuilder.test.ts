@@ -170,6 +170,34 @@ describe('buildSystemPrompt — routing and JSON rule', () => {
   it('states the JSON-only rule', () => {
     expect(prompt).toContain('JSON ONLY')
   })
+
+  it('block 8 contains all multi-trigger routing rules (Phase 8 success criterion #5 — static-side coverage)', () => {
+    // Routing rules must be PRESENT in the system prompt — the LLM uses these
+    // to decide which personas respond to a multi-trigger facilitator message.
+    // 08-RESEARCH "08-05: Multi-trigger persona routing" confirms there is no
+    // TypeScript router; all routing logic is literal prompt text.
+    // The behavioural validation ("multi-trigger message -> 2-3 distinct
+    // personas, no duplicates, additive state updates") is captured during the
+    // 08-02 live run (08-02-LIVE-RUN.md), NOT here.
+
+    // Isolate Block 8 so the assertions pin the correct section.
+    const block8Start = prompt.indexOf('## 8. Routing Rules')
+    const block9Start = prompt.indexOf('## 9. JSON Output Schema')
+    expect(block8Start).toBeGreaterThanOrEqual(0)
+    expect(block9Start).toBeGreaterThan(block8Start)
+    const block8 = prompt.slice(block8Start, block9Start)
+
+    // Trigger keywords — verbatim substrings present in buildBlock8():
+    expect(block8).toContain('Round start')       // Kent (framing) + Finch (inject)
+    expect(block8).toContain('Card play')          // route by card category
+    expect(block8).toContain('National action')    // route by character of action
+    expect(block8).toContain('Dispute')            // challenged persona speaks
+    expect(block8).toContain('Threshold warning')  // finch or chen escalation
+    expect(block8).toContain('Debrief')            // all three, fixed order
+    // Fixed-order + cap rules
+    expect(block8).toContain('Kent → Finch → Chen')
+    expect(block8).toContain('Minimum 1, maximum 3 personas per turn')
+  })
 })
 
 // ─── Determinism ─────────────────────────────────────────────────────────────
