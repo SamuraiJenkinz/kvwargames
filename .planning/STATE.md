@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 3 of 8 (UI Design System)
-Plan: 4 of 4 in current phase
-Status: Phase 3 plans complete — ready for verification
-Last activity: 2026-04-13 — All 4 plans in Phase 3 executed
+Phase: 4 of 8 (Setup Screen)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-04-13 — Completed 04-01-PLAN.md (Router Scaffold + Phase Removal)
 
-Progress: [████░░░░░░] 31% (11/35 plans)
+Progress: [████░░░░░░] 34% (12/35 plans)
 
 ## Performance Metrics
 
@@ -76,6 +76,10 @@ Recent decisions affecting current work:
 - 03-04: Applied flex-wrap to Persona Colours row (was the only horizontal row missing it)
 - 03-04: Reduced outer padding and section spacing at mobile breakpoint for better density; kept max-w-4xl container width
 - 03-04: Human verification confirmed all tokens render correctly at 1280px and 768px — Phase 3 design system foundation complete
+- 04-01: react-router v7 uses consolidated "react-router" package (react-router-dom merged in v7) — no imports from react-router-dom anywhere in src/
+- 04-01: GuardedGameScreen is an inline function component in App.tsx (not a separate file) — route guard with no exported contract; separate file adds overhead for no gain
+- 04-01: AppPhase type retained in types/game.ts post-store-removal — no store references remain, but Phase 5 may want 'debrief' distinction within /game
+- 04-01: All router redirects use replace prop — prevents history entry pollution on null gameState guard and catch-all routes
 
 ### Pending Todos
 
@@ -91,5 +95,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-13
-Stopped at: Completed 03-04-PLAN.md (Responsive Breakpoint Validation) — Phase 3 complete
+Stopped at: Completed 04-01-PLAN.md (Router Scaffold + Phase Removal) — Phase 4 plan 1/4 done
 Resume file: None
