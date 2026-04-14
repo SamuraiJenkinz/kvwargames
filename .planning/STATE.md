@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 4 of 8 (Setup Screen)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-04-13 — Completed 04-02-PLAN.md (HomeScreen Two-Path Cards)
+Last activity: 2026-04-14 — Completed 04-03-PLAN.md (Load Config Panel)
 
-Progress: [████░░░░░░] 37% (13/35 plans)
+Progress: [█████░░░░░] 40% (14/35 plans)
 
 ## Performance Metrics
 
@@ -83,6 +83,10 @@ Recent decisions affecting current work:
 - 04-02: Disabled card uses aria-disabled (not disabled attr) — preserves keyboard focus so screen readers can hear the disabled state
 - 04-02: Load placeholder inlined in SetupScreen switch case (no stub file) — plan 04-03 replaces the JSX in-place via TODO(04-03) comment
 - 04-02: briefMessageVisible state lives in HomeScreen component (not store) — purely transient UI state with no cross-component lifetime
+- 04-03: parseConfigJson called eagerly on mount via useState(() => parseConfigJson(configJson)) — summary visible immediately, no 300ms blank state on first render
+- 04-03: Regex /at position (\d+)/ used for V8 JSON.parse error offset extraction — falls back to line 1 col 1 when regex doesn't match
+- 04-03: Launch handler re-parses synchronously at click time — guards against 300ms debounce window where debounced parseResult may be stale
+- 04-03: ParseResult lives in local component state only — store holds raw configJson string; derived parse state is not persisted to Zustand
 
 ### Pending Todos
 
@@ -97,6 +101,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-13
-Stopped at: Completed 04-02-PLAN.md (HomeScreen Two-Path Cards) — Phase 4 plan 2/4 done
+Last session: 2026-04-14
+Stopped at: Completed 04-03-PLAN.md (Load Config Panel) — Phase 4 plan 3/4 done
 Resume file: None
