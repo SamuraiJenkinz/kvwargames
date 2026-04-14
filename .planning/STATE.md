@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 4 of 8 (Setup Screen)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-04-14 — Completed 04-03-PLAN.md (Load Config Panel)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-04-14 — Completed 04-04-PLAN.md (Validation Polish) — Phase 4 ships
 
-Progress: [█████░░░░░] 40% (14/35 plans)
+Progress: [█████░░░░░] 43% (15/35 plans)
 
 ## Performance Metrics
 
@@ -87,6 +87,9 @@ Recent decisions affecting current work:
 - 04-03: Regex /at position (\d+)/ used for V8 JSON.parse error offset extraction — falls back to line 1 col 1 when regex doesn't match
 - 04-03: Launch handler re-parses synchronously at click time — guards against 300ms debounce window where debounced parseResult may be stale
 - 04-03: ParseResult lives in local component state only — store holds raw configJson string; derived parse state is not persisted to Zustand
+- 04-04: useRef (not useState) for lastValidScenarioCount — preserves button count across invalid states without extra re-renders; purely display value
+- 04-04: AppRoutes split from App.tsx (option a) — exported named component with no Router wrapper; enables MemoryRouter in tests without BrowserRouter conflict; App delegates to AppRoutes
+- 04-04: Launch buttons are disabled-not-hidden on invalid JSON — CONTEXT.md locked decision corrected from 04-03's hide-on-invalid starting point
 
 ### Pending Todos
 
@@ -102,5 +105,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-14
-Stopped at: Completed 04-03-PLAN.md (Load Config Panel) — Phase 4 plan 3/4 done
+Stopped at: Completed 04-04-PLAN.md (Validation Polish) — Phase 4 complete (4/4 plans), ready for Phase 5
 Resume file: None
