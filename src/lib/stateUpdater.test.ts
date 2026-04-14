@@ -370,3 +370,73 @@ describe('applyStateUpdatePure — clampLog field path format', () => {
     expect(clampLog[0]?.field).toBe('teams[B].pc')
   })
 })
+
+// ─── Phase 8 boundary coverage (08-01) ──────────────────────────────────────
+// Direct evidence for Phase 8 success criterion #4: at-boundary acceptance +
+// just-above-max clamping for crisisSeverity and edipLegitimacy, plus
+// null/undefined no-op semantics extended into team-scoped updates.
+
+describe('applyStateUpdatePure — crisisSeverity boundary (0..5)', () => {
+  it('accepts crisisSeverity=0 and crisisSeverity=5', () => {
+    const state = makeState({ crisisSeverity: 3 })
+    const { nextState: s1, clampLog: log1 } = applyStateUpdatePure(state, { crisisSeverity: 0 })
+    expect(s1.crisisSeverity).toBe(0)
+    expect(log1).toEqual([])
+
+    const { nextState: s2, clampLog: log2 } = applyStateUpdatePure(state, { crisisSeverity: 5 })
+    expect(s2.crisisSeverity).toBe(5)
+    expect(log2).toEqual([])
+  })
+
+  it('clamps crisisSeverity=6 → 5 and records clampLog', () => {
+    const state = makeState({ crisisSeverity: 3 })
+    const { nextState, clampLog } = applyStateUpdatePure(state, { crisisSeverity: 6 })
+    expect(nextState.crisisSeverity).toBe(5)
+    expect(clampLog).toContainEqual({ field: 'crisisSeverity', raw: 6, clamped: 5 })
+  })
+})
+
+describe('applyStateUpdatePure — edipLegitimacy boundary (-2..+2)', () => {
+  it('accepts edipLegitimacy=-2 and edipLegitimacy=+2', () => {
+    const state = makeState({ edipLegitimacy: 0 })
+    const { nextState: s1, clampLog: log1 } = applyStateUpdatePure(state, { edipLegitimacy: -2 })
+    expect(s1.edipLegitimacy).toBe(-2)
+    expect(log1).toEqual([])
+
+    const { nextState: s2, clampLog: log2 } = applyStateUpdatePure(state, { edipLegitimacy: 2 })
+    expect(s2.edipLegitimacy).toBe(2)
+    expect(log2).toEqual([])
+  })
+
+  it('clamps edipLegitimacy=+3 → +2 and records clampLog', () => {
+    const state = makeState({ edipLegitimacy: 0 })
+    const { nextState, clampLog } = applyStateUpdatePure(state, { edipLegitimacy: 3 })
+    expect(nextState.edipLegitimacy).toBe(2)
+    expect(clampLog).toContainEqual({ field: 'edipLegitimacy', raw: 3, clamped: 2 })
+  })
+})
+
+describe('applyStateUpdatePure — team-field null/undefined no-op', () => {
+  // Plan 08-01 decision #5 extends top-level null/undefined coverage (lines 109/118)
+  // into the team layer. StateUpdate's team-scoped key is `teamUpdates` (not `teams`);
+  // the applyTeamUpdate helper treats null/undefined via `if (value == null) continue`.
+  it('treats teamUpdates[].pc = null as no-op (preserves existing pc)', () => {
+    const state = makeState({ teams: [makeTeam('A', { pc: 4 })] })
+    const update: StateUpdate = {
+      teamUpdates: [{ id: 'A', pc: null as unknown as number }],
+    }
+    const { nextState, clampLog } = applyStateUpdatePure(state, update)
+    expect(nextState.teams.find((t) => t.id === 'A')!.pc).toBe(4)
+    expect(clampLog).toEqual([])
+  })
+
+  it('treats teamUpdates[].pc = undefined as no-op (preserves existing pc)', () => {
+    const state = makeState({ teams: [makeTeam('A', { pc: 4 })] })
+    const update: StateUpdate = {
+      teamUpdates: [{ id: 'A', pc: undefined }],
+    }
+    const { nextState, clampLog } = applyStateUpdatePure(state, update)
+    expect(nextState.teams.find((t) => t.id === 'A')!.pc).toBe(4)
+    expect(clampLog).toEqual([])
+  })
+})
