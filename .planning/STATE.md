@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 5 (Game Screen Layout) — Wave 1 complete (05-01, 05-02, 05-03)
+**Current focus:** Phase 5 (Game Screen Layout) — Wave 1 complete (05-01, 05-02, 05-03); Wave 2 in progress (05-04 done, 05-05 done)
 
 ## Current Position
 
 Phase: 5 of 8 (Game Screen Layout)
-Plan: 3 of 7 in current phase
-Status: In progress — 05-03 complete; Wave 1 complete; ready for Wave 2 (05-04 ChatFeed)
-Last activity: 2026-04-14 — Completed 05-03-PLAN.md (Game Screen Shell)
+Plan: 5 of 7 in current phase
+Status: In progress — 05-05 complete; 05-04 + 05-05 done; ready for 05-06 (StatePanel) + 05-07 (FacilitatorInput)
+Last activity: 2026-04-14 — Completed 05-05-PLAN.md (ReferencePanel)
 
-Progress: [██████░░░░] 51% (18/35 plans)
+Progress: [███████░░░] 57% (20/35 plans)
 
 ## Performance Metrics
 
@@ -100,6 +100,10 @@ Recent decisions affecting current work:
 - 05-03: gameConfig.name used as game title (not .title) — GameConfig interface has 'name' not 'title'; plan pseudocode was illustrative
 - 05-03: vi.stubEnv('DEV', false) pattern for production-path tests — isolates redirect invariant test from DEV seed without global env changes
 - 05-03: Three-column layout uses h-screen flex-col + min-h-0 overflow-hidden on column row — prevents page scroll, enables per-column independent scroll
+- 05-05: useGameStore(s => s.gameConfig) not s.gameConfig?.cards ?? [] as selector — unstable [] reference causes Zustand infinite rerender loop when gameConfig is null
+- 05-05: setSelectedId(null) never called inside render — call in onClick handler only; calling setState in render body triggers React's max update depth protection
+- 05-05: scrollIntoView global mock in src/test/setup.ts — jsdom doesn't implement scrollIntoView; affects any test that renders ChatFeed (useStickyBottomScroll hook)
+- 05-05: Pre-baked CAT_CHIP_CLASS lookup (same pattern as PERSONA_META.bubbleClass from 05-02) — Tailwind v4 purges template-literal class names
 
 ### Pending Todos
 
@@ -114,6 +118,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14T11:10:50Z
-Stopped at: Completed 05-03-PLAN.md (Game Screen Shell) — Phase 5 Wave 1 complete (3/7 plans)
+Last session: 2026-04-14T11:34:44Z
+Stopped at: Completed 05-05-PLAN.md (ReferencePanel) — Phase 5 Wave 2 progress: 05-04 + 05-05 done (5/7 plans)
 Resume file: None
