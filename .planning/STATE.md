@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 6 of 8 (LLM Integration) — ✓ VERIFIED
-Plan: 9 of 9 in current phase (06-01..06-09 all complete)
-Status: Phase 6 verifier PASSED 5/5 must-haves with concrete code evidence. Live smoke test approved 2026-04-14 (all 22 requirements exercised end-to-end against real OpenAI endpoint). 406/406 tests green. Requirements PROMPT-01..05, STATE-01..04, RESP-01..05, FLOW-01..05, CTX-01..03 all marked Complete. Five Phase 8 follow-ups logged: backend upstream-error detail swallowed, uvicorn doesn't watch .env, Vite proxy 502 → INTERNAL_ERROR, stale localStorage cleanup, TOKENS_PER_TURN_ESTIMATE recalibration. .env scrubbed; OpenAI key used in smoke test must be rotated (appeared in chat logs). Ready for Phase 7.
-Last activity: 2026-04-14 — Phase 6 verifier passed 5/5; smoke test approved; 22 requirements marked Complete.
+Phase: 7 of 8 (Debrief, Export & Config Generation) — In progress
+Plan: 1 of 4 in current phase (07-01 complete)
+Status: 07-01 complete — debrief export foundation delivered. GameStore extended with stateSnapshots/gameEnded. debriefExporter.ts created with pure markdown generator + Firefox-safe download. 442/442 tests green (+36 new). Typecheck clean. Build clean.
+Last activity: 2026-04-14 — 07-01 complete (store snapshot slices + debriefExporter)
 
-Progress: [█████████████] 86% (30/35 plans)
+Progress: [█████████████░] 89% (31/35 plans)
 
 ## Performance Metrics
 
@@ -182,6 +182,11 @@ Recent decisions affecting current work:
 - 06-09: Plan referenced `src/index.css` but actual file is `src/styles/index.css` — used the correct path (confirmed via Glob). Future plans should reference the real path
 - 06-09: [Rule 3 unblock] `GameHeader.tsx` was using `gameConfig?.title` (non-existent on GameConfig interface); replaced with `.name` per 05-03 decision. Pre-existing regression discovered during `pnpm build` verify
 - 06-09: [Rule 3 unblock] `responseParser.test.ts` stateUpdate round-trip test used a bogus shape `{teams: {...}}` incompatible with StateUpdate type; cast through `as unknown as PersonaResponse['stateUpdate']` since the parser deliberately doesn't validate the inner shape (only "non-null object")
+- 07-01: stateSnapshots[N] = state at START of Round N (Option A keying). Seeded at initGame for N=1 via structuredClone(get().gameState) AFTER set() — freshly assigned plain object inside set() is not yet an Immer draft proxy. advanceRound uses current(s.gameState) inside set() because s.gameState IS a draft proxy there.
+- 07-01: gameEnded lives on GameStore (session UI state), NOT on GameState (simulation state). CONTEXT.md placement overridden. Reset in both newGame() and resetGame().
+- 07-01: ## Debrief anchor = LAST debrief_divider via reduce() pattern — first-divider anchor wrongly swallows post-interim round content into Debrief section.
+- 07-01: PERSONA_META displayName values are short names: 'Kent', 'Finch', 'Chen'. Plan test example of 'Kent Voss' was incorrect.
+- 07-01: ChatMessage has no teamId field — team code rendered as '—' in debrief transcripts. Plan 07-02 may extend if persona-team mapping needed.
 
 ### Pending Todos
 
@@ -196,6 +201,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Plan 06-09 complete (state-visibility polish); Phase 6 closed out
-Stopped at: Plan 06-09 complete — StatePanel delta diff + TrackBar ghost labels + TeamCard cell pulse + favourability colouring. `src/styles/index.css` gained `@keyframes cellPulse` (800ms), `@keyframes ghostFade` (2500ms), and `--color-track-readiness: #2BC48A` token. 3 atomic commits (78ac275 feat StatePanel+TrackBar+keyframes, 48b8812 feat TeamCard+track-readiness token+GameHeader Rule 3 fix, bc3cda3 test StatePanel+TeamCard+responseParser Rule 3 fix). 406/406 tests passing (+18 over 388 baseline); typecheck clean; `pnpm build` succeeds; both favourability classes present in dist/assets/*.css. Resume: Phase 7 (config generation) — `/gsd:plan-phase 07` to seed the phase plans. Deferred: number-tick interpolation on track readouts (low-value polish, revisit in Phase 8 if facilitator feedback requests it); manual visual spot-check via dev seed (recommended before Phase 7 kicks off).
+Last session: 2026-04-14 — Plan 07-01 complete (debrief export foundation)
+Stopped at: Plan 07-01 complete — GameStore extended with stateSnapshots/gameEnded/setters; debriefExporter.ts created with generateDebriefMarkdown + downloadDebrief + filename helpers. 2 atomic commits: 8d2f244 feat(07-01) store stateSnapshots + gameEnded; 3f10910 feat(07-01) debriefExporter. 442/442 tests passing (+36 over 406 baseline); typecheck clean; build clean. Ready for 07-02 (button wiring + End Game semantics split).
 Resume file: None
