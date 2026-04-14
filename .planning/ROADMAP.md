@@ -14,7 +14,7 @@ Build a three-persona AI facilitation console for live policy tabletop exercises
 - [x] **Phase 2: FastAPI Backend** — Credential proxy, both LLM endpoints, static file serving
 - [x] **Phase 3: UI Design System** — Google Stitch design, Tailwind v4 tokens, persona colours, fonts
 - [x] **Phase 4: Setup Screen** — Home, load config, JSON validation, scenario launch (brief gen stubbed)
-- [ ] **Phase 5: Game Screen Layout** — Three-column layout, chat feed, state dashboard, reference panel (all mock data)
+- [x] **Phase 5: Game Screen Layout** — Three-column layout, chat feed, state dashboard, reference panel (all mock data)
 - [ ] **Phase 6: LLM Integration** — Prompt builder, persona routing, state updater, response handling, context windowing (highest risk)
 - [ ] **Phase 7: Debrief, Export & Config Generation** — Markdown debrief export, wire generate-from-brief to backend
 - [ ] **Phase 8: QA & Credential Audit** — Full 5-round scenario run, credential audit, boundary value testing
@@ -105,11 +105,13 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 05-01: GameScreen shell — three-column layout, GameHeader, mock data injection into store
-- [ ] 05-02: ChatFeed component — all seven message types, auto-scroll behaviour
-- [ ] 05-03: StatePanel — TrackBar (severity + legitimacy), team resource grid cards, PC warning badges, persona dots, animations
-- [ ] 05-04: ReferencePanel — three-tab shell, CARDS list + detail view, ACTIONS section
-- [ ] 05-05: ReferencePanel GUIDE tab, FacilitatorInput bar — action buttons, Enter-to-send, loading disable state
+- [x] 05-01-PLAN.md — Mock game state + seeder (dev-only)
+- [x] 05-02-PLAN.md — Store stub actions + personaConfig + pcThresholds
+- [x] 05-03-PLAN.md — GameScreen three-column shell + GameHeader + DEV seed wire-in
+- [x] 05-04-PLAN.md — ChatFeed with 7 message types + sticky-bottom scroll hook
+- [x] 05-05-PLAN.md — ReferencePanel CARDS/ACTIONS/GUIDE tabs + scroll preservation
+- [x] 05-06-PLAN.md — StatePanel TrackBar + TeamCard + PcBadge + PersonaDots
+- [x] 05-07-PLAN.md — FacilitatorInput ActionToolbar + MessageInput + keyboard/loading handling
 
 ### Phase 6: LLM Integration
 **Goal**: The facilitator can type an event, press Enter, and receive in-character persona responses that update the live game state — the complete LLM loop is hardened against JSON parse failures, context overflow, out-of-range state values, and credential leakage.
@@ -178,7 +180,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. FastAPI Backend | 4/4 | ✓ Verified | 2026-04-13 |
 | 3. UI Design System | 4/4 | ✓ Verified | 2026-04-13 |
 | 4. Setup Screen | 4/4 | ✓ Verified | 2026-04-13 |
-| 5. Game Screen Layout | 0/5 | Not started | - |
+| 5. Game Screen Layout | 7/7 | ✓ Verified | 2026-04-14 |
 | 6. LLM Integration | 0/6 | Not started | - |
 | 7. Debrief, Export & Config Generation | 0/4 | Not started | - |
 | 8. QA & Credential Audit | 0/5 | Not started | - |
