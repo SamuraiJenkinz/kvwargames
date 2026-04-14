@@ -73,6 +73,17 @@
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+
+  @keyframes cellPulse {
+    0%   { background-color: color-mix(in oklab, var(--color-persona-finch) 20%, transparent); }
+    100% { background-color: transparent; }
+  }
+
+  @keyframes ghostFade {
+    0%   { opacity: 1; transform: translateY(-4px); }
+    80%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-10px); }
+  }
 }
 
 @layer base {

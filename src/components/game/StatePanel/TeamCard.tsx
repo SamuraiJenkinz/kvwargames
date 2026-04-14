@@ -10,7 +10,17 @@ const FIELDS: Array<{ key: keyof TeamState; label: string; colorClass: string }>
   { key: 'ic', label: 'IC', colorClass: 'text-resource-ic' },
 ]
 
-export default function TeamCard({ team }: { team: TeamState }) {
+type DeltaKey = 'pc' | 'po' | 'readiness' | 'stock' | 'crm' | 'ic'
+
+export interface TeamCardProps {
+  team: TeamState
+  /** Per-field signed delta from the previous render. Zero / missing = no pulse, no ghost. */
+  deltas?: Partial<Record<DeltaKey, number>>
+}
+
+export default function TeamCard({ team, deltas }: TeamCardProps) {
+  // deltas reserved for Task 2 visualisation; reference to silence unused warnings.
+  void deltas
   const short = `Team ${team.id}`
 
   return (
