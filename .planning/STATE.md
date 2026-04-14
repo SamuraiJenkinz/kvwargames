@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 5 (Game Screen Layout) — Plan 1 of 7 complete
+**Current focus:** Phase 5 (Game Screen Layout) — Plan 2 of 7 complete
 
 ## Current Position
 
 Phase: 5 of 8 (Game Screen Layout)
-Plan: 1 of 7 in current phase
-Status: In progress — 05-01 complete; ready for 05-02
-Last activity: 2026-04-14 — Completed 05-01-PLAN.md (Mock Game State)
+Plan: 2 of 7 in current phase
+Status: In progress — 05-02 complete; ready for 05-03
+Last activity: 2026-04-14 — Completed 05-02-PLAN.md (Store Stubs + Utility Modules)
 
-Progress: [█████░░░░░] 46% (16/35 plans)
+Progress: [██████░░░░] 49% (17/35 plans)
 
 ## Performance Metrics
 
@@ -93,6 +93,10 @@ Recent decisions affecting current work:
 - 05-01: DEV guard excluded from seedMockState() — gate lives at call site (GuardedGameScreen in 05-03) for testability; seeder is unconditional
 - 05-01: EDIP_CONFIG cast as GameConfig in seeder — required because 'as const satisfies GameConfig' gives narrower literal type incompatible with setGameConfig parameter
 - 05-01: No chen message after Round 2 round_divider in MOCK_MESSAGES — intentional; exercises 2-lit/1-dim persona indicator dot state
+- 05-02: REQUIREMENTS.md CHAT-02 KV/AF/MC initials override CONTEXT.md single-letter K/F/C — documented in personaConfig.ts comments
+- 05-02: PERSONA_META bubbleClass pre-baked as literal Tailwind strings (not template-literal generation) — Tailwind v4 purges non-literal class references
+- 05-02: advanceRound captures newRound before calling get().addMessages — avoids reading from immer draft after set() completes
+- 05-02: sendFacilitatorMessage does NOT trigger LLM call — Phase 6 replaces this stub; signature is the stable Phase 6 entry point
 
 ### Pending Todos
 
@@ -108,5 +112,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-14
-Stopped at: Completed 05-01-PLAN.md (Mock Game State) — Phase 5 in progress (1/7 plans)
+Stopped at: Completed 05-02-PLAN.md (Store Stubs + Utility Modules) — Phase 5 in progress (2/7 plans)
 Resume file: None
