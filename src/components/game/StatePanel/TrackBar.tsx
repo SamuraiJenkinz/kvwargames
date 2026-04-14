@@ -5,6 +5,13 @@ interface TrackBarProps {
   max: number
   colorClass: string
   mode?: 'simple' | 'center-zero'
+  /** Signed delta from previous render. When non-zero, a ghost label floats up and fades. */
+  delta?: number
+  /**
+   * Favourability direction for the underlying field.
+   * 'up' = higher is better (e.g. edipLegitimacy); 'down' = lower is better (e.g. crisisSeverity).
+   */
+  favourability?: 'up' | 'down'
 }
 
 export default function TrackBar({
@@ -14,6 +21,8 @@ export default function TrackBar({
   max,
   colorClass,
   mode = 'simple',
+  delta,
+  favourability = 'up',
 }: TrackBarProps) {
   const formattedValue =
     mode === 'center-zero'
@@ -29,12 +38,35 @@ export default function TrackBar({
 
   const simpleFillWidth = mode === 'simple' ? ((value - min) / (max - min)) * 100 : 0
 
+  const showGhost = delta != null && delta !== 0
+  const isFavourable =
+    showGhost &&
+    ((favourability === 'up' && delta > 0) || (favourability === 'down' && delta < 0))
+  // Literal class strings required by Tailwind v4 static source scan — do not compose dynamically.
+  const deltaColorClass = isFavourable ? 'text-track-readiness' : 'text-crisis-security'
+  const deltaText = showGhost && delta > 0 ? `+${delta}` : `${delta}`
+  // Stable key changes each time delta flips — forces animation restart on genuinely new deltas.
+  const ghostKey = showGhost ? `${label}-${delta}-${value}` : undefined
+
   return (
     <div className="space-y-1">
       {/* Header row */}
-      <div className="flex justify-between text-xs font-mono">
+      <div className="flex justify-between text-xs font-mono relative">
         <span className="text-text-muted uppercase">{label}</span>
         <span>{formattedValue}</span>
+        {showGhost && (
+          <span
+            key={ghostKey}
+            data-testid={`trackbar-ghost-${label.toLowerCase()}`}
+            className={[
+              'absolute right-0 -top-3 text-[10px] font-mono font-medium pointer-events-none',
+              'animate-[ghostFade_2500ms_ease-out_both]',
+              deltaColorClass,
+            ].join(' ')}
+          >
+            {deltaText}
+          </span>
+        )}
       </div>
 
       {/* Bar shell */}
