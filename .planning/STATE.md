@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 6 (LLM Integration) — Wave 4 complete, end-to-end LLM loop wired into gameStore + UI; smoke test (06-08) and state-visibility polish (06-09) remaining
+**Current focus:** Phase 6 (LLM Integration) — Wave 5 Task 1 complete (token budget measured, N reduced 6→2); paused at 06-08 Task 2 human-verify smoke test checkpoint.
 
 ## Current Position
 
 Phase: 6 of 8 (LLM Integration)
-Plan: 7 of 9 in current phase (06-01 + 06-02 + 06-03 + 06-04 + 06-05 + 06-06 + 06-07 complete)
-Status: In progress — Wave 4 complete. gameStore.runLLMTurn orchestrates the full LLM turn atomically (sync facilitator bubble → async turn → single set() on success, single red error bubble on failure, byte-identical gameState + llmHistory on any non-2xx path). UI integration done: ErrorMessage raw disclosure + Retry, PersonaMessage CSS-stagger + amber flag, ControlBanner non-blocking confirmation, ActionToolbar dual-debrief. 379 tests green, typecheck clean.
-Last activity: 2026-04-14 — Completed 06-07-store-and-ui-wiring-PLAN.md; 29 new/updated tests, FLOW-01..05 + CTX-01..02 + RESP-02..05 + STATE-01..04 satisfied.
+Plan: 7 of 9 in current phase (06-01..06-07 complete; 06-08 Task 1 complete, Task 2 awaiting human smoke test)
+Status: Paused at 06-08 Task 2 checkpoint (human-verify). Task 1 delivered reportPromptBudget + DEV init logging + BUDGET.md; empirical systemPromptTokens = 5124; HISTORY_WINDOW_N reduced 6 → 2 for gpt-4 8k safe ceiling (total 6724 / 7500). 388 tests green, typecheck clean. Awaiting live end-to-end smoke test against corporate Azure endpoint.
+Last activity: 2026-04-14 — Plan 06-08 Task 1 complete; 4 atomic commits (feat/test/chore/docs).
 
 Progress: [████████████] 83% (29/35 plans)
 
@@ -167,6 +167,10 @@ Recent decisions affecting current work:
 - 06-07: vi.mock of 4 external modules in gameStore.test.ts (`promptBuilder`, `contextWindow`, `llmClient`, `responseParser`) — `applyStateUpdatePure` intentionally NOT mocked so clamp-log assertions exercise real behaviour
 - 06-07: FacilitatorInput tests now also mock the LLM pipeline — previously `sendFacilitatorMessage` was a stub and buttons fired no async work; now they trigger `runLLMTurn` which the mocks short-circuit with a never-resolving promise (for loading=true assertions) or happy-path defaults
 - 06-07: Two debrief buttons ('Request Debrief Now' + 'End Game + Debrief') both dispatch `triggerDebrief` today. Plan 08 may split semantics (interim vs end-of-game clears cardsThisRound, etc.) if smoke test surfaces the need
+- 06-08: Empirical budget measurement confirms systemPromptTokens = 5124 (via measurePromptTokens heuristic on EDIP_CONFIG + fresh GameState). With SAFE_CONTEXT_CEILING_TOKENS=7500 (gpt-4 8k), N=6 overshoots by 2424 tokens — reduced to N=2 (total 6724/7500, 776-token headroom). Reversal path documented in BUDGET.md; raise both constants once corporate context window is confirmed >8k
+- 06-08: SAFE_CONTEXT_CEILING_TOKENS=7500 chosen as conservative default for gpt-4 8k; corporate deployment context size UNCONFIRMED at plan-execution time — flagged for Phase 8 ops confirmation before considering raising N back up
+- 06-08: TOKENS_PER_TURN_ESTIMATE=800 pinned in test; recalibration procedure (±20% band against actual DevTools-captured response) deferred to Task 2 smoke test per plan verify clause
+- 06-08: reportPromptBudget wired into gameStore.initGame behind import.meta.env.DEV — console.info on withinLimit, console.error with 'CTX-03 BUDGET EXCEEDED' tag when over-budget. Cannot silently fail (CTX-03 satisfied)
 
 ### Pending Todos
 
@@ -175,12 +179,12 @@ None.
 ### Blockers/Concerns
 
 - Phase 6 research flag: Corporate LLM endpoint response structure may deviate from standard OpenAI format — make extraction path configurable in `config.py` before hardcoding; verify against actual endpoint
-- Phase 6 research flag (MEASURED 06-04): Token budget for system prompt is **5124 tokens (20496 chars)** on the EDIP config via measurePromptTokens — exceeds the original 3K-4K estimate. Plan 06-08 must verify corporate LLM endpoint context window vs this number; with an 8K cap, history + response share only ~3K and windowing must be aggressive
+- Phase 6 research flag (MEASURED 06-04, RESOLVED 06-08): Token budget for system prompt is **5124 tokens** on the EDIP config. 06-08 Task 1 reduced HISTORY_WINDOW_N 6 → 2 against gpt-4 8k assumption (total 6724 / 7500 safe ceiling). See .planning/phases/06-llm-integration/06-08-BUDGET.md. Remaining Phase 8 follow-up: confirm actual corporate context window with ops; if >8k, raise SAFE_CONTEXT_CEILING_TOKENS + HISTORY_WINDOW_N accordingly
 - Phase 6 research flag: Corporate proxy timeout (est. 30s) vs LLM generation time (25–35s) — verify actual timeout with ops team before Phase 6 completes
 - Phase 7 research flag: Config generation prompt needs testing against 3 brief types to establish reliability threshold
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Completed Phase 6 plan 06-07 (store + UI wiring)
-Stopped at: 06-07 done; gameStore wired end-to-end. `runLLMTurn` orchestrates prompt → window → LLM → parse → apply-state atomically. Atomicity tests: LLM_TIMEOUT / PARSE_FAILURE / NETWORK_ERROR + VALIDATION_FAILURE all leave gameState + llmHistory byte-identical. FLOW-05 newGame mid-flight test: never-resolving fetch, newGame() aborts controller + clears all transient slices, captured signal.aborted=true. Invariant test: 10 consecutive turns, llmHistory.length stabilises at exactly 13. UI: ErrorMessage raw `<details>` + Retry, PersonaMessage inline `animationDelay` + `text-amber-400` flag, ControlBanner null-when-idle / `kind`-based confirm buttons, ActionToolbar dual-debrief. 379/379 tests pass, typecheck clean. Wave 4 complete. Remaining: 06-08 (token budget empirical smoke test against live corporate LLM) and 06-09 (state-visibility polish — delta ghost-text + cell pulse).
+Last session: 2026-04-14 — Plan 06-08 Task 1 complete; paused at Task 2 human-verify smoke test checkpoint
+Stopped at: 06-08 Task 1 delivered — `src/lib/promptBudget.ts` (reportPromptBudget + SAFE_CONTEXT_CEILING_TOKENS=7500 + TOKENS_PER_TURN_ESTIMATE=800), pinned-constant test suite (9 tests), HISTORY_WINDOW_N reduced 6→2 (total 6724/7500 at measured 5124 systemPromptTokens), DEV init logging wired into gameStore.initGame (console.info on withinLimit, console.error with CTX-03 tag on exceeded), BUDGET.md documenting empirical measurement + deployment-class table + context-window-unconfirmed flag for Phase 8. 4 atomic commits (feat/test/chore/docs). 388/388 tests pass, typecheck clean. Resume: Task 2 live end-to-end smoke test against corporate Azure endpoint — 22-item checklist covering all PROMPT/STATE/RESP/FLOW/CTX requirements + credential audit + failure-mode drills. Post-smoke-test: recalibrate TOKENS_PER_TURN_ESTIMATE against a captured real response (±20% band).
 Resume file: None
