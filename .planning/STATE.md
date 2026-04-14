@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 6 (LLM Integration) — backend Azure auth unblocked, types seeded, downstream wiring plans queued
+**Current focus:** Phase 6 (LLM Integration) — backend Azure auth unblocked, types seeded, llm client boundary shipped, store wiring next
 
 ## Current Position
 
 Phase: 6 of 8 (LLM Integration)
-Plan: 5 of 9 in current phase (06-01 + 06-02 + 06-03 + 06-04 + 06-05 complete)
-Status: In progress — response parser + context window shipped; defensive four-layer parse never throws, sliding window at N=6 enforces pair-alignment invariant
-Last activity: 2026-04-14 — Completed 06-05-response-parser-and-context-window-PLAN.md; 63/63 new tests pass (42 parser + 21 context window), typecheck clean
+Plan: 6 of 9 in current phase (06-01 + 06-02 + 06-03 + 06-04 + 06-05 + 06-06 complete)
+Status: In progress — Wave 3 complete. llmClient.ts boundary ready (never throws, preserves backend error codes, AbortController-aware); all inputs assembled for store wiring plan 06-07
+Last activity: 2026-04-14 — Completed 06-06-llm-client-PLAN.md; 19/19 new tests pass, 350-suite green, typecheck clean, zero `throw` in source
 
-Progress: [██████████] 77% (27/35 plans)
+Progress: [██████████] 80% (28/35 plans)
 
 ## Performance Metrics
 
@@ -147,6 +147,14 @@ Recent decisions affecting current work:
 - 06-05: BOM stripped via `charCodeAt(0) === 0xFEFF` (not regex) — single-codepoint check has clearer intent than a pattern
 - 06-05: windowHistory adds `if (n <= 0) return []` guard — `Array.prototype.slice(-0)` returns the full array in JS (negative zero coerced to 0), which would violate the `result.length <= 2n` invariant when history is non-empty. Rule-2 fix caught by the `n = 0` invariant test on first run
 - 06-05: HistoryEntry imported from `@/types/llm` and re-exported by contextWindow.ts — single source of truth in types module; 06-06 llmClient.ts depends on the type without depending on this module
+- 06-06: llmClient.ts imports ONLY from `@/types/llm` — zero import of contextWindow.ts or responseParser.ts; 06-06 truly depends only on 06-02 at the type level and can be reverted independently
+- 06-06: Never-throws invariant grep-verified (`grep -c "throw" src/lib/llmClient.ts` = 0) — every error path (abort, network, HTTP error, malformed body, non-Error rejection) returns a discriminated `LLMCallResult`
+- 06-06: AbortError distinguished from network failure via `err instanceof DOMException && err.name === 'AbortError'` → `ABORTED`; all other catch paths → `NETWORK_ERROR`. Store can branch cleanly in 06-07
+- 06-06: Known-list gate on backend codes — `(known as string[]).includes(code ?? '')` coerces unknown strings to `INTERNAL_ERROR`, keeping `LLMClientErrorCode` union tight even if backend adds new codes
+- 06-06: `LLM_FRONTEND_TIMEOUT_MS = 45000` is consumed by the store (06-07), not by the client itself — store owns `AbortController`, `setTimeout(() => controller.abort(), LLM_FRONTEND_TIMEOUT_MS)`, fresh controller per call (never cached, per RESEARCH.md)
+- 06-06: `error.message` fallback is `HTTP ${status}` — Phase 2 backend guarantees `code` on non-2xx but `message` is optional; client must not crash on `error: { code: 'LLM_TIMEOUT' }` without message
+- 06-06: Test harness uses `vi.stubGlobal('fetch', vi.fn())` + `new Response(JSON.stringify(body), { status })` — zero new test dependencies; fetch mock module-level via beforeEach/afterEach + `vi.unstubAllGlobals()` teardown
+- 06-06: Abort test mocks fetch as a Promise that listens to `signal.addEventListener('abort', ...)` and rejects with `new DOMException('aborted', 'AbortError')` — reproduces browser fetch cancellation semantics exactly
 
 ### Pending Todos
 
@@ -161,6 +169,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Completed Phase 6 plan 06-05 (response parser + context window)
-Stopped at: 06-05 done; parsePersonaResponse (4 defence layers, zero throws) + windowHistory (pair-alignment invariant, HISTORY_WINDOW_N=6) exported from src/lib/; 63 tests pass (42 parser + 21 context window), typecheck clean. gameStore still untouched. Remaining Wave 3: 06-06 (llm client, depends on 06-04 + 06-05). Wave 4: 06-07 (store + ui wiring, consumes 06-03 + 06-04 + 06-05 + 06-06). Then 06-08 (token budget smoke test — re-tune HISTORY_WINDOW_N if needed) and 06-09 (state visibility).
+Last session: 2026-04-14 — Completed Phase 6 plan 06-06 (llm client)
+Stopped at: 06-06 done; callLLMProxy (never throws, preserves backend error codes end-to-end, AbortController-aware) + LLM_FRONTEND_TIMEOUT_MS=45000 exported from src/lib/llmClient.ts. 19 tests pass, full 350-suite green, typecheck clean. Wave 3 complete — 06-03 stateUpdater + 06-04 promptBuilder + 06-05 responseParser/contextWindow + 06-06 llmClient all shipped. gameStore still untouched. Wave 4: 06-07 (store + ui wiring, consumes 06-03 + 06-04 + 06-05 + 06-06). Then 06-08 (token budget smoke test — re-tune HISTORY_WINDOW_N if needed) and 06-09 (state visibility).
 Resume file: None
