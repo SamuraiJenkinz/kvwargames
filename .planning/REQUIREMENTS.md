@@ -26,26 +26,26 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Prompt Engineering
 
-- [ ] **PROMPT-01**: Prompt builder constructs system prompt from game config + live game state (10 required blocks: game context, live state, team identities, national actions, EDIP cards, key mechanics, persona definitions, routing rules, JSON format, absolute rules)
-- [ ] **PROMPT-02**: Three personas have distinct voice and constraints: Kent (structured, inclusive, question-led), Finch (precise, data-driven, consequential), Chen (grounding, procedurally rigorous, challenging)
-- [ ] **PROMPT-03**: Routing rules encoded in prompt determine which persona speaks for which trigger (round start, card play, national action, unique action, EO response, dispute, threshold warning, debrief)
-- [ ] **PROMPT-04**: LLM returns structured JSON with responses array containing speaker, message (2-4 sentences), stateUpdate (or null), and flag (or null)
-- [ ] **PROMPT-05**: Negative constraints prevent persona bleed (each persona defined by what they must NOT do)
+- [x] **PROMPT-01**: Prompt builder constructs system prompt from game config + live game state (10 required blocks: game context, live state, team identities, national actions, EDIP cards, key mechanics, persona definitions, routing rules, JSON format, absolute rules)
+- [x] **PROMPT-02**: Three personas have distinct voice and constraints: Kent (structured, inclusive, question-led), Finch (precise, data-driven, consequential), Chen (grounding, procedurally rigorous, challenging)
+- [x] **PROMPT-03**: Routing rules encoded in prompt determine which persona speaks for which trigger (round start, card play, national action, unique action, EO response, dispute, threshold warning, debrief)
+- [x] **PROMPT-04**: LLM returns structured JSON with responses array containing speaker, message (2-4 sentences), stateUpdate (or null), and flag (or null)
+- [x] **PROMPT-05**: Negative constraints prevent persona bleed (each persona defined by what they must NOT do)
 
 ### State Management
 
-- [ ] **STATE-01**: State updater applies LLM state deltas to game state with clamping (crisisSeverity 0-5, edipLegitimacy -2 to +2, PC 0-6, PO -2 to +2, readiness 0-5, stock/crm/ic 0-99)
-- [ ] **STATE-02**: Team updates match by team ID, not array index
-- [ ] **STATE-03**: Only changed fields are included in state updates; unchanged fields are omitted
-- [ ] **STATE-04**: Crisis state transitions are tracked (No Crisis -> Supply Crisis -> Security-Related Supply Crisis)
+- [x] **STATE-01**: State updater applies LLM state deltas to game state with clamping (crisisSeverity 0-5, edipLegitimacy -2 to +2, PC 0-6, PO -2 to +2, readiness 0-5, stock/crm/ic 0-99)
+- [x] **STATE-02**: Team updates match by team ID, not array index
+- [x] **STATE-03**: Only changed fields are included in state updates; unchanged fields are omitted
+- [x] **STATE-04**: Crisis state transitions are tracked (No Crisis -> Supply Crisis -> Security-Related Supply Crisis)
 
 ### Response Handling
 
-- [ ] **RESP-01**: Client-side JSON parsing strips markdown code fences before parsing
-- [ ] **RESP-02**: Defensive parsing handles malformed LLM responses gracefully (error message in chat, not session crash)
-- [ ] **RESP-03**: Parsed persona responses are added to chat as individual messages with correct speaker, colour, timestamp
-- [ ] **RESP-04**: State updates from parsed responses are applied to game state via state updater
-- [ ] **RESP-05**: Flag field (when not null) renders as amber facilitator-facing banner below the persona message
+- [x] **RESP-01**: Client-side JSON parsing strips markdown code fences before parsing
+- [x] **RESP-02**: Defensive parsing handles malformed LLM responses gracefully (error message in chat, not session crash)
+- [x] **RESP-03**: Parsed persona responses are added to chat as individual messages with correct speaker, colour, timestamp
+- [x] **RESP-04**: State updates from parsed responses are applied to game state via state updater
+- [x] **RESP-05**: Flag field (when not null) renders as amber facilitator-facing banner below the persona message
 
 ### Setup Screen
 
@@ -92,11 +92,11 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Game Flow
 
-- [ ] **FLOW-01**: Facilitator types event description, sends to LLM, receives persona responses
-- [ ] **FLOW-02**: "Advance to Round N" triggers round divider + LLM call with round inject, Finch delivers inject, Kent frames round
-- [ ] **FLOW-03**: "End Game + Debrief" triggers debrief divider + LLM debrief call, all three personas respond
-- [ ] **FLOW-04**: "Request Debrief Now" available mid-game for interim debrief
-- [ ] **FLOW-05**: New Game button navigates to setup, triggers store reset
+- [x] **FLOW-01**: Facilitator types event description, sends to LLM, receives persona responses
+- [x] **FLOW-02**: "Advance to Round N" triggers round divider + LLM call with round inject, Finch delivers inject, Kent frames round
+- [x] **FLOW-03**: "End Game + Debrief" triggers debrief divider + LLM debrief call, all three personas respond
+- [x] **FLOW-04**: "Request Debrief Now" available mid-game for interim debrief
+- [x] **FLOW-05**: New Game button navigates to setup, triggers store reset
 
 ### Debrief & Export
 
@@ -116,9 +116,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Context Management
 
-- [ ] **CTX-01**: LLM history accumulates full session conversation for persona continuity
-- [ ] **CTX-02**: History windowing strategy prevents context overflow in long scenarios (5-round Scenario 2)
-- [ ] **CTX-03**: System prompt + history fit within corporate LLM context window
+- [x] **CTX-01**: LLM history accumulates full session conversation for persona continuity
+- [x] **CTX-02**: History windowing strategy prevents context overflow in long scenarios (5-round Scenario 2)
+- [x] **CTX-03**: System prompt + history fit within corporate LLM context window
 
 ### Infrastructure
 
@@ -183,20 +183,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LLM-04 | Phase 2 | Complete |
 | LLM-05 | Phase 2 | Complete |
 | LLM-06 | Phase 2 | Complete |
-| PROMPT-01 | Phase 6 | Pending |
-| PROMPT-02 | Phase 6 | Pending |
-| PROMPT-03 | Phase 6 | Pending |
-| PROMPT-04 | Phase 6 | Pending |
-| PROMPT-05 | Phase 6 | Pending |
-| STATE-01 | Phase 6 | Pending |
-| STATE-02 | Phase 6 | Pending |
-| STATE-03 | Phase 6 | Pending |
-| STATE-04 | Phase 6 | Pending |
-| RESP-01 | Phase 6 | Pending |
-| RESP-02 | Phase 6 | Pending |
-| RESP-03 | Phase 6 | Pending |
-| RESP-04 | Phase 6 | Pending |
-| RESP-05 | Phase 6 | Pending |
+| PROMPT-01 | Phase 6 | Complete |
+| PROMPT-02 | Phase 6 | Complete |
+| PROMPT-03 | Phase 6 | Complete |
+| PROMPT-04 | Phase 6 | Complete |
+| PROMPT-05 | Phase 6 | Complete |
+| STATE-01 | Phase 6 | Complete |
+| STATE-02 | Phase 6 | Complete |
+| STATE-03 | Phase 6 | Complete |
+| STATE-04 | Phase 6 | Complete |
+| RESP-01 | Phase 6 | Complete |
+| RESP-02 | Phase 6 | Complete |
+| RESP-03 | Phase 6 | Complete |
+| RESP-04 | Phase 6 | Complete |
+| RESP-05 | Phase 6 | Complete |
 | SETUP-01 | Phase 4 | Complete |
 | SETUP-02 | Phase 4 | Complete |
 | SETUP-03 | Phase 4 | Complete |
@@ -225,11 +225,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REF-02 | Phase 5 | Complete |
 | REF-03 | Phase 5 | Complete |
 | REF-04 | Phase 5 | Complete |
-| FLOW-01 | Phase 6 | Pending |
-| FLOW-02 | Phase 6 | Pending |
-| FLOW-03 | Phase 6 | Pending |
-| FLOW-04 | Phase 6 | Pending |
-| FLOW-05 | Phase 6 | Pending |
+| FLOW-01 | Phase 6 | Complete |
+| FLOW-02 | Phase 6 | Complete |
+| FLOW-03 | Phase 6 | Complete |
+| FLOW-04 | Phase 6 | Complete |
+| FLOW-05 | Phase 6 | Complete |
 | DEB-01 | Phase 7 | Pending |
 | DEB-02 | Phase 7 | Pending |
 | DEB-03 | Phase 7 | Pending |
@@ -240,9 +240,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-05 | Phase 3 | Complete |
 | UI-06 | Phase 3 | Complete |
 | UI-07 | Phase 3 | Complete |
-| CTX-01 | Phase 6 | Pending |
-| CTX-02 | Phase 6 | Pending |
-| CTX-03 | Phase 6 | Pending |
+| CTX-01 | Phase 6 | Complete |
+| CTX-02 | Phase 6 | Complete |
+| CTX-03 | Phase 6 | Complete |
 | INFRA-01 | Phase 1 | Complete |
 | INFRA-02 | Phase 2 | Complete |
 | INFRA-03 | Phase 1 | Complete |
