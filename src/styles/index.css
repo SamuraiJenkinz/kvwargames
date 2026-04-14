@@ -48,6 +48,13 @@
   /* Track Bars */
   --color-track-severity:   #FF6B6B;
   --color-track-legitimacy: #5B9BD5;
+  /*
+   * --color-track-readiness is the canonical "favourable delta" green used by
+   * StatePanel + TeamCard ghost labels (Plan 06-09). Matches resource-readiness /
+   * crisis-none so ghost tint reads as semantically consistent with "things
+   * improved".
+   */
+  --color-track-readiness:  #2BC48A;
 
   /* Typography */
   --font-display: 'Syne', sans-serif;
