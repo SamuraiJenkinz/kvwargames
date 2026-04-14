@@ -29,8 +29,11 @@ function buildAlternating(pairs: number): HistoryEntry[] {
 // ─── Constant pin ─────────────────────────────────────────────────────────────
 
 describe('HISTORY_WINDOW_N constant', () => {
-  it('equals 6 (pinned — accidental change should fail CI)', () => {
-    expect(HISTORY_WINDOW_N).toBe(6)
+  it('equals 2 (pinned post-06-08 empirical reduction — accidental change should fail CI)', () => {
+    // Reduced from 6 → 2 in Plan 06-08 after measuring systemPromptTokens=5124
+    // against SAFE_CONTEXT_CEILING_TOKENS=7500 for the gpt-4 8k deployment.
+    // See .planning/phases/06-llm-integration/06-08-BUDGET.md.
+    expect(HISTORY_WINDOW_N).toBe(2)
   })
 })
 
@@ -57,7 +60,8 @@ describe('windowHistory — basic cases', () => {
   })
 
   it('returns full history (no trim) when it fits within the window', () => {
-    const history = buildAlternating(3) // 6 entries, N=6 allows 12
+    // N=2 allows 4 entries; fixture size 1 pair (2 entries) fits comfortably.
+    const history = buildAlternating(1)
     const result = windowHistory(history)
     expect(result).toEqual(history)
   })
