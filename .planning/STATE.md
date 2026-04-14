@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 6 of 8 (LLM Integration) — COMPLETE
+Phase: 6 of 8 (LLM Integration) — ✓ VERIFIED
 Plan: 9 of 9 in current phase (06-01..06-09 all complete)
-Status: Phase 6 complete. 06-09 delivered StatePanel delta diff + TrackBar ghost labels + TeamCard cell pulse + favourability colouring; Tailwind v4 static scan verified in built CSS bundle; 406/406 tests green (+18 over 388 baseline); typecheck clean; build succeeds. Rule 3 deviations: fixed pre-existing GameHeader.tsx .title typo and responseParser.test.ts stateUpdate shape incompatibility. Added --color-track-readiness token (#2BC48A) to unlock Tailwind scan. Ready for Phase 7.
-Last activity: 2026-04-14 — Plan 06-09 complete; 3 atomic commits (feat/feat/test) + summary commit.
+Status: Phase 6 verifier PASSED 5/5 must-haves with concrete code evidence. Live smoke test approved 2026-04-14 (all 22 requirements exercised end-to-end against real OpenAI endpoint). 406/406 tests green. Requirements PROMPT-01..05, STATE-01..04, RESP-01..05, FLOW-01..05, CTX-01..03 all marked Complete. Five Phase 8 follow-ups logged: backend upstream-error detail swallowed, uvicorn doesn't watch .env, Vite proxy 502 → INTERNAL_ERROR, stale localStorage cleanup, TOKENS_PER_TURN_ESTIMATE recalibration. .env scrubbed; OpenAI key used in smoke test must be rotated (appeared in chat logs). Ready for Phase 7.
+Last activity: 2026-04-14 — Phase 6 verifier passed 5/5; smoke test approved; 22 requirements marked Complete.
 
 Progress: [█████████████] 86% (30/35 plans)
 

@@ -15,7 +15,7 @@ Build a three-persona AI facilitation console for live policy tabletop exercises
 - [x] **Phase 3: UI Design System** — Google Stitch design, Tailwind v4 tokens, persona colours, fonts
 - [x] **Phase 4: Setup Screen** — Home, load config, JSON validation, scenario launch (brief gen stubbed)
 - [x] **Phase 5: Game Screen Layout** — Three-column layout, chat feed, state dashboard, reference panel (all mock data)
-- [ ] **Phase 6: LLM Integration** — Prompt builder, persona routing, state updater, response handling, context windowing (highest risk)
+- [x] **Phase 6: LLM Integration** — Prompt builder, persona routing, state updater, response handling, context windowing (highest risk)
 - [ ] **Phase 7: Debrief, Export & Config Generation** — Markdown debrief export, wire generate-from-brief to backend
 - [ ] **Phase 8: QA & Credential Audit** — Full 5-round scenario run, credential audit, boundary value testing
 
@@ -123,15 +123,18 @@ Plans:
   3. LLM state deltas are applied to the StatePanel with correct clamping — a response that pushes crisisSeverity above 5 or edipLegitimacy outside −2/+2 is silently clamped, not rejected or crashed
   4. A malformed or truncated LLM JSON response produces a red error bubble in the chat feed; the session state is intact and the facilitator can send the next message without refreshing
   5. After 4+ rounds of a live scenario, the system prompt + windowed history stays within the model's context window — persona voice and JSON format hold for Round 4 and beyond; `llmHistory.length` never exceeds 2×N+1 entries
-**Plans**: TBD
+**Plans:** 9 plans
 
 Plans:
-- [ ] 06-01: `promptBuilder.ts` — full 10-block system prompt construction from live GameConfig + GameState
-- [ ] 06-02: Persona definitions, routing rules, negative constraints, JSON output schema in prompt
-- [ ] 06-03: `llmClient.ts` — fetch to `/api/llm`, markdown fence stripping, defensive JSON parse, error bubble on failure, AbortController timeout
-- [ ] 06-04: `stateUpdater.ts` — all fields clamped with explicit bounds, null/undefined = no-op, team match by ID
-- [ ] 06-05: Wire FacilitatorInput → llmClient → stateUpdater → store; round advance action; debrief trigger; FLOW-01..05
-- [ ] 06-06: Context windowing — `CTX-02` windowed history (N=6 message pairs), token budget measurement, `CTX-03` validation
+- [ ] 06-01-PLAN.md — Backend Azure auth header fix (configurable `api-key` vs `Authorization: Bearer` in `llm.py`/`config.py`)
+- [ ] 06-02-PLAN.md — Types extension (`ChatMessage` error metadata + revealDelay; `LLMStructuredResponse.control`; `ParseResult`/`LLMCallResult`/`HistoryEntry` shared types)
+- [ ] 06-03-PLAN.md — `stateUpdater.ts` pure clamping function + boundary TDD suite (STATE-01..04)
+- [ ] 06-04-PLAN.md — `promptBuilder.ts` 10-block system prompt + persona defs + routing rules + negative constraints (PROMPT-01..05)
+- [ ] 06-05-PLAN.md — `responseParser.ts` four-layer defensive parse + `contextWindow.ts` sliding window (RESP-01/02, CTX-02)
+- [ ] 06-06-PLAN.md — `llmClient.ts` fetch + AbortController + backend error-code mapping
+- [ ] 06-07-PLAN.md — Store + UI wiring (gameStore refactor incl. newGame abort + llmHistory bound; ErrorMessage/PersonaMessage/ControlBanner/ActionToolbar; FLOW-01..05, RESP-03..05, CTX-01)
+- [ ] 06-08-PLAN.md — Token budget measurement + live smoke test (CTX-03; human-verify checkpoint)
+- [ ] 06-09-PLAN.md — State-visibility polish: StatePanel delta ghost + TeamCard cell pulse (split out of 06-07; runs after the 06-08 smoke test)
 
 ### Phase 7: Debrief, Export & Config Generation
 **Goal**: The session ends with a downloadable debrief artifact, and a facilitator can generate a game config from a plain-text brief — completing the two remaining user-facing workflows.
@@ -181,6 +184,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. UI Design System | 4/4 | ✓ Verified | 2026-04-13 |
 | 4. Setup Screen | 4/4 | ✓ Verified | 2026-04-13 |
 | 5. Game Screen Layout | 7/7 | ✓ Verified | 2026-04-14 |
-| 6. LLM Integration | 0/6 | Not started | - |
+| 6. LLM Integration | 9/9 | ✓ Verified | 2026-04-14 |
 | 7. Debrief, Export & Config Generation | 0/4 | Not started | - |
 | 8. QA & Credential Audit | 0/5 | Not started | - |
