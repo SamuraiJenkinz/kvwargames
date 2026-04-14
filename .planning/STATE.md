@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 5 (Game Screen Layout) — Wave 1 complete (05-01, 05-02, 05-03); Wave 2 complete (05-04, 05-05); Wave 3 in progress (05-06 done; 05-07 in parallel)
+**Current focus:** Phase 5 (Game Screen Layout) — COMPLETE (all 7 plans done); ready for Phase 6 (LLM Wiring)
 
 ## Current Position
 
-Phase: 5 of 8 (Game Screen Layout)
-Plan: 6 of 7 in current phase
-Status: In progress — 05-06 complete; 05-07 (FacilitatorInput) running in parallel
-Last activity: 2026-04-14 — Completed 05-06-PLAN.md (StatePanel)
+Phase: 5 of 8 (Game Screen Layout) — COMPLETE
+Plan: 7 of 7 in current phase
+Status: Phase complete — all 7 Phase 5 plans done; ready for Phase 6
+Last activity: 2026-04-14 — Completed 05-07-PLAN.md (FacilitatorInput)
 
-Progress: [████████░░] 60% (21/35 plans)
+Progress: [████████░░] 63% (22/35 plans)
 
 ## Performance Metrics
 
@@ -111,6 +111,9 @@ Recent decisions affecting current work:
 - 05-06: CSS text-transform:uppercase not applied by jsdom — tests assert against DOM text ('Severity' not 'SEVERITY'); comment explains discrepancy
 - 05-06: getAllByText used for values that collide across multiple TeamCards (e.g. '+1' appears on legitimacy track + two team PO fields)
 - 05-06: No @theme additions needed — bg-track-severity, bg-track-legitimacy, all text-resource-* tokens pre-existed from Phase 3
+- 05-07: @testing-library/user-event installed via pnpm (npm fails on workspace: protocol) — required for keyboard interaction tests (Shift+Enter newline)
+- 05-07: insertRef bridge pattern — useRef stores insert-at-cursor closure from MessageInput; parent passes it to ActionToolbar via handleInsert; avoids lifting textarea value state
+- 05-07: registerInsert prop uses useEffect with [registerInsert] dependency — closure captured once on mount; stable reference from parent inline function
 
 ### Pending Todos
 
@@ -125,6 +128,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14T11:21:53Z (05-06)
-Stopped at: Completed 05-06-PLAN.md (StatePanel) — Phase 5 Wave 3 progress: 05-06 done (6/7 plans); 05-07 running in parallel
+Last session: 2026-04-14T11:25:31Z (05-07)
+Stopped at: Completed 05-07-PLAN.md (FacilitatorInput) — Phase 5 complete (7/7 plans); Phase 6 is next
 Resume file: None
