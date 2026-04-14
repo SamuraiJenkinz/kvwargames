@@ -23,12 +23,25 @@ export default function ActionToolbar({ disabled, onInsert }: ActionToolbarProps
         Advance to Round {nextRound}
       </button>
 
+      {/*
+        LAYOUT-04 / FLOW-04: facilitator can request an interim debrief turn
+        at any point. Wired to the same `triggerDebrief` store action; Plan 08
+        may split interim vs. end-of-game semantics if needed.
+      */}
       <button
         onClick={() => triggerDebrief()}
         disabled={disabled}
         className="text-xs font-mono uppercase px-2 py-1 rounded-sm border border-border-default hover:bg-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Trigger Debrief
+        Request Debrief Now
+      </button>
+
+      <button
+        onClick={() => triggerDebrief()}
+        disabled={disabled}
+        className="text-xs font-mono uppercase px-2 py-1 rounded-sm border border-border-default hover:bg-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        End Game + Debrief
       </button>
 
       <select
