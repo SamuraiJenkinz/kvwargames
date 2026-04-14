@@ -148,12 +148,12 @@ None.
 ### Blockers/Concerns
 
 - Phase 6 research flag: Corporate LLM endpoint response structure may deviate from standard OpenAI format — make extraction path configurable in `config.py` before hardcoding; verify against actual endpoint
-- Phase 6 research flag: Token budget for system prompt needs measurement before choosing windowed history N — estimated 3,000–4,000 tokens but depends on actual EDIP card count
+- Phase 6 research flag (MEASURED 06-04): Token budget for system prompt is **5124 tokens (20496 chars)** on the EDIP config via measurePromptTokens — exceeds the original 3K-4K estimate. Plan 06-08 must verify corporate LLM endpoint context window vs this number; with an 8K cap, history + response share only ~3K and windowing must be aggressive
 - Phase 6 research flag: Corporate proxy timeout (est. 30s) vs LLM generation time (25–35s) — verify actual timeout with ops team before Phase 6 completes
 - Phase 7 research flag: Config generation prompt needs testing against 3 brief types to establish reliability threshold
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Completed Phase 6 plan 06-03 (state updater, TDD)
-Stopped at: 06-03 done; applyStateUpdatePure + CLAMP_RANGES + ClampLog exported from src/lib/stateUpdater.ts with 28 boundary tests. gameStore untouched. Next Wave 2: 06-04 (prompt builder), 06-05 (response parser + context window); Wave 3: 06-06 (llm client); Wave 4: 06-07 (store + ui wiring, consumes this module).
+Last session: 2026-04-14 — Completed Phase 6 plan 06-04 (prompt builder)
+Stopped at: 06-04 done; buildSystemPrompt + measurePromptTokens exported from src/lib/promptBuilder.ts; 10-block deterministic prompt with kent/finch/chen voice + MUST NOT; 28 structural tests + empirical 5124-token baseline logged. gameStore untouched. Remaining Wave 2: 06-05 (response parser + context window, already landed in parallel); Wave 3: 06-06 (llm client, depends on 06-04 + 06-05); Wave 4: 06-07 (store + ui wiring, consumes 06-03 + 06-04 + 06-05 + 06-06).
 Resume file: None
