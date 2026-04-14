@@ -49,6 +49,11 @@ export interface GameStore {
   // Actions
   initGame: (config: GameConfig, scenarioIndex: number) => void
   resetGame: () => void
+
+  // Game flow stubs (Phase 6 will replace with LLM wiring)
+  advanceRound: () => void
+  triggerDebrief: () => void
+  sendFacilitatorMessage: (text: string) => void
 }
 
 // ─── Initial State ────────────────────────────────────────────────────────────
@@ -59,7 +64,7 @@ const initialConfigJson = JSON.stringify(EDIP_CONFIG, null, 2)
 
 export const useGameStore = create<GameStore>()(
   devtools(
-    immer((set) => ({
+    immer((set, get) => ({
       // Setup navigation (intra-/setup distinction; URL owns /setup vs /game)
       setupMode: 'home',
       setSetupMode: (mode) =>
@@ -196,6 +201,64 @@ export const useGameStore = create<GameStore>()(
           state.loading = false
           state.activeTab = 'cards'
         }),
+
+      // ─── Game Flow Stubs ─────────────────────────────────────────────────────
+      // Phase 6 will replace these with real LLM wiring.
+
+      advanceRound: () => {
+        let newRound: number | null = null
+        set((state) => {
+          if (!state.gameState) return
+          state.gameState.round += 1
+          newRound = state.gameState.round
+        })
+        if (newRound === null) return
+        const divider = {
+          id: crypto.randomUUID(),
+          type: 'round_divider' as const,
+          label: `Round ${newRound}`,
+          timestamp: new Date().toISOString(),
+        }
+        const stubKent = {
+          id: crypto.randomUUID(),
+          type: 'persona' as const,
+          speaker: 'kent' as const,
+          text: '[Round framing — placeholder until LLM wiring in Phase 6.]',
+          timestamp: new Date().toISOString(),
+        }
+        get().addMessages([divider, stubKent])
+      },
+
+      triggerDebrief: () => {
+        const divider = {
+          id: crypto.randomUUID(),
+          type: 'debrief_divider' as const,
+          label: 'DEBRIEF',
+          timestamp: new Date().toISOString(),
+          isDebrief: true,
+        }
+        const stubFacilitator = {
+          id: crypto.randomUUID(),
+          type: 'facilitator' as const,
+          speaker: 'facilitator' as const,
+          text: '[Debrief placeholder — facilitator notes will appear here in Phase 7.]',
+          timestamp: new Date().toISOString(),
+        }
+        get().addMessages([divider, stubFacilitator])
+      },
+
+      sendFacilitatorMessage: (text: string) => {
+        const trimmed = text.trim()
+        if (trimmed === '') return
+        get().addMessage({
+          id: crypto.randomUUID(),
+          type: 'facilitator',
+          speaker: 'facilitator',
+          text: trimmed,
+          timestamp: new Date().toISOString(),
+        })
+        get().setLoading(true)
+      },
     })),
     { name: 'GameStore', enabled: import.meta.env.DEV },
   ),
