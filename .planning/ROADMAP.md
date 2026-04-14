@@ -145,13 +145,13 @@ Plans:
   2. The downloaded markdown report includes game metadata (name, scenario, date), all persona messages with speaker attribution, state snapshots at round boundaries, and the debrief section
   3. The "Generate from Brief" path on the setup screen accepts free text, calls `/api/generate-config`, returns JSON to the review panel pre-populated, and the facilitator can launch from that generated config
   4. A generated config that fails JSON schema validation shows a specific field-level error, not a generic "invalid JSON" message
-**Plans**: TBD
+**Plans:** 4 plans
 
 Plans:
-- [ ] 07-01: `debriefExporter.ts` — collect all debrief messages, format markdown report, browser file download
-- [ ] 07-02: Wire debrief export button to exporter; DEB-01..03 end-to-end test
-- [ ] 07-03: GenerateBriefPanel wired to `/api/generate-config` — loading state, error handling, result piped to review mode
-- [ ] 07-04: Generated config schema validation with field-level error messages (SETUP-04, SETUP-05)
+- [ ] 07-01-PLAN.md — debriefExporter.ts (pure markdown + download) + store additions (stateSnapshots, gameEnded)
+- [ ] 07-02-PLAN.md — Wire Download Debrief button; split endGame() from triggerDebrief(); gameEnded gates Send/Advance
+- [ ] 07-03-PLAN.md — Backend CONFIG_GEN prompt rewrite + json_object + GenerateBriefPanel + live 3-brief smoke test
+- [ ] 07-04-PLAN.md — configValidator.ts field-level schema validation + LoadConfigPanel error banner (SETUP-05)
 
 ### Phase 8: QA & Credential Audit
 **Goal**: The tool survives a full 5-round live scenario without context degradation, persona drift, or credential leakage — confirmed by structured tests, not assumption.
