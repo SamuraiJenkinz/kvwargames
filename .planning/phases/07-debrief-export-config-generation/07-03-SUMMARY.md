@@ -147,7 +147,7 @@ Human-verify checkpoint approved after live smoke test against the deployed LLM 
 
 ## Back-to-Brief Conditional Verification
 
-**Verified by code inspection** (smoke-test step skipped after DEV-mode detour).
+**Verified by user observation AND code inspection.** User confirmed the "← Back to Brief" link appeared at the top of the Load panel when Brief 2's generated JSON landed (post-Generate, in the live smoke test run). Code inspection below corroborates the wiring.
 
 `LoadConfigPanel.tsx` lines 87–95 contain:
 
@@ -199,6 +199,8 @@ None — plan executed exactly as written. All decisions were locked prior to ex
 During the smoke test, clicking "New Game" from the `/game` route while in DEV mode re-seeded the EDIP mock state instead of returning to `/setup`. This caused a navigation detour that prevented explicit confirmation of the "← Back to Brief" button during the smoke test. The button was subsequently confirmed correct by code inspection.
 
 Root cause: `GuardedGameScreen` in `App.tsx` calls `seedMockState()` when `import.meta.env.DEV === true` and `gameState === null`. After `newGame()` clears `gameState`, the guard re-seeds immediately on the next render — short-circuiting the redirect to `/setup`. This is pre-existing Phase 4/5 behaviour, not a 07-03 regression. Workaround: navigate to `/` directly, or use `pnpm build && pnpm preview` for smoke testing.
+
+Despite this detour, the user manually returned to `/setup` and ran Brief 2 → the "← Back to Brief" link rendered correctly at the top of the Load panel, providing direct user-observation confirmation of the wiring.
 
 Logged for Phase 8 follow-up: condition `DEV && gameState === null` in GuardedGameScreen should distinguish "initial load" from "intentional new-game reset".
 
