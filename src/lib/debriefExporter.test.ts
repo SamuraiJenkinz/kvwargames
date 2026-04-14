@@ -181,6 +181,26 @@ describe('generateDebriefMarkdown', () => {
   it('appendix contains the game config name', () => {
     expect(markdown).toContain('Config: EDIP Security of Supply Wargame')
   })
+
+  it('regression: post-debrief persona message does NOT appear in any Round transcript section', () => {
+    // STATE.md Phase 8 follow-up (line 217): debrief duplication bug — Chen's
+    // 'Final reflection.' was previously rendered in BOTH the Round 2
+    // transcript bucket AND the ## Debrief section. After the bucketing fix
+    // (lastDebriefIdx halt), 'Final reflection.' must appear ONLY in ## Debrief.
+    const md = generateDebriefMarkdown(baseSnapshot)
+
+    // Slice the markdown into round-section vs debrief-section halves so we
+    // can assert the message's location precisely.
+    const debriefHeaderIdx = md.indexOf('## Debrief')
+    expect(debriefHeaderIdx).toBeGreaterThan(-1)
+    const beforeDebrief = md.slice(0, debriefHeaderIdx)
+    const fromDebriefOn = md.slice(debriefHeaderIdx)
+
+    // Round transcripts (everything before ## Debrief) must NOT contain Final reflection.
+    expect(beforeDebrief).not.toContain('Final reflection.')
+    // ## Debrief section MUST contain it (proves the message wasn't lost — only relocated).
+    expect(fromDebriefOn).toContain('Final reflection.')
+  })
 })
 
 // ─── Group 3b: ## Debrief anchor uses LAST divider ────────────────────────────
