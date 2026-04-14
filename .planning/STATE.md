@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 6 of 8 (LLM Integration)
-Plan: 4 of 9 in current phase (06-01 + 06-02 + 06-03 + 06-04 complete; 06-05 landed in parallel wave)
-Status: In progress — prompt builder shipped with deterministic 10-block system prompt and empirical 5124-token baseline on EDIP config
-Last activity: 2026-04-14 — Completed 06-04-prompt-builder-PLAN.md; 28/28 new tests pass, full suite 310/310, typecheck clean
+Plan: 5 of 9 in current phase (06-01 + 06-02 + 06-03 + 06-04 + 06-05 complete)
+Status: In progress — response parser + context window shipped; defensive four-layer parse never throws, sliding window at N=6 enforces pair-alignment invariant
+Last activity: 2026-04-14 — Completed 06-05-response-parser-and-context-window-PLAN.md; 63/63 new tests pass (42 parser + 21 context window), typecheck clean
 
-Progress: [██████████] 74% (26/35 plans)
+Progress: [██████████] 77% (27/35 plans)
 
 ## Performance Metrics
 
@@ -140,6 +140,13 @@ Recent decisions affecting current work:
 - 06-04: Empirical prompt size on EDIP config is 5124 tokens / 20496 chars — logged by a dedicated test so Plan 06-08 has the baseline without re-running. Exceeds the STATE.md-flagged 3K–4K estimate; windowing must be tight
 - 06-04: Tests isolate block content via `indexOf(heading) + slice(next heading)` — assertions scope correctly even if block order changes; drop-in robustness for future voice edits
 - 06-04: Test fixture casts EDIP_CONFIG as unknown as GameConfig (same pattern as 05-01 seedMockState) — the `as const satisfies GameConfig` narrows too literally for the `GameConfig` parameter type
+- 06-05: responseParser.ts uses FOUR defence layers (BOM/fence strip → JSON.parse → manual type guard → sort+dedupe) and contains zero `throw` statements — grep-verified. All failures return `{ ok: false, errorKind: 'PARSE_FAILURE' | 'VALIDATION_FAILURE', raw, detail }` with the ORIGINAL (uncleaned) input preserved for diagnostics
+- 06-05: PERSONA_ORDER is parser-local (`const PERSONA_ORDER = ['kent','finch','chen']`) — intentionally NOT imported from personaConfig.ts; keeps responseParser.ts a pure utility with `@/types/llm` as its only cross-module dependency
+- 06-05: Layer 4 de-dupe keeps first occurrence on duplicate speaker — alternative (merge / last-wins) would hide model confusion. First-wins makes the bug visible in the chat transcript for facilitator review
+- 06-05: Fence regex `/^```(?:json)?\s*\n?|\n?\s*```$/gm` strips both opening and closing fences in a single `.replace` pass; language tag optional
+- 06-05: BOM stripped via `charCodeAt(0) === 0xFEFF` (not regex) — single-codepoint check has clearer intent than a pattern
+- 06-05: windowHistory adds `if (n <= 0) return []` guard — `Array.prototype.slice(-0)` returns the full array in JS (negative zero coerced to 0), which would violate the `result.length <= 2n` invariant when history is non-empty. Rule-2 fix caught by the `n = 0` invariant test on first run
+- 06-05: HistoryEntry imported from `@/types/llm` and re-exported by contextWindow.ts — single source of truth in types module; 06-06 llmClient.ts depends on the type without depending on this module
 
 ### Pending Todos
 
@@ -154,6 +161,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Completed Phase 6 plan 06-04 (prompt builder)
-Stopped at: 06-04 done; buildSystemPrompt + measurePromptTokens exported from src/lib/promptBuilder.ts; 10-block deterministic prompt with kent/finch/chen voice + MUST NOT; 28 structural tests + empirical 5124-token baseline logged. gameStore untouched. Remaining Wave 2: 06-05 (response parser + context window, already landed in parallel); Wave 3: 06-06 (llm client, depends on 06-04 + 06-05); Wave 4: 06-07 (store + ui wiring, consumes 06-03 + 06-04 + 06-05 + 06-06).
+Last session: 2026-04-14 — Completed Phase 6 plan 06-05 (response parser + context window)
+Stopped at: 06-05 done; parsePersonaResponse (4 defence layers, zero throws) + windowHistory (pair-alignment invariant, HISTORY_WINDOW_N=6) exported from src/lib/; 63 tests pass (42 parser + 21 context window), typecheck clean. gameStore still untouched. Remaining Wave 3: 06-06 (llm client, depends on 06-04 + 06-05). Wave 4: 06-07 (store + ui wiring, consumes 06-03 + 06-04 + 06-05 + 06-06). Then 06-08 (token budget smoke test — re-tune HISTORY_WINDOW_N if needed) and 06-09 (state visibility).
 Resume file: None
