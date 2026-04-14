@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 6 (LLM Integration) — backend Azure auth unblocked, types seeded, llm client boundary shipped, store wiring next
+**Current focus:** Phase 6 (LLM Integration) — Wave 4 complete, end-to-end LLM loop wired into gameStore + UI; smoke test (06-08) and state-visibility polish (06-09) remaining
 
 ## Current Position
 
 Phase: 6 of 8 (LLM Integration)
-Plan: 6 of 9 in current phase (06-01 + 06-02 + 06-03 + 06-04 + 06-05 + 06-06 complete)
-Status: In progress — Wave 3 complete. llmClient.ts boundary ready (never throws, preserves backend error codes, AbortController-aware); all inputs assembled for store wiring plan 06-07
-Last activity: 2026-04-14 — Completed 06-06-llm-client-PLAN.md; 19/19 new tests pass, 350-suite green, typecheck clean, zero `throw` in source
+Plan: 7 of 9 in current phase (06-01 + 06-02 + 06-03 + 06-04 + 06-05 + 06-06 + 06-07 complete)
+Status: In progress — Wave 4 complete. gameStore.runLLMTurn orchestrates the full LLM turn atomically (sync facilitator bubble → async turn → single set() on success, single red error bubble on failure, byte-identical gameState + llmHistory on any non-2xx path). UI integration done: ErrorMessage raw disclosure + Retry, PersonaMessage CSS-stagger + amber flag, ControlBanner non-blocking confirmation, ActionToolbar dual-debrief. 379 tests green, typecheck clean.
+Last activity: 2026-04-14 — Completed 06-07-store-and-ui-wiring-PLAN.md; 29 new/updated tests, FLOW-01..05 + CTX-01..02 + RESP-02..05 + STATE-01..04 satisfied.
 
-Progress: [██████████] 80% (28/35 plans)
+Progress: [████████████] 83% (29/35 plans)
 
 ## Performance Metrics
 
@@ -155,6 +155,18 @@ Recent decisions affecting current work:
 - 06-06: `error.message` fallback is `HTTP ${status}` — Phase 2 backend guarantees `code` on non-2xx but `message` is optional; client must not crash on `error: { code: 'LLM_TIMEOUT' }` without message
 - 06-06: Test harness uses `vi.stubGlobal('fetch', vi.fn())` + `new Response(JSON.stringify(body), { status })` — zero new test dependencies; fetch mock module-level via beforeEach/afterEach + `vi.unstubAllGlobals()` teardown
 - 06-06: Abort test mocks fetch as a Promise that listens to `signal.addEventListener('abort', ...)` and rejects with `new DOMException('aborted', 'AbortError')` — reproduces browser fetch cancellation semantics exactly
+- 06-07: `runLLMTurn` is a local async closure INSIDE `create(immer(...))` — captures `get`/`set` directly, keeps LLM orchestration co-located with the store actions that invoke it. Module-level function would force prop-drilling the store APIs
+- 06-07: `newGame()` aborts the controller BEFORE the `set()` call so the in-flight fetch's AbortSignal fires synchronously; `runLLMTurn` sees `errorCode === 'ABORTED'` and bails early without pushing an error bubble. The bail-out path is the only reason the plan's generic error handler was extended
+- 06-07: `applyStateUpdate` computes `nextState` OUTSIDE `set()` then assigns inside — `structuredClone` in `applyStateUpdatePure` DataCloneErrors on immer draft proxies. Same pattern applied in `runLLMTurn`. Store's reduce-over-responses also runs outside set() for the same reason
+- 06-07: Single `addMessages([...persona1, persona2, persona3])` with `revealDelay: i * 500` on each message — stagger is CSS-driven (`style.animationDelay`), NOT three setTimeout inserts. Sticky-bottom scroll hook from 05-04 sees ONE insert batch; CONTEXT.md pitfall #3 dodged
+- 06-07: `text-persona-amber` @theme token does not exist; `PersonaMessage.flag` uses `text-amber-400` Tailwind literal. Noted for future token consolidation pass — not promoting single-consumer colour to @theme now
+- 06-07: Control banner conflict resolution (both flags true → `kind='triggerDebrief'`) lives in `runLLMTurn`'s set() branch, NOT in the UI. UI reads `pendingControlBanner.kind` and renders one kind at a time; never has to pick
+- 06-07: `confirmControlBanner` clears the banner state BEFORE dispatching to `advanceRound`/`triggerDebrief` — prevents re-entrancy concerns (next LLM response could legitimately re-signal, but that's a new banner, not the same one)
+- 06-07: `retryLastMessage` guards on `loading` so double-clicks can't spawn two concurrent AbortControllers; same guard in `sendFacilitatorMessage` / `advanceRound` / `triggerDebrief`
+- 06-07: `llmHistory` bounded at `2 * HISTORY_WINDOW_N + 1 = 13` inside `runLLMTurn`'s success set() (not in `appendHistory`, which stays a free-form slice-setter). Enforced by a 10-turn invariant test that stabilises at exactly 13
+- 06-07: vi.mock of 4 external modules in gameStore.test.ts (`promptBuilder`, `contextWindow`, `llmClient`, `responseParser`) — `applyStateUpdatePure` intentionally NOT mocked so clamp-log assertions exercise real behaviour
+- 06-07: FacilitatorInput tests now also mock the LLM pipeline — previously `sendFacilitatorMessage` was a stub and buttons fired no async work; now they trigger `runLLMTurn` which the mocks short-circuit with a never-resolving promise (for loading=true assertions) or happy-path defaults
+- 06-07: Two debrief buttons ('Request Debrief Now' + 'End Game + Debrief') both dispatch `triggerDebrief` today. Plan 08 may split semantics (interim vs end-of-game clears cardsThisRound, etc.) if smoke test surfaces the need
 
 ### Pending Todos
 
@@ -169,6 +181,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Completed Phase 6 plan 06-06 (llm client)
-Stopped at: 06-06 done; callLLMProxy (never throws, preserves backend error codes end-to-end, AbortController-aware) + LLM_FRONTEND_TIMEOUT_MS=45000 exported from src/lib/llmClient.ts. 19 tests pass, full 350-suite green, typecheck clean. Wave 3 complete — 06-03 stateUpdater + 06-04 promptBuilder + 06-05 responseParser/contextWindow + 06-06 llmClient all shipped. gameStore still untouched. Wave 4: 06-07 (store + ui wiring, consumes 06-03 + 06-04 + 06-05 + 06-06). Then 06-08 (token budget smoke test — re-tune HISTORY_WINDOW_N if needed) and 06-09 (state visibility).
+Last session: 2026-04-14 — Completed Phase 6 plan 06-07 (store + UI wiring)
+Stopped at: 06-07 done; gameStore wired end-to-end. `runLLMTurn` orchestrates prompt → window → LLM → parse → apply-state atomically. Atomicity tests: LLM_TIMEOUT / PARSE_FAILURE / NETWORK_ERROR + VALIDATION_FAILURE all leave gameState + llmHistory byte-identical. FLOW-05 newGame mid-flight test: never-resolving fetch, newGame() aborts controller + clears all transient slices, captured signal.aborted=true. Invariant test: 10 consecutive turns, llmHistory.length stabilises at exactly 13. UI: ErrorMessage raw `<details>` + Retry, PersonaMessage inline `animationDelay` + `text-amber-400` flag, ControlBanner null-when-idle / `kind`-based confirm buttons, ActionToolbar dual-debrief. 379/379 tests pass, typecheck clean. Wave 4 complete. Remaining: 06-08 (token budget empirical smoke test against live corporate LLM) and 06-09 (state-visibility polish — delta ghost-text + cell pulse).
 Resume file: None
