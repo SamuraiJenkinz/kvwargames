@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 6 of 8 (LLM Integration)
-Plan: 2 of 9 in current phase (06-01 + 06-02 both complete)
-Status: In progress — 06-01 (backend configurable auth header) + 06-02 (type extensions) complete
-Last activity: 2026-04-14 — Completed 06-01-backend-azure-auth-fix-PLAN.md; pytest 2/2 passing, default auth behaviour byte-identical to previous hardcoded path
+Plan: 4 of 9 in current phase (06-01 + 06-02 + 06-03 + 06-04 complete; 06-05 landed in parallel wave)
+Status: In progress — prompt builder shipped with deterministic 10-block system prompt and empirical 5124-token baseline on EDIP config
+Last activity: 2026-04-14 — Completed 06-04-prompt-builder-PLAN.md; 28/28 new tests pass, full suite 310/310, typecheck clean
 
-Progress: [█████████░] 69% (24/35 plans)
+Progress: [██████████] 74% (26/35 plans)
 
 ## Performance Metrics
 
@@ -125,6 +125,21 @@ Recent decisions affecting current work:
 - 06-02: ParseResult and LLMCallResult use discriminated { ok: true | false } unions rather than throwing — consumers pattern-match without try/catch and error metadata rides the value channel
 - 06-02: ParseErrorKind uses string literal union ('PARSE_FAILURE' | 'VALIDATION_FAILURE') matching eventual ChatMessage.errorCode strings — trivial serialization, no enum indirection
 - 06-02: LLMStructuredResponse.control conflict rule documented in JSDoc — store prefers triggerDebrief over advanceRound when both true; never auto-applies either (non-blocking confirmation banner owns the decision)
+- 06-03: applyStateUpdatePure returns { nextState, clampLog } tuple — matches CONTEXT.md "clamping is silent but logged"; store forwards clampLog to dev console in 06-07 without surfacing to users
+- 06-03: structuredClone (native) over lodash.cloneDeep — Node 17+ and modern browsers; zero dependency cost
+- 06-03: CLAMP_RANGES is single-source-of-truth `as const` object iterated by TEAM_CLAMP_FIELDS — adding a numeric field = one line in CLAMP_RANGES + TEAM_CLAMP_FIELDS, no magic numbers elsewhere
+- 06-03: clampLog field path format is bare name for top-level ('crisisSeverity') and 'teams[ID].field' for team entries — readable in dev console, machine-parseable by bracket for future tooling
+- 06-03: Unknown team IDs still produce a new state reference via unconditional structuredClone — contract is always-pure always-returns-new, no store branch assigns the same reference back
+- 06-03: gameStore.ts intentionally untouched in this plan — 06-07 is the wiring plan; keeping store unchanged means 06-03 can be reverted independently if the contract needs to change before 06-07 lands
+- 06-03: REFACTOR step folded into GREEN implementation — applyTeamUpdate helper extraction was trivial once tests pinned the behaviour; no separate refactor commit needed, suite stayed green throughout
+- 06-04: promptBuilder.ts does NOT import EDIP_CONFIG — config passed only via parameter; Phase 7 generated configs work identically with zero module change
+- 06-04: PERSONA_PROMPT_DEFS kept module-private (not exported) — voice tuning remains a single-file edit; no downstream code couples to the literal persona shape
+- 06-04: Block 9 embeds clamp ranges inline (crisisSeverity 0–5, pc 0–6, etc.) — nudges the LLM to produce in-range values and removes one validation round-trip at a ~300-char prompt cost
+- 06-04: Block 9 documents the advanceRound/triggerDebrief conflict rule (triggerDebrief wins) — mirrors 06-02 LLMStructuredResponse JSDoc so both the model and the store see the same tie-break
+- 06-04: Block 2 renders `scenario.injects[round - 1]` with deterministic fallback when round exceeds injects.length — tests stay stable across scenario-end edge cases
+- 06-04: Empirical prompt size on EDIP config is 5124 tokens / 20496 chars — logged by a dedicated test so Plan 06-08 has the baseline without re-running. Exceeds the STATE.md-flagged 3K–4K estimate; windowing must be tight
+- 06-04: Tests isolate block content via `indexOf(heading) + slice(next heading)` — assertions scope correctly even if block order changes; drop-in robustness for future voice edits
+- 06-04: Test fixture casts EDIP_CONFIG as unknown as GameConfig (same pattern as 05-01 seedMockState) — the `as const satisfies GameConfig` narrows too literally for the `GameConfig` parameter type
 
 ### Pending Todos
 
@@ -139,6 +154,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Completed Phase 6 plan 06-01 (backend Azure auth fix)
-Stopped at: 06-01 + 06-02 both done; backend proxy can target Azure OpenAI via env vars, Phase 6 types seeded. Next: 06-03 (state updater) or 06-04 (prompt builder).
+Last session: 2026-04-14 — Completed Phase 6 plan 06-03 (state updater, TDD)
+Stopped at: 06-03 done; applyStateUpdatePure + CLAMP_RANGES + ClampLog exported from src/lib/stateUpdater.ts with 28 boundary tests. gameStore untouched. Next Wave 2: 06-04 (prompt builder), 06-05 (response parser + context window); Wave 3: 06-06 (llm client); Wave 4: 06-07 (store + ui wiring, consumes this module).
 Resume file: None
