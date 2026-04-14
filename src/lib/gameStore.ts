@@ -96,6 +96,8 @@ export interface GameStore {
   // Game flow
   advanceRound: () => void
   triggerDebrief: () => void
+  /** Final-debrief variant: sets gameEnded=true THEN fires the debrief LLM turn inline. Send button and round-advance disable after this. Does NOT delegate to triggerDebrief (which would bail on the gameEnded guard — see implementation comment). */
+  endGame: () => void
   sendFacilitatorMessage: (text: string) => void
   retryLastMessage: () => void
   confirmControlBanner: () => void
@@ -504,7 +506,7 @@ export const useGameStore = create<GameStore>()(
          */
         advanceRound: () => {
           const state = get()
-          if (!state.gameState || state.loading) return
+          if (!state.gameState || state.loading || state.gameEnded) return
           const currentRound = state.gameState.round
           const newRound = currentRound + 1
           const scenario = state.gameConfig?.scenarios[state.gameState.scenarioIndex]
@@ -543,9 +545,40 @@ export const useGameStore = create<GameStore>()(
          * personas respond (Kent → Finch → Chen) per routing rules.
          */
         triggerDebrief: () => {
-          if (get().loading) return
+          if (get().loading || get().gameEnded) return
           const prefixedInput = '[DEBRIEF_TRIGGER] Facilitator-requested debrief.'
           set((s) => {
+            s.messages.push({
+              id: crypto.randomUUID(),
+              type: 'debrief_divider',
+              label: 'DEBRIEF',
+              timestamp: formatTime(),
+              isDebrief: true,
+            })
+            s.loading = true
+            s.lastFacilitatorInput = prefixedInput
+          })
+          void runLLMTurn(prefixedInput)
+        },
+
+        /**
+         * FLOW-04b: Final debrief path. Sets gameEnded=true and fires a debrief
+         * LLM turn inline. Does NOT delegate to triggerDebrief() because once
+         * gameEnded is set, triggerDebrief's guard would reject the call. The
+         * divider-push + LLM-fire logic is intentionally duplicated from
+         * triggerDebrief — keep in sync if triggerDebrief's body changes.
+         */
+        endGame: () => {
+          // Bail if already loading or already ended (idempotent — second click is a no-op).
+          if (get().loading || get().gameEnded) return
+
+          const prefixedInput = '[END_GAME_DEBRIEF] Facilitator ended the game.'
+
+          // Delegating to triggerDebrief() would bail on its gameEnded guard once we
+          // flip the flag — inline the divider push + LLM kick-off here. Keep in sync
+          // with triggerDebrief()'s divider-push block if that ever changes.
+          set((s) => {
+            s.gameEnded = true
             s.messages.push({
               id: crypto.randomUUID(),
               type: 'debrief_divider',
@@ -566,7 +599,7 @@ export const useGameStore = create<GameStore>()(
          */
         sendFacilitatorMessage: (text: string) => {
           const trimmed = text.trim()
-          if (trimmed === '' || get().loading) return
+          if (trimmed === '' || get().loading || get().gameEnded) return
           set((state) => {
             state.messages.push({
               id: crypto.randomUUID(),
@@ -588,7 +621,7 @@ export const useGameStore = create<GameStore>()(
          */
         retryLastMessage: () => {
           const input = get().lastFacilitatorInput
-          if (!input || get().loading) return
+          if (!input || get().loading || get().gameEnded) return
           set((s) => {
             s.loading = true
           })
