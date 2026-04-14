@@ -13,6 +13,7 @@ import type { HistoryEntry, PersonaResponse } from '@/types/llm'
 import { EDIP_CONFIG } from '@/data/edipConfig'
 import { buildSystemPrompt } from '@/lib/promptBuilder'
 import { windowHistory, HISTORY_WINDOW_N } from '@/lib/contextWindow'
+import { reportPromptBudget } from '@/lib/promptBudget'
 import { callLLMProxy, LLM_FRONTEND_TIMEOUT_MS } from '@/lib/llmClient'
 import { parsePersonaResponse } from '@/lib/responseParser'
 import { applyStateUpdatePure, type ClampLog } from '@/lib/stateUpdater'
@@ -239,7 +240,8 @@ export const useGameStore = create<GameStore>()(
           state.gameState = nextState
 
           // llmHistory append + bound length (CONTEXT.md invariant:
-          // llmHistory.length <= 2 * HISTORY_WINDOW_N + 1 = 13 when N = 6).
+          // llmHistory.length <= 2 * HISTORY_WINDOW_N + 1; currently 5 at N=2
+          // (reduced from 6 → 2 in Plan 06-08 after empirical budget measurement).
           state.llmHistory.push({ role: 'user', content: input })
           state.llmHistory.push({ role: 'assistant', content: llmResult.text })
           const maxHistoryEntries = 2 * HISTORY_WINDOW_N + 1
@@ -350,7 +352,7 @@ export const useGameStore = create<GameStore>()(
 
         // ─── Game Actions ────────────────────────────────────────────────────
 
-        initGame: (config, scenarioIndex) =>
+        initGame: (config, scenarioIndex) => {
           set((state) => {
             const scenario = config.scenarios[scenarioIndex]
             state.gameConfig = config
@@ -374,7 +376,26 @@ export const useGameStore = create<GameStore>()(
             }
             state.messages = []
             state.llmHistory = []
-          }),
+          })
+          // CTX-03: surface prompt budget in DEV. `console.error` on over-budget
+          // so a broken deployment context is impossible to miss in DevTools.
+          if (import.meta.env.DEV) {
+            const fresh = get().gameState
+            if (fresh) {
+              const budget = reportPromptBudget(config, fresh)
+              if (budget.withinLimit) {
+                // eslint-disable-next-line no-console
+                console.info('[promptBudget]', budget)
+              } else {
+                // eslint-disable-next-line no-console
+                console.error(
+                  '[promptBudget] CTX-03 BUDGET EXCEEDED — reduce HISTORY_WINDOW_N or raise SAFE_CONTEXT_CEILING_TOKENS',
+                  budget,
+                )
+              }
+            }
+          }
+        },
 
         resetGame: () =>
           set((state) => {
