@@ -13,7 +13,7 @@ Build a three-persona AI facilitation console for live policy tabletop exercises
 - [x] **Phase 1: Foundation** — TypeScript interfaces, EDIP data constant, Zustand store, dev scaffolding
 - [x] **Phase 2: FastAPI Backend** — Credential proxy, both LLM endpoints, static file serving
 - [x] **Phase 3: UI Design System** — Google Stitch design, Tailwind v4 tokens, persona colours, fonts
-- [ ] **Phase 4: Setup Screen** — Home, load config, JSON validation, scenario launch (brief gen stubbed)
+- [x] **Phase 4: Setup Screen** — Home, load config, JSON validation, scenario launch (brief gen stubbed)
 - [ ] **Phase 5: Game Screen Layout** — Three-column layout, chat feed, state dashboard, reference panel (all mock data)
 - [ ] **Phase 6: LLM Integration** — Prompt builder, persona routing, state updater, response handling, context windowing (highest risk)
 - [ ] **Phase 7: Debrief, Export & Config Generation** — Markdown debrief export, wire generate-from-brief to backend
@@ -87,10 +87,10 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 04-01: Router setup, app shell, `AppPhase` navigation (setup / game screens)
-- [ ] 04-02: Home screen — two-path landing with stubbed "Generate from Brief" panel
-- [ ] 04-03: Load Config panel — JSON textarea, live parse, scenario summary, Launch buttons
-- [ ] 04-04: JSON validation error states, null gameState guard for `/game` route
+- [x] 04-01-PLAN.md — Router setup, app shell, flat routes (setup / game screens) with null-gameState guard
+- [x] 04-02-PLAN.md — Home screen — two-path landing with stubbed "Generate from Brief" panel
+- [x] 04-03-PLAN.md — Load Config panel — JSON textarea, live parse, scenario summary, Launch buttons
+- [x] 04-04-PLAN.md — JSON validation error states, null gameState guard test for `/game` route
 
 ### Phase 5: Game Screen Layout
 **Goal**: The complete three-column game interface renders correctly against mock data — every visual component, message type, and interactive element is built and styled before any real LLM is wired in.
@@ -177,7 +177,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Foundation | 3/3 | ✓ Verified | 2026-04-13 |
 | 2. FastAPI Backend | 4/4 | ✓ Verified | 2026-04-13 |
 | 3. UI Design System | 4/4 | ✓ Verified | 2026-04-13 |
-| 4. Setup Screen | 0/4 | Not started | - |
+| 4. Setup Screen | 4/4 | ✓ Verified | 2026-04-13 |
 | 5. Game Screen Layout | 0/5 | Not started | - |
 | 6. LLM Integration | 0/6 | Not started | - |
 | 7. Debrief, Export & Config Generation | 0/4 | Not started | - |
