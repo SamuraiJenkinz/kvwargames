@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 7 (Debrief, Export & Config Generation) — ✓ VERIFIED. All 4 plans + verifier (4/4 must-haves, concrete code evidence) + human verification (Download Debrief live test: .md saved, structure correct; Generate from Brief 3/3 smoke test passed; validator banner gate verified by code + tests). User approved 2026-04-14. Phase 8 (QA & Credential Audit — final phase) remaining.
+**Current focus:** Phase 8 (QA & Credential Audit — final phase) — in progress. Plan 08-01 complete (stateUpdater boundary coverage). Remaining: 08-02 live run, 08-03 credential audit, 08-04 error-injection tests, 08-05 debrief duplication fix.
 
 ## Current Position
 
-Phase: 7 of 8 (Debrief, Export & Config Generation) — ✓ VERIFIED
-Plan: 4 of 4 in current phase (07-01, 07-02, 07-03, 07-04 all complete)
-Status: Phase 7 verifier PASSED 4/4 must-haves with concrete code evidence. User approved human-verification checklist 2026-04-14 after live test: Download Debrief saved `.md` file with all six required sections (H1, metadata, per-round + GFM table, Debrief, Final State, Appendix); non-canonical `crisisState: "Alert"` rendered gracefully as ALERT badge. 507/507 tests + 8/8 backend + typecheck + build all clean. Requirements DEB-01..03, SETUP-04, SETUP-05 marked Complete. Two Phase 8 follow-ups logged: (1) debrief messages appear in BOTH round transcript AND Debrief section because round-bucketing only splits on round_divider (polish — filter messages after last debrief_divider out of their round bucket); (2) DEV-mode GuardedGameScreen re-seeds mock EDIP on New Game instead of /setup navigation. Ready for Phase 8.
-Last activity: 2026-04-14 — Phase 7 verifier passed 4/4; user approved; all 22 requirements marked Complete.
+Phase: 8 of 8 (QA & Credential Audit) — in progress
+Plan: 1 of 5 complete in current phase (08-01 done; 08-02..08-05 pending)
+Status: Plan 08-01 complete. Added 3 describe blocks / 6 it blocks to src/lib/stateUpdater.test.ts closing the Phase 8 success-criterion-#4 coverage gap (crisisSeverity 0/5/6, edipLegitimacy -2/+2/+3, team-field null/undefined no-op). Test count 507 → 513. `pnpm typecheck` clean. Additions-only — no production code changes. One deviation: used `teamUpdates` (correct StateUpdate key) instead of plan's pseudocode `teams` so the null/undefined no-op test actually exercises applyTeamUpdate's short-circuit branch. Ready for Plan 08-02 (live run).
+Last activity: 2026-04-14 — Plan 08-01 complete; commit 7e2428f.
 
-Progress: [█████████████░] 97% (34/35 plans)
+Progress: [████████████░░] 90% (35/39 plans) — Phase 8 has 5 plans total (08-01 done; 08-02..08-05 pending)
 
 ## Performance Metrics
 
@@ -203,6 +203,9 @@ Recent decisions affecting current work:
 - 07-02: All four gated UI primitives confirmed: Send (disabled={disabled||gameEnded||value.trim()===''} in MessageInput), Advance to Round (disabled={disabled||gameEnded}), Request Debrief Now (disabled={loading||gameEnded}), End Game + Debrief (disabled={loading||gameEnded}).
 - 07-02: Pre-existing 07-01 tests that called advanceRound() after setGameEnded(true) fixed by reordering — advanceRound correctly bails on gameEnded now.
 - 07-02: Download button conditionally rendered (not just disabled) — avoids flash of disabled→enabled state when first debrief_divider appears.
+- 08-01: Plan pseudocode `update = { teams: [{ id: 'A', pc: null }] }` corrected to `{ teamUpdates: [...] }` in Block 3 — StateUpdate interface has no `teams` key; literal pseudocode shape would be a vacuous no-op test. Correction exercises applyTeamUpdate's `if (value == null) continue` branch which is the actual production path being asserted. Plan decisions #1–#4 (file location, naming style, clampLog assertion shape, no-production-code-changes) all preserved.
+- 08-01: Additions-only confirmed — new Phase 8 boundary coverage section appended at EOF of stateUpdater.test.ts; zero edits to existing describe blocks. Test count 28 → 34 (stateUpdater), 507 → 513 (full frontend suite). All 513 pass. Typecheck clean.
+- 08-01: `describe('applyStateUpdatePure — team-field null/undefined no-op', …)` closes the success-criterion-#4 gap for team-scoped null/undefined — existing top-level tests at lines 109/118 covered the top-level path only.
 
 ### Pending Todos
 
@@ -219,6 +222,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Phase 7 complete + verified + user-approved
-Stopped at: Phase 7 closed. Verifier passed 4/4 must-haves; user approved 2026-04-14 after live Download Debrief test (.md saved to downloads with all 6 required sections: H1, metadata, per-round + GFM table, Debrief, Final State, Appendix). Bonus finding: non-canonical `crisisState` renders gracefully as fallback badge. 507/507 tests green; 8/8 backend; typecheck + build clean. REQUIREMENTS.md: DEB-01..03, SETUP-04, SETUP-05 all Complete. Resume: Phase 8 (QA & Credential Audit) — `/gsd:discuss-phase 8` for context gathering, or `/gsd:plan-phase 8` to skip discussion. Note: Phase 8 should pick up the two follow-ups logged above (GuardedGameScreen DEV behaviour; debrief transcript/debrief duplication).
+Last session: 2026-04-14 — Plan 08-01 complete
+Stopped at: Plan 08-01 closed. Added Phase 8 boundary coverage section (3 describe blocks / 6 it blocks) at EOF of src/lib/stateUpdater.test.ts — crisisSeverity 0/5/6, edipLegitimacy -2/+2/+3, team-field null/undefined no-op. All 513 frontend tests pass; typecheck clean; additions-only. Commit 7e2428f. Phase 8 success criterion #4 now satisfied by direct, grep-able evidence. Resume: Plan 08-02 (live-run artifact capture for Scenario 2 at 5 rounds against real corporate LLM).
 Resume file: None
