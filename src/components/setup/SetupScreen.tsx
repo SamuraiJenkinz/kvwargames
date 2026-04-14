@@ -1,12 +1,36 @@
+import { useGameStore } from '@/lib/gameStore'
+import HomeScreen from './HomeScreen'
+
+// TODO(04-03): replace placeholder with real LoadConfigPanel import
+// import LoadConfigPanel from './LoadConfigPanel'
+
 export default function SetupScreen() {
-  return (
-    <div className="min-h-screen bg-bg-base flex flex-col items-center justify-center gap-4 p-8">
-      <h1 className="text-3xl font-bold text-text-primary font-display tracking-wider">
-        EDIP Wargame Facilitator
-      </h1>
-      <p className="text-text-secondary text-sm">
-        Setup screen — content arrives in plan 04-02
-      </p>
-    </div>
-  )
+  const setupMode = useGameStore((s) => s.setupMode)
+
+  switch (setupMode) {
+    case 'home':
+      return <HomeScreen />
+
+    case 'load':
+      // TODO(04-03): replace with <LoadConfigPanel />
+      return (
+        <div className="p-8 text-text-secondary">
+          Load Config Panel — arriving in plan 04-03
+        </div>
+      )
+
+    case 'brief':
+      return (
+        <div className="p-8 text-text-secondary">
+          Brief generation — Phase 7
+        </div>
+      )
+
+    case 'review':
+      return (
+        <div className="p-8 text-text-secondary">
+          Review — Phase 7
+        </div>
+      )
+  }
 }
