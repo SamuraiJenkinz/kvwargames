@@ -192,13 +192,33 @@ export function generateDebriefMarkdown(snapshot: DebriefSnapshot): string {
   // ── 2. Metadata ────────────────────────────────────────────────────────────
   const metadata = renderMetadata(snapshot)
 
+  // Compute the index of the LAST debrief_divider FIRST — the bucketing loop
+  // below must halt here so messages after the final debrief are not double-
+  // counted (they appear in the ## Debrief section, not in any Round bucket).
+  // STATE.md Phase 8 follow-up — duplication bug observed 2026-04-14.
+  // reduce() scans all messages, accumulating the index of each debrief_divider;
+  // the final value is the LAST such index. This correctly handles interim debriefs
+  // followed by continued play and a final debrief.
+  const lastDebriefIdx = messages.reduce<number>(
+    (acc, m, i) => (m.type === 'debrief_divider' ? i : acc),
+    -1,
+  )
+
   // ── 3. Per-round sections ──────────────────────────────────────────────────
   // Bucket messages by round. Track currentRound as we see round_dividers.
   const roundBuckets = new Map<number, ChatMessage[]>()
   let currentRound = 1
   roundBuckets.set(1, [])
 
-  for (const msg of messages) {
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i]
+    // Halt at the last debrief divider — subsequent messages belong to the
+    // ## Debrief section (handled by the messages.slice(lastDebriefIdx + 1)
+    // path below), NOT to a round transcript bucket. When lastDebriefIdx === -1
+    // (no debrief ever fired), the guard is inert and the full message stream
+    // is bucketed, preserving pre-fix behaviour for sessions without debrief.
+    if (lastDebriefIdx !== -1 && i >= lastDebriefIdx) break
+
     if (msg.type === 'round_divider') {
       // Parse next round from label or increment
       const match = msg.label ? /(\d+)/.exec(msg.label) : null
@@ -221,15 +241,8 @@ export function generateDebriefMarkdown(snapshot: DebriefSnapshot): string {
   )
 
   // ── 4. Debrief section ─────────────────────────────────────────────────────
-  // Use the LAST debrief_divider as the anchor (not the first).
-  // reduce() scans all messages, accumulating the index of each debrief_divider;
-  // the final value is the LAST such index. This correctly handles interim debriefs
-  // followed by continued play and a final debrief.
-  const lastDebriefIdx = messages.reduce<number>(
-    (acc, m, i) => (m.type === 'debrief_divider' ? i : acc),
-    -1,
-  )
-
+  // lastDebriefIdx was computed above (before the bucketing loop) so the loop
+  // can use it as a halt condition. Same value is reused here.
   let debriefContent: string
   if (lastDebriefIdx === -1) {
     debriefContent = '_(No debrief was triggered during this session.)_'
