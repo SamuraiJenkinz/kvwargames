@@ -6,6 +6,7 @@ import MessageInput from './MessageInput'
 
 export default function FacilitatorInput() {
   const loading = useGameStore((s) => s.loading)
+  const gameEnded = useGameStore((s) => s.gameEnded)
   const insertRef = useRef<((text: string) => void) | null>(null)
 
   const handleInsert = (text: string) => {
@@ -28,7 +29,12 @@ export default function FacilitatorInput() {
       */}
       <ControlBanner />
       <ActionToolbar disabled={loading} onInsert={handleInsert} />
-      <MessageInput disabled={loading} registerInsert={registerInsert} />
+      <MessageInput disabled={loading} gameEnded={gameEnded} registerInsert={registerInsert} />
+      {gameEnded && (
+        <p className="text-xs text-text-secondary/70 mt-1">
+          Game ended. Download the debrief to save a record.
+        </p>
+      )}
     </div>
   )
 }

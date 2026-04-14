@@ -266,4 +266,45 @@ describe('FacilitatorInput', () => {
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
     expect(textarea.value).toContain(expectedText)
   })
+
+  // ─── gameEnded gates (Phase 7 Plan 02) ───────────────────────────────────────
+
+  it('Send button is disabled when gameEnded=true (even with text in input)', async () => {
+    const user = userEvent.setup()
+    act(() => {
+      useGameStore.setState({ loading: false, gameEnded: true })
+    })
+    render(<FacilitatorInput />)
+
+    // Type something so the normal "value is empty" gate doesn't mask the gameEnded gate
+    const textarea = screen.getByRole('textbox')
+    await user.type(textarea, 'hello')
+
+    expect(screen.getByRole('button', { name: /send/i })).toBeDisabled()
+  })
+
+  it('Enter key does not submit when gameEnded=true — no messages pushed', async () => {
+    const user = userEvent.setup()
+    act(() => {
+      useGameStore.setState({ loading: false, gameEnded: true })
+    })
+    render(<FacilitatorInput />)
+
+    const textarea = screen.getByRole('textbox')
+    await user.click(textarea)
+    await user.type(textarea, 'hello')
+    await user.keyboard('{Enter}')
+
+    // sendFacilitatorMessage bails on gameEnded — no facilitator message pushed
+    const msgs = useGameStore.getState().messages.filter((m) => m.type === 'facilitator')
+    expect(msgs).toHaveLength(0)
+  })
+
+  it('shows game-ended hint paragraph when gameEnded=true', () => {
+    act(() => {
+      useGameStore.setState({ loading: false, gameEnded: true })
+    })
+    render(<FacilitatorInput />)
+    expect(screen.getByText(/game ended/i)).toBeInTheDocument()
+  })
 })
