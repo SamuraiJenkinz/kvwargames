@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 5 complete — ready for Phase 6 (LLM Integration)
+**Current focus:** Phase 6 (LLM Integration) — types seeding complete, downstream wiring plans queued
 
 ## Current Position
 
-Phase: 5 of 8 (Game Screen Layout) — ✓ VERIFIED
-Plan: 7 of 7 in current phase
-Status: Phase goal verified 5/5 must-haves; human verification approved 2026-04-14; ready for Phase 6
-Last activity: 2026-04-14 — Phase 5 verifier passed 5/5; LAYOUT/CHAT/DASH/REF requirements marked Complete
+Phase: 6 of 8 (LLM Integration)
+Plan: 2 of 9 in current phase
+Status: In progress — plan 06-02 complete (additive type extensions for downstream Phase 6 plans)
+Last activity: 2026-04-14 — Completed 06-02-types-extension-PLAN.md; pnpm typecheck + 212/212 tests pass
 
-Progress: [████████░░] 63% (22/35 plans)
+Progress: [████████░░] 66% (23/35 plans)
 
 ## Performance Metrics
 
@@ -114,6 +114,11 @@ Recent decisions affecting current work:
 - 05-07: @testing-library/user-event installed via pnpm (npm fails on workspace: protocol) — required for keyboard interaction tests (Shift+Enter newline)
 - 05-07: insertRef bridge pattern — useRef stores insert-at-cursor closure from MessageInput; parent passes it to ActionToolbar via handleInsert; avoids lifting textarea value state
 - 05-07: registerInsert prop uses useEffect with [registerInsert] dependency — closure captured once on mount; stable reference from parent inline function
+- 06-02: HistoryEntry defined in src/types/llm.ts (not contextWindow.ts) — sibling modules 06-05 and 06-06 both import from shared types module, breaking would-be type-level dependency between them
+- 06-02: All new ChatMessage fields (rawResponse, errorCode, retryInput, revealDelay) are optional — Phase 5 callers satisfy the interface unchanged; only Phase 6 producers set the new fields
+- 06-02: ParseResult and LLMCallResult use discriminated { ok: true | false } unions rather than throwing — consumers pattern-match without try/catch and error metadata rides the value channel
+- 06-02: ParseErrorKind uses string literal union ('PARSE_FAILURE' | 'VALIDATION_FAILURE') matching eventual ChatMessage.errorCode strings — trivial serialization, no enum indirection
+- 06-02: LLMStructuredResponse.control conflict rule documented in JSDoc — store prefers triggerDebrief over advanceRound when both true; never auto-applies either (non-blocking confirmation banner owns the decision)
 
 ### Pending Todos
 
@@ -128,6 +133,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Phase 5 verified and approved
-Stopped at: Phase 5 complete (7/7 plans executed, verifier passed 5/5, human verification approved); ready for Phase 6 planning
+Last session: 2026-04-14 — Completed Phase 6 plan 06-02 (types extension)
+Stopped at: 06-02 types seeded; downstream plans (06-03 through 06-09) can now import ParseResult, LLMCallResult, HistoryEntry and use new ChatMessage error metadata fields
 Resume file: None
