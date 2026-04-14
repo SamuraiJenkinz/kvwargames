@@ -1,7 +1,43 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { waitFor } from '@testing-library/react'
 import { useGameStore } from './gameStore'
 import { EDIP_CONFIG } from '@/data/edipConfig'
 import type { GameConfig, ChatMessage } from '@/types/game'
+import type { LLMCallResult, ParseResult } from '@/types/llm'
+import { HISTORY_WINDOW_N } from '@/lib/contextWindow'
+
+// ─── Module mocks (Phase 6) ────────────────────────────────────────────────────
+//
+// We mock the four external Phase 6 modules so gameStore tests stay fully
+// deterministic without hitting network or real parsing. Each test case sets
+// a controlled return value on the mock fn.
+//
+// IMPORTANT: these mocks must be hoisted-safe — vi.mock runs before module
+// evaluation. We use `vi.fn()` factories that can be reassigned per test.
+
+vi.mock('@/lib/promptBuilder', () => ({
+  buildSystemPrompt: vi.fn(() => 'SYSTEM PROMPT'),
+}))
+
+vi.mock('@/lib/contextWindow', () => ({
+  HISTORY_WINDOW_N: 6,
+  windowHistory: vi.fn((h) => h),
+}))
+
+vi.mock('@/lib/llmClient', () => ({
+  LLM_FRONTEND_TIMEOUT_MS: 45000,
+  callLLMProxy: vi.fn(),
+}))
+
+vi.mock('@/lib/responseParser', () => ({
+  parsePersonaResponse: vi.fn(),
+}))
+
+// NOTE: applyStateUpdatePure is intentionally NOT mocked — we keep the real
+// clamp behaviour so the clamp-log invariant test exercises genuine logic.
+
+import { callLLMProxy } from '@/lib/llmClient'
+import { parsePersonaResponse } from '@/lib/responseParser'
 
 // Ensure Vitest uses the __mocks__/zustand.ts mock for automatic store reset between tests
 vi.mock('zustand')
@@ -16,6 +52,35 @@ const getState = () => useGameStore.getState()
 const initS1 = () => getState().initGame(config, 0)
 // Convenience: run initGame with S2 (scenario 1)
 const initS2 = () => getState().initGame(config, 1)
+
+// Typed mock refs for easy per-test overrides.
+const mockedCallLLMProxy = vi.mocked(callLLMProxy)
+const mockedParsePersonaResponse = vi.mocked(parsePersonaResponse)
+
+// Canonical successful LLM response used in happy-path tests.
+const OK_RESPONSE_TEXT = '{"responses":[{"speaker":"kent","message":"hi","stateUpdate":null,"flag":null}]}'
+const okLLMResult = (): LLMCallResult => ({ ok: true, text: OK_RESPONSE_TEXT })
+const okParseResult = (): ParseResult => ({
+  ok: true,
+  value: {
+    responses: [
+      { speaker: 'kent', message: 'Kent speaks.', stateUpdate: null, flag: null },
+      { speaker: 'finch', message: 'Finch speaks.', stateUpdate: { crisisSeverity: 2 }, flag: null },
+    ],
+  },
+})
+
+beforeEach(() => {
+  // Default mocks: happy path that resolves immediately.
+  mockedCallLLMProxy.mockReset()
+  mockedParsePersonaResponse.mockReset()
+  mockedCallLLMProxy.mockResolvedValue(okLLMResult())
+  mockedParsePersonaResponse.mockReturnValue(okParseResult())
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
 
 describe('gameStore', () => {
   // ─── Initial State ──────────────────────────────────────────────────────────
@@ -52,6 +117,18 @@ describe('gameStore', () => {
     it('configJson is a valid JSON string that parses to an object with name "EDIP Security of Supply Wargame"', () => {
       const parsed = JSON.parse(getState().configJson)
       expect(parsed.name).toBe('EDIP Security of Supply Wargame')
+    })
+
+    it('currentAbortController is null', () => {
+      expect(getState().currentAbortController).toBeNull()
+    })
+
+    it('lastFacilitatorInput is null', () => {
+      expect(getState().lastFacilitatorInput).toBeNull()
+    })
+
+    it('pendingControlBanner is null', () => {
+      expect(getState().pendingControlBanner).toBeNull()
     })
   })
 
@@ -401,72 +478,444 @@ describe('gameStore', () => {
     })
   })
 
-  // ─── advanceRound ───────────────────────────────────────────────────────────
+  // ─── advanceRound (LLM-wired) ───────────────────────────────────────────────
 
   describe('advanceRound', () => {
-    it('increments round and appends round_divider + kent stub when gameState is active', () => {
+    it('increments round, appends round_divider, flips loading, and fires LLM turn with [ROUND_START] prefix', async () => {
       initS1()
-      // S1 starts at round 1; advance to round 2
       expect(getState().gameState?.round).toBe(1)
+
       getState().advanceRound()
+
+      // Synchronous observable state: round incremented, divider pushed, loading=true
       expect(getState().gameState?.round).toBe(2)
       const msgs = getState().messages
-      expect(msgs).toHaveLength(2)
-      expect(msgs[0].type).toBe('round_divider')
-      expect(msgs[0].label).toBe('Round 2')
-      expect(msgs[1].type).toBe('persona')
-      expect(msgs[1].speaker).toBe('kent')
+      expect(msgs.some((m) => m.type === 'round_divider' && m.label === 'Round 2')).toBe(true)
+      expect(getState().loading).toBe(true)
+
+      // Prefixed input persisted for Retry
+      expect(getState().lastFacilitatorInput).toMatch(/^\[ROUND_START Round 2\]/)
+
+      // Wait for async LLM turn to complete
+      await waitFor(() => expect(getState().loading).toBe(false))
+      // Kent + Finch bubbles added via LLM mock
+      const personaMsgs = getState().messages.filter((m) => m.type === 'persona')
+      expect(personaMsgs.length).toBe(2)
     })
 
     it('is a no-op when gameState is null', () => {
-      // Do NOT call initS1 — gameState remains null
       expect(getState().gameState).toBeNull()
       getState().advanceRound()
       expect(getState().messages).toHaveLength(0)
       expect(getState().gameState).toBeNull()
+      expect(getState().loading).toBe(false)
+    })
+
+    it('is a no-op when loading=true (already has an in-flight turn)', () => {
+      initS1()
+      getState().setLoading(true)
+      getState().advanceRound()
+      // Round NOT incremented, no divider appended.
+      expect(getState().gameState?.round).toBe(1)
+      expect(getState().messages.length).toBe(0)
     })
   })
 
-  // ─── triggerDebrief ─────────────────────────────────────────────────────────
+  // ─── triggerDebrief (LLM-wired) ─────────────────────────────────────────────
 
   describe('triggerDebrief', () => {
-    it('appends exactly 2 messages: debrief_divider with label DEBRIEF and a facilitator stub', () => {
+    it('appends debrief_divider, flips loading, fires LLM turn with [DEBRIEF_TRIGGER] prefix', async () => {
+      initS1()
       getState().triggerDebrief()
       const msgs = getState().messages
-      expect(msgs).toHaveLength(2)
-      expect(msgs[0].type).toBe('debrief_divider')
-      expect(msgs[0].label).toBe('DEBRIEF')
-      expect(msgs[1].type).toBe('facilitator')
+      expect(msgs.some((m) => m.type === 'debrief_divider' && m.label === 'DEBRIEF')).toBe(true)
+      expect(getState().loading).toBe(true)
+      expect(getState().lastFacilitatorInput).toMatch(/^\[DEBRIEF_TRIGGER\]/)
+
+      await waitFor(() => expect(getState().loading).toBe(false))
     })
   })
 
-  // ─── sendFacilitatorMessage ─────────────────────────────────────────────────
+  // ─── sendFacilitatorMessage happy path + error paths ────────────────────────
 
   describe('sendFacilitatorMessage', () => {
-    it('appends a facilitator message and sets loading=true for non-empty text', () => {
-      getState().sendFacilitatorMessage('hello')
-      const msgs = getState().messages
-      expect(msgs).toHaveLength(1)
-      expect(msgs[0].type).toBe('facilitator')
-      expect(msgs[0].text).toBe('hello')
-      expect(getState().loading).toBe(true)
+    beforeEach(() => {
+      initS1()
     })
 
-    it('trims whitespace: "  hi  " is stored as "hi"', () => {
-      getState().sendFacilitatorMessage('  hi  ')
-      expect(getState().messages[0].text).toBe('hi')
+    it('no-ops for empty string', () => {
+      getState().sendFacilitatorMessage('')
+      expect(getState().messages).toHaveLength(0)
+      expect(getState().loading).toBe(false)
     })
 
-    it('is a no-op for whitespace-only input "   "', () => {
+    it('no-ops for whitespace-only input', () => {
       getState().sendFacilitatorMessage('   ')
       expect(getState().messages).toHaveLength(0)
       expect(getState().loading).toBe(false)
     })
 
-    it('is a no-op for empty string ""', () => {
-      getState().sendFacilitatorMessage('')
-      expect(getState().messages).toHaveLength(0)
+    it('no-ops when already loading', () => {
+      getState().setLoading(true)
+      getState().sendFacilitatorMessage('hello')
+      // Facilitator message NOT pushed
+      expect(getState().messages.filter((m) => m.type === 'facilitator').length).toBe(0)
+    })
+
+    it('trims whitespace and stores trimmed text', () => {
+      getState().sendFacilitatorMessage('  hello  ')
+      expect(getState().messages[0].text).toBe('hello')
+      expect(getState().lastFacilitatorInput).toBe('hello')
+    })
+
+    it('happy path: adds facilitator bubble, runs LLM turn, adds persona messages, updates state, appends history, clears loading', async () => {
+      getState().sendFacilitatorMessage('hello world')
+
+      // Synchronous: facilitator bubble + loading=true
+      expect(getState().messages[0].type).toBe('facilitator')
+      expect(getState().loading).toBe(true)
+
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      // Two persona messages added
+      const personaMsgs = getState().messages.filter((m) => m.type === 'persona')
+      expect(personaMsgs).toHaveLength(2)
+      expect(personaMsgs[0].speaker).toBe('kent')
+      expect(personaMsgs[1].speaker).toBe('finch')
+      // revealDelay staggered 0ms / 500ms
+      expect(personaMsgs[0].revealDelay).toBe(0)
+      expect(personaMsgs[1].revealDelay).toBe(500)
+
+      // gameState updated from Finch's stateUpdate { crisisSeverity: 2 }
+      expect(getState().gameState?.crisisSeverity).toBe(2)
+
+      // llmHistory got +2 entries (user + assistant)
+      expect(getState().llmHistory).toHaveLength(2)
+      expect(getState().llmHistory[0]).toEqual({ role: 'user', content: 'hello world' })
+      expect(getState().llmHistory[1].role).toBe('assistant')
+
+      // currentAbortController cleared
+      expect(getState().currentAbortController).toBeNull()
+    })
+
+    it('LLM error path (timeout): adds red error bubble, retryInput set, gameState + llmHistory unchanged', async () => {
+      mockedCallLLMProxy.mockResolvedValue({
+        ok: false,
+        errorCode: 'LLM_TIMEOUT',
+        message: 'Timed out after 45s',
+      })
+      const beforeGameState = getState().gameState
+      const beforeHistory = getState().llmHistory
+
+      getState().sendFacilitatorMessage('hello')
+
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      const errMsgs = getState().messages.filter((m) => m.type === 'error')
+      expect(errMsgs).toHaveLength(1)
+      expect(errMsgs[0].errorCode).toBe('LLM_TIMEOUT')
+      expect(errMsgs[0].retryInput).toBe('hello')
+      expect(errMsgs[0].rawResponse).toBeUndefined()
+
+      // Atomicity: gameState + llmHistory byte-identical
+      expect(getState().gameState).toEqual(beforeGameState)
+      expect(getState().llmHistory).toEqual(beforeHistory)
+      expect(getState().currentAbortController).toBeNull()
+    })
+
+    it('parse failure path: error bubble carries rawResponse + retryInput; gameState + llmHistory unchanged', async () => {
+      mockedCallLLMProxy.mockResolvedValue({ ok: true, text: 'junk response' })
+      mockedParsePersonaResponse.mockReturnValue({
+        ok: false,
+        errorKind: 'PARSE_FAILURE',
+        raw: 'junk response',
+        detail: 'JSON.parse failed',
+      })
+      const beforeGameState = getState().gameState
+      const beforeHistory = getState().llmHistory
+
+      getState().sendFacilitatorMessage('hello')
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      const errMsgs = getState().messages.filter((m) => m.type === 'error')
+      expect(errMsgs).toHaveLength(1)
+      expect(errMsgs[0].errorCode).toBe('PARSE_FAILURE')
+      expect(errMsgs[0].retryInput).toBe('hello')
+      expect(errMsgs[0].rawResponse).toBe('junk response')
+
+      // Atomicity
+      expect(getState().gameState).toEqual(beforeGameState)
+      expect(getState().llmHistory).toEqual(beforeHistory)
+    })
+
+    it('atomicity across both error paths: no mutation regardless of which layer failed', async () => {
+      // Establish a known baseline state
+      initS1()
+      const baseGameState = structuredClone(getState().gameState)
+      const baseHistory = structuredClone(getState().llmHistory)
+
+      // First error: network
+      mockedCallLLMProxy.mockResolvedValueOnce({
+        ok: false,
+        errorCode: 'NETWORK_ERROR',
+        message: 'offline',
+      })
+      getState().sendFacilitatorMessage('a')
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      expect(getState().gameState).toEqual(baseGameState)
+      expect(getState().llmHistory).toEqual(baseHistory)
+
+      // Second error: parse failure
+      mockedCallLLMProxy.mockResolvedValueOnce({ ok: true, text: 'bad' })
+      mockedParsePersonaResponse.mockReturnValueOnce({
+        ok: false,
+        errorKind: 'VALIDATION_FAILURE',
+        raw: 'bad',
+        detail: 'schema mismatch',
+      })
+      getState().sendFacilitatorMessage('b')
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      expect(getState().gameState).toEqual(baseGameState)
+      expect(getState().llmHistory).toEqual(baseHistory)
+    })
+  })
+
+  // ─── retryLastMessage ───────────────────────────────────────────────────────
+
+  describe('retryLastMessage', () => {
+    beforeEach(() => {
+      initS1()
+    })
+
+    it('replays lastFacilitatorInput and applies the retry response', async () => {
+      // First call fails
+      mockedCallLLMProxy.mockResolvedValueOnce({
+        ok: false,
+        errorCode: 'LLM_TIMEOUT',
+        message: 'Timed out',
+      })
+      getState().sendFacilitatorMessage('replay me')
+      await waitFor(() => expect(getState().loading).toBe(false))
+      expect(getState().messages.some((m) => m.type === 'error')).toBe(true)
+
+      // Second call (retry) succeeds via the default happy-path mock
+      getState().retryLastMessage()
+      expect(getState().loading).toBe(true)
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      // Persona messages now present + gameState updated
+      expect(getState().messages.filter((m) => m.type === 'persona')).toHaveLength(2)
+      expect(getState().gameState?.crisisSeverity).toBe(2)
+
+      // callLLMProxy called twice with same input
+      expect(mockedCallLLMProxy).toHaveBeenCalledTimes(2)
+      const secondCallArgs = mockedCallLLMProxy.mock.calls[1][1]
+      const lastMessage = secondCallArgs[secondCallArgs.length - 1]
+      expect(lastMessage).toEqual({ role: 'user', content: 'replay me' })
+    })
+
+    it('no-ops when lastFacilitatorInput is null', () => {
+      getState().retryLastMessage()
+      expect(mockedCallLLMProxy).not.toHaveBeenCalled()
+    })
+
+    it('no-ops when already loading', async () => {
+      getState().sendFacilitatorMessage('hi')
+      // While loading=true, retry should bail
+      expect(getState().loading).toBe(true)
+      getState().retryLastMessage()
+      expect(mockedCallLLMProxy).toHaveBeenCalledTimes(1)
+      await waitFor(() => expect(getState().loading).toBe(false))
+    })
+  })
+
+  // ─── Control banner ─────────────────────────────────────────────────────────
+
+  describe('pendingControlBanner', () => {
+    beforeEach(() => {
+      initS1()
+    })
+
+    it('LLM response with control.advanceRound=true sets banner kind=advanceRound with targetRound', async () => {
+      mockedParsePersonaResponse.mockReturnValue({
+        ok: true,
+        value: {
+          responses: [{ speaker: 'kent', message: 'go', stateUpdate: null, flag: null }],
+          control: { advanceRound: true },
+        },
+      })
+      getState().sendFacilitatorMessage('advance?')
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      const banner = getState().pendingControlBanner
+      expect(banner?.kind).toBe('advanceRound')
+      expect(banner?.targetRound).toBe(2)
+    })
+
+    it('conflict resolution: both flags true → prefer triggerDebrief', async () => {
+      mockedParsePersonaResponse.mockReturnValue({
+        ok: true,
+        value: {
+          responses: [{ speaker: 'kent', message: 'both', stateUpdate: null, flag: null }],
+          control: { advanceRound: true, triggerDebrief: true },
+        },
+      })
+      getState().sendFacilitatorMessage('both?')
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      const banner = getState().pendingControlBanner
+      expect(banner?.kind).toBe('triggerDebrief')
+    })
+
+    it('dismissControlBanner clears banner; next no-control LLM response keeps it null', async () => {
+      mockedParsePersonaResponse.mockReturnValueOnce({
+        ok: true,
+        value: {
+          responses: [{ speaker: 'kent', message: 'go', stateUpdate: null, flag: null }],
+          control: { advanceRound: true },
+        },
+      })
+      getState().sendFacilitatorMessage('advance?')
+      await waitFor(() => expect(getState().loading).toBe(false))
+      expect(getState().pendingControlBanner?.kind).toBe('advanceRound')
+
+      getState().dismissControlBanner()
+      expect(getState().pendingControlBanner).toBeNull()
+
+      // Next message returns no control signal.
+      mockedParsePersonaResponse.mockReturnValueOnce({
+        ok: true,
+        value: {
+          responses: [{ speaker: 'kent', message: 'nothing', stateUpdate: null, flag: null }],
+        },
+      })
+      getState().sendFacilitatorMessage('noop')
+      await waitFor(() => expect(getState().loading).toBe(false))
+      expect(getState().pendingControlBanner).toBeNull()
+    })
+
+    it('confirmControlBanner with kind=advanceRound increments round and clears banner', async () => {
+      mockedParsePersonaResponse.mockReturnValueOnce({
+        ok: true,
+        value: {
+          responses: [{ speaker: 'kent', message: 'go', stateUpdate: null, flag: null }],
+          control: { advanceRound: true },
+        },
+      })
+      getState().sendFacilitatorMessage('advance?')
+      await waitFor(() => expect(getState().loading).toBe(false))
+      expect(getState().pendingControlBanner?.kind).toBe('advanceRound')
+      expect(getState().gameState?.round).toBe(1)
+
+      getState().confirmControlBanner()
+      // Banner clears synchronously (before advanceRound's async LLM turn returns)
+      expect(getState().pendingControlBanner).toBeNull()
+      expect(getState().gameState?.round).toBe(2)
+
+      await waitFor(() => expect(getState().loading).toBe(false))
+    })
+  })
+
+  // ─── Clamp log warning (DEV only) ───────────────────────────────────────────
+
+  describe('clamp log warning', () => {
+    it('LLM stateUpdate with crisisSeverity=9 → clamped to 5, console.warn called in dev', async () => {
+      initS1()
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      mockedParsePersonaResponse.mockReturnValue({
+        ok: true,
+        value: {
+          responses: [
+            { speaker: 'kent', message: 'overshoot', stateUpdate: { crisisSeverity: 9 }, flag: null },
+          ],
+        },
+      })
+
+      getState().sendFacilitatorMessage('boom')
+      await waitFor(() => expect(getState().loading).toBe(false))
+
+      expect(getState().gameState?.crisisSeverity).toBe(5)
+      // import.meta.env.DEV is true under Vitest — warning must have fired.
+      expect(warnSpy).toHaveBeenCalled()
+      const warnCall = warnSpy.mock.calls.find((c) =>
+        typeof c[0] === 'string' && c[0].includes('[stateUpdater]'),
+      )
+      expect(warnCall).toBeDefined()
+
+      warnSpy.mockRestore()
+    })
+  })
+
+  // ─── llmHistory invariant: ≤ 2N+1 = 13 entries ──────────────────────────────
+
+  describe('llmHistory length invariant', () => {
+    it('after 10 consecutive successful turns, llmHistory.length stays ≤ 2*HISTORY_WINDOW_N+1 = 13', async () => {
+      initS1()
+      const MAX = 2 * HISTORY_WINDOW_N + 1 // 13 when N=6
+
+      for (let i = 0; i < 10; i++) {
+        getState().sendFacilitatorMessage(`turn ${i}`)
+        await waitFor(() => expect(getState().loading).toBe(false))
+        expect(getState().llmHistory.length).toBeLessThanOrEqual(MAX)
+      }
+
+      // After 10 turns (20 entries appended raw), length should stabilise at exactly 13.
+      expect(getState().llmHistory.length).toBe(MAX)
+    })
+  })
+
+  // ─── newGame: FLOW-05 in-flight abort + Phase 6 transient reset ─────────────
+
+  describe('newGame (FLOW-05)', () => {
+    it('mid-LLM-turn newGame() aborts fetch, clears loading, nulls all transient slices', async () => {
+      initS1()
+
+      // Mock a never-resolving promise that records the signal it received.
+      let capturedSignal: AbortSignal | undefined
+      mockedCallLLMProxy.mockImplementation(async (_sys, _msgs, opts) => {
+        capturedSignal = opts?.signal
+        // Return a promise that only resolves when aborted.
+        return new Promise<LLMCallResult>((resolve) => {
+          opts?.signal?.addEventListener('abort', () => {
+            resolve({ ok: false, errorCode: 'ABORTED', message: 'cancelled' })
+          })
+        })
+      })
+
+      // Pre-populate some transient state so we can verify it gets cleared.
+      useGameStore.setState({
+        lastFacilitatorInput: 'old input',
+        pendingControlBanner: { kind: 'advanceRound', targetRound: 5 },
+        llmHistory: [
+          { role: 'user', content: 'old user' },
+          { role: 'assistant', content: 'old asst' },
+        ],
+      })
+
+      // Kick off an in-flight LLM call.
+      getState().sendFacilitatorMessage('in-flight')
+      expect(getState().loading).toBe(true)
+      expect(getState().currentAbortController).not.toBeNull()
+
+      // Immediately call newGame.
+      getState().newGame()
+
+      // Synchronous assertions.
+      expect(getState().currentAbortController).toBeNull()
       expect(getState().loading).toBe(false)
+      expect(getState().llmHistory).toEqual([])
+      expect(getState().lastFacilitatorInput).toBeNull()
+      expect(getState().pendingControlBanner).toBeNull()
+      expect(getState().gameState).toBeNull()
+      expect(getState().messages).toEqual([])
+
+      // The fetch mock saw abort() on its signal.
+      expect(capturedSignal?.aborted).toBe(true)
+
+      // Let the aborted promise resolve so the in-flight turn's catch/bail completes cleanly.
+      await waitFor(() => expect(getState().loading).toBe(false))
     })
   })
 })
