@@ -118,6 +118,17 @@ export interface ChatMessage {
   speaker?: PersonaId | 'facilitator'
   text?: string
   flag?: string | null // Facilitator note from LLM
+
+  // ─── Phase 6 additions ─────────────────────────────────────────────────────
+  /** Raw LLM response text — populated on error bubbles for the "Show raw response" disclosure. */
+  rawResponse?: string
+  /** Machine-readable error code (e.g. 'PARSE_FAILURE', 'LLM_TIMEOUT', 'LLM_UPSTREAM_ERROR'). */
+  errorCode?: string
+  /** Facilitator input to replay when the Retry button is clicked on this error bubble. */
+  retryInput?: string
+  /** ms delay for staggered reveal animation (set on persona messages). Applied via CSS animation-delay. */
+  revealDelay?: number
+
   label?: string // For dividers
   timestamp: string
   isDebrief?: boolean
