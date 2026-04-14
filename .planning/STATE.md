@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 6 (LLM Integration) — Wave 5 Task 1 complete (token budget measured, N reduced 6→2); paused at 06-08 Task 2 human-verify smoke test checkpoint.
+**Current focus:** Phase 6 (LLM Integration) — COMPLETE. 06-09 delivered state-visibility polish (delta ghost labels + cell pulse); Phase 7 (config generation) ready to begin.
 
 ## Current Position
 
-Phase: 6 of 8 (LLM Integration)
-Plan: 7 of 9 in current phase (06-01..06-07 complete; 06-08 Task 1 complete, Task 2 awaiting human smoke test)
-Status: Paused at 06-08 Task 2 checkpoint (human-verify). Task 1 delivered reportPromptBudget + DEV init logging + BUDGET.md; empirical systemPromptTokens = 5124; HISTORY_WINDOW_N reduced 6 → 2 for gpt-4 8k safe ceiling (total 6724 / 7500). 388 tests green, typecheck clean. Awaiting live end-to-end smoke test against corporate Azure endpoint.
-Last activity: 2026-04-14 — Plan 06-08 Task 1 complete; 4 atomic commits (feat/test/chore/docs).
+Phase: 6 of 8 (LLM Integration) — COMPLETE
+Plan: 9 of 9 in current phase (06-01..06-09 all complete)
+Status: Phase 6 complete. 06-09 delivered StatePanel delta diff + TrackBar ghost labels + TeamCard cell pulse + favourability colouring; Tailwind v4 static scan verified in built CSS bundle; 406/406 tests green (+18 over 388 baseline); typecheck clean; build succeeds. Rule 3 deviations: fixed pre-existing GameHeader.tsx .title typo and responseParser.test.ts stateUpdate shape incompatibility. Added --color-track-readiness token (#2BC48A) to unlock Tailwind scan. Ready for Phase 7.
+Last activity: 2026-04-14 — Plan 06-09 complete; 3 atomic commits (feat/feat/test) + summary commit.
 
-Progress: [████████████] 83% (29/35 plans)
+Progress: [█████████████] 86% (30/35 plans)
 
 ## Performance Metrics
 
@@ -171,6 +171,17 @@ Recent decisions affecting current work:
 - 06-08: SAFE_CONTEXT_CEILING_TOKENS=7500 chosen as conservative default for gpt-4 8k; corporate deployment context size UNCONFIRMED at plan-execution time — flagged for Phase 8 ops confirmation before considering raising N back up
 - 06-08: TOKENS_PER_TURN_ESTIMATE=800 pinned in test; recalibration procedure (±20% band against actual DevTools-captured response) deferred to Task 2 smoke test per plan verify clause
 - 06-08: reportPromptBudget wired into gameStore.initGame behind import.meta.env.DEV — console.info on withinLimit, console.error with 'CTX-03 BUDGET EXCEEDED' tag when over-budget. Cannot silently fail (CTX-03 satisfied)
+- 06-09: prevStateRef updated INSIDE useEffect (not during render) so the current render pass can read previous value — updating during render would overwrite prev with current and always yield zero deltas. First render prevStateRef.current === null → no ghost labels anywhere
+- 06-09: Zero delta is explicit no-op (`hasDelta = delta != null && delta !== 0`) — re-rendering same gameState object or a same-value clone produces no visual noise
+- 06-09: Ghost-label colour via LITERAL ternary (`isFavourable ? 'text-track-readiness' : 'text-crisis-security'`) — Tailwind v4 static source scanner drops dynamically composed class names; the two literals appear verbatim in StatePanel.tsx (2×), TeamCard.tsx (3×), and TrackBar.tsx; build-output grep confirms both classes emit to dist/assets/*.css
+- 06-09: Added `--color-track-readiness: #2BC48A;` to @theme — plan mandated the class name but no matching token existed; #2BC48A matches resource-readiness and crisis-none for canonical "favourable green" semantic consistency
+- 06-09: Favourability map is a module-level Record<string, 'up'|'down'> constant (FAVORABILITY in StatePanel, FAVOURABILITY in TeamCard) — crisisSeverity is the ONLY 'down' field (lower is better); edipLegitimacy, pc, po, readiness, stock, crm, ic are all 'up'
+- 06-09: Ghost label text format — prepend '+' for positive deltas (`+1`), rely on natural '-' for negatives (`-2`); matches mental model of signed delta
+- 06-09: @keyframes cellPulse + @keyframes ghostFade live inside @theme alongside existing messageIn (src/styles/index.css) — animation-system co-location keeps keyframes discoverable in one place; used via animate-[name_duration_easing_fill] arbitrary-value syntax (no animate-* token needed since only this component uses them)
+- 06-09: TrackBar ghost uses stable key `${label}-${delta}-${value}` — forces animation restart when delta genuinely changes, avoids spurious resets on unrelated prop flips
+- 06-09: Plan referenced `src/index.css` but actual file is `src/styles/index.css` — used the correct path (confirmed via Glob). Future plans should reference the real path
+- 06-09: [Rule 3 unblock] `GameHeader.tsx` was using `gameConfig?.title` (non-existent on GameConfig interface); replaced with `.name` per 05-03 decision. Pre-existing regression discovered during `pnpm build` verify
+- 06-09: [Rule 3 unblock] `responseParser.test.ts` stateUpdate round-trip test used a bogus shape `{teams: {...}}` incompatible with StateUpdate type; cast through `as unknown as PersonaResponse['stateUpdate']` since the parser deliberately doesn't validate the inner shape (only "non-null object")
 
 ### Pending Todos
 
@@ -185,6 +196,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Plan 06-08 Task 1 complete; paused at Task 2 human-verify smoke test checkpoint
-Stopped at: 06-08 Task 1 delivered — `src/lib/promptBudget.ts` (reportPromptBudget + SAFE_CONTEXT_CEILING_TOKENS=7500 + TOKENS_PER_TURN_ESTIMATE=800), pinned-constant test suite (9 tests), HISTORY_WINDOW_N reduced 6→2 (total 6724/7500 at measured 5124 systemPromptTokens), DEV init logging wired into gameStore.initGame (console.info on withinLimit, console.error with CTX-03 tag on exceeded), BUDGET.md documenting empirical measurement + deployment-class table + context-window-unconfirmed flag for Phase 8. 4 atomic commits (feat/test/chore/docs). 388/388 tests pass, typecheck clean. Resume: Task 2 live end-to-end smoke test against corporate Azure endpoint — 22-item checklist covering all PROMPT/STATE/RESP/FLOW/CTX requirements + credential audit + failure-mode drills. Post-smoke-test: recalibrate TOKENS_PER_TURN_ESTIMATE against a captured real response (±20% band).
+Last session: 2026-04-14 — Plan 06-09 complete (state-visibility polish); Phase 6 closed out
+Stopped at: Plan 06-09 complete — StatePanel delta diff + TrackBar ghost labels + TeamCard cell pulse + favourability colouring. `src/styles/index.css` gained `@keyframes cellPulse` (800ms), `@keyframes ghostFade` (2500ms), and `--color-track-readiness: #2BC48A` token. 3 atomic commits (78ac275 feat StatePanel+TrackBar+keyframes, 48b8812 feat TeamCard+track-readiness token+GameHeader Rule 3 fix, bc3cda3 test StatePanel+TeamCard+responseParser Rule 3 fix). 406/406 tests passing (+18 over 388 baseline); typecheck clean; `pnpm build` succeeds; both favourability classes present in dist/assets/*.css. Resume: Phase 7 (config generation) — `/gsd:plan-phase 07` to seed the phase plans. Deferred: number-tick interpolation on track readouts (low-value polish, revisit in Phase 8 if facilitator feedback requests it); manual visual spot-check via dev seed (recommended before Phase 7 kicks off).
 Resume file: None
