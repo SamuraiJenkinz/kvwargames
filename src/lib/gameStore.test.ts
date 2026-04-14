@@ -928,11 +928,14 @@ describe('gameStore', () => {
     // Test D: newGame clears stateSnapshots and gameEnded
     it('newGame clears stateSnapshots and resets gameEnded to false', async () => {
       initS1()
-      getState().setGameEnded(true)
+      // advanceRound BEFORE setGameEnded — gameEnded guard now bails advanceRound
+      // when true, so we must advance first to populate stateSnapshots[2].
       getState().advanceRound()
       await waitFor(() => expect(getState().loading).toBe(false))
       // Verify we have snapshots before newGame
       expect(getState().stateSnapshots[2]).toBeDefined()
+
+      getState().setGameEnded(true)
       expect(getState().gameEnded).toBe(true)
 
       getState().newGame()
@@ -969,9 +972,10 @@ describe('gameStore', () => {
     // resetGame also clears stateSnapshots and gameEnded
     it('resetGame clears stateSnapshots and resets gameEnded to false', async () => {
       initS1()
-      getState().setGameEnded(true)
+      // advanceRound BEFORE setGameEnded — gameEnded guard bails advanceRound when true.
       getState().advanceRound()
       await waitFor(() => expect(getState().loading).toBe(false))
+      getState().setGameEnded(true)
 
       getState().resetGame()
 
@@ -1070,6 +1074,92 @@ describe('gameStore', () => {
       expect(getState().draftSource).toBe('load')
       getState().resetGame()
       expect(getState().draftSource).toBeNull()
+    })
+  })
+
+  // ─── endGame (Phase 7 Plan 02) ───────────────────────────────────────────────
+
+  describe('endGame (07-02)', () => {
+    beforeEach(() => {
+      initS1()
+    })
+
+    // Test A: endGame sets gameEnded=true and pushes debrief_divider + fires LLM turn
+    it('endGame sets gameEnded=true, pushes debrief_divider, sets loading=true', () => {
+      getState().endGame()
+
+      expect(getState().gameEnded).toBe(true)
+      const msgs = getState().messages
+      const lastMsg = msgs[msgs.length - 1]
+      expect(lastMsg.type).toBe('debrief_divider')
+      expect(getState().loading).toBe(true)
+    })
+
+    // Test B: endGame is no-op if already ended (no duplicate divider)
+    it('endGame is no-op if already ended — no duplicate debrief_divider pushed', () => {
+      getState().endGame()
+      const countAfterFirst = getState().messages.length
+
+      // Second endGame() call should be idempotent — loading is true so it bails
+      getState().endGame()
+      expect(getState().messages.length).toBe(countAfterFirst)
+    })
+
+    // Test B2: endGame is no-op if gameEnded already set (direct flag)
+    it('endGame is no-op if gameEnded=true was set externally — no duplicate divider', () => {
+      getState().setGameEnded(true)
+      const countBefore = getState().messages.length
+
+      getState().endGame()
+      expect(getState().messages.length).toBe(countBefore)
+      expect(getState().loading).toBe(false)
+    })
+
+    // Test C: advanceRound bails out when gameEnded=true
+    it('advanceRound bails out when gameEnded=true — round unchanged, no messages added', () => {
+      const roundBefore = getState().gameState?.round
+      const msgsBefore = getState().messages.length
+      getState().setGameEnded(true)
+
+      getState().advanceRound()
+
+      expect(getState().gameState?.round).toBe(roundBefore)
+      expect(getState().messages.length).toBe(msgsBefore)
+      expect(getState().loading).toBe(false)
+    })
+
+    // Test D: sendFacilitatorMessage bails out when gameEnded=true
+    it('sendFacilitatorMessage bails out when gameEnded=true — no facilitator message pushed, no loading flip', () => {
+      getState().setGameEnded(true)
+
+      getState().sendFacilitatorMessage('hi')
+
+      const facilitatorMsgs = getState().messages.filter((m) => m.type === 'facilitator')
+      expect(facilitatorMsgs).toHaveLength(0)
+      expect(getState().loading).toBe(false)
+    })
+
+    // Test E: triggerDebrief (interim) bails out when gameEnded=true
+    it('triggerDebrief (interim) bails out when gameEnded=true — loading stays false, no new divider', () => {
+      getState().setGameEnded(true)
+      const msgsBefore = getState().messages.length
+
+      getState().triggerDebrief()
+
+      expect(getState().loading).toBe(false)
+      // No new divider pushed
+      expect(getState().messages.length).toBe(msgsBefore)
+    })
+
+    // Test F: newGame resets gameEnded AND clears stateSnapshots after endGame
+    it('newGame resets gameEnded AND clears stateSnapshots after endGame', async () => {
+      getState().endGame()
+      expect(getState().gameEnded).toBe(true)
+
+      getState().newGame()
+
+      expect(getState().gameEnded).toBe(false)
+      expect(getState().stateSnapshots).toEqual({})
     })
   })
 })
