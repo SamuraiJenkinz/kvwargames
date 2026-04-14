@@ -7,9 +7,16 @@ Required env vars (startup fails if missing):
   LLM_MODEL           - Model identifier string
 
 Optional env vars (have defaults):
-  LLM_TIMEOUT_SECONDS - HTTP timeout in seconds (default: 60)
-  LLM_MAX_TOKENS      - Max tokens per completion (default: 2048)
-  LLM_EXTRA_HEADERS   - JSON object string for extra HTTP headers (default: '{}')
+  LLM_TIMEOUT_SECONDS   - HTTP timeout in seconds (default: 60)
+  LLM_MAX_TOKENS        - Max tokens per completion (default: 2048)
+  LLM_EXTRA_HEADERS     - JSON object string for extra HTTP headers (default: '{}')
+  LLM_AUTH_HEADER_NAME  - HTTP header name used to carry the API key
+                          (default: 'Authorization' for OpenAI-compatible endpoints;
+                          set to 'api-key' for Azure OpenAI).
+  LLM_AUTH_VALUE_PREFIX - String prefixed to the API key in the auth header
+                          (default: 'Bearer ' — trailing space intentional so that
+                          f"{prefix}{key}".strip() yields "Bearer <key>". Set to ''
+                          for Azure OpenAI, which expects the raw key with no prefix).
 """
 
 import json
@@ -30,6 +37,8 @@ class Settings(BaseSettings):
     llm_timeout_seconds: int = 60
     llm_max_tokens: int = 2048
     llm_extra_headers: str = "{}"
+    llm_auth_header_name: str = "Authorization"
+    llm_auth_value_prefix: str = "Bearer "
 
     def get_extra_headers(self) -> dict:
         """Parse llm_extra_headers JSON string safely. Returns {} on parse error."""

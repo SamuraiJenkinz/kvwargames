@@ -73,8 +73,12 @@ async def llm_proxy(body: LLMProxyRequest, request: Request) -> JSONResponse:
         "max_tokens": max_tokens,
     }
 
+    # Auth header is configurable so the same proxy can target either an
+    # OpenAI-compatible endpoint ("Authorization: Bearer <key>") or Azure
+    # OpenAI ("api-key: <key>" with no prefix). See config.py for env vars.
+    auth_value = f"{settings.llm_auth_value_prefix}{settings.llm_api_key}".strip()
     headers = {
-        "Authorization": f"Bearer {settings.llm_api_key}",
+        settings.llm_auth_header_name: auth_value,
         "Content-Type": "application/json",
         **settings.get_extra_headers(),
     }
