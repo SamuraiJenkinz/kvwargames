@@ -4,10 +4,11 @@ import { useGameStore } from '@/lib/gameStore'
 
 interface MessageInputProps {
   disabled: boolean
+  gameEnded: boolean
   registerInsert: (fn: (text: string) => void) => void
 }
 
-export default function MessageInput({ disabled, registerInsert }: MessageInputProps) {
+export default function MessageInput({ disabled, gameEnded, registerInsert }: MessageInputProps) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const sendFacilitatorMessage = useGameStore((s) => s.sendFacilitatorMessage)
@@ -30,6 +31,7 @@ export default function MessageInput({ disabled, registerInsert }: MessageInputP
     const trimmed = value.trim()
     if (trimmed === '') return
     if (disabled) return
+    if (gameEnded) return
     sendFacilitatorMessage(trimmed)
     setValue('')
   }
@@ -56,7 +58,7 @@ export default function MessageInput({ disabled, registerInsert }: MessageInputP
       />
       <button
         onClick={submit}
-        disabled={disabled || value.trim() === ''}
+        disabled={disabled || gameEnded || value.trim() === ''}
         className="flex-none flex items-center gap-1 px-3 py-2 rounded-sm border border-border-default hover:bg-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed text-sm font-mono uppercase"
       >
         <Send className="w-3 h-3" />
