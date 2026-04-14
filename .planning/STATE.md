@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 4 of 8 (Setup Screen)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-04-13 — Completed 04-01-PLAN.md (Router Scaffold + Phase Removal)
+Last activity: 2026-04-13 — Completed 04-02-PLAN.md (HomeScreen Two-Path Cards)
 
-Progress: [████░░░░░░] 34% (12/35 plans)
+Progress: [████░░░░░░] 37% (13/35 plans)
 
 ## Performance Metrics
 
@@ -80,6 +80,9 @@ Recent decisions affecting current work:
 - 04-01: GuardedGameScreen is an inline function component in App.tsx (not a separate file) — route guard with no exported contract; separate file adds overhead for no gain
 - 04-01: AppPhase type retained in types/game.ts post-store-removal — no store references remain, but Phase 5 may want 'debrief' distinction within /game
 - 04-01: All router redirects use replace prop — prevents history entry pollution on null gameState guard and catch-all routes
+- 04-02: Disabled card uses aria-disabled (not disabled attr) — preserves keyboard focus so screen readers can hear the disabled state
+- 04-02: Load placeholder inlined in SetupScreen switch case (no stub file) — plan 04-03 replaces the JSX in-place via TODO(04-03) comment
+- 04-02: briefMessageVisible state lives in HomeScreen component (not store) — purely transient UI state with no cross-component lifetime
 
 ### Pending Todos
 
@@ -95,5 +98,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-13
-Stopped at: Completed 04-01-PLAN.md (Router Scaffold + Phase Removal) — Phase 4 plan 1/4 done
+Stopped at: Completed 04-02-PLAN.md (HomeScreen Two-Path Cards) — Phase 4 plan 2/4 done
 Resume file: None
