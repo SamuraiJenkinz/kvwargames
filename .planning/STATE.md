@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 5 (Game Screen Layout) — Wave 1 complete (05-01, 05-02, 05-03); Wave 2 in progress (05-04 done, 05-05 done)
+**Current focus:** Phase 5 (Game Screen Layout) — Wave 1 complete (05-01, 05-02, 05-03); Wave 2 complete (05-04, 05-05); Wave 3 in progress (05-06 done; 05-07 in parallel)
 
 ## Current Position
 
 Phase: 5 of 8 (Game Screen Layout)
-Plan: 5 of 7 in current phase
-Status: In progress — 05-05 complete; 05-04 + 05-05 done; ready for 05-06 (StatePanel) + 05-07 (FacilitatorInput)
-Last activity: 2026-04-14 — Completed 05-05-PLAN.md (ReferencePanel)
+Plan: 6 of 7 in current phase
+Status: In progress — 05-06 complete; 05-07 (FacilitatorInput) running in parallel
+Last activity: 2026-04-14 — Completed 05-06-PLAN.md (StatePanel)
 
-Progress: [███████░░░] 57% (20/35 plans)
+Progress: [████████░░] 60% (21/35 plans)
 
 ## Performance Metrics
 
@@ -108,6 +108,9 @@ Recent decisions affecting current work:
 - 05-05: setSelectedId(null) never called inside render — call in onClick handler only; calling setState in render body triggers React's max update depth protection
 - 05-05: scrollIntoView global mock in src/test/setup.ts — jsdom doesn't implement scrollIntoView; affects any test that renders ChatFeed (useStickyBottomScroll hook)
 - 05-05: Pre-baked CAT_CHIP_CLASS lookup (same pattern as PERSONA_META.bubbleClass from 05-02) — Tailwind v4 purges template-literal class names
+- 05-06: CSS text-transform:uppercase not applied by jsdom — tests assert against DOM text ('Severity' not 'SEVERITY'); comment explains discrepancy
+- 05-06: getAllByText used for values that collide across multiple TeamCards (e.g. '+1' appears on legitimacy track + two team PO fields)
+- 05-06: No @theme additions needed — bg-track-severity, bg-track-legitimacy, all text-resource-* tokens pre-existed from Phase 3
 
 ### Pending Todos
 
@@ -122,6 +125,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14T11:18:22Z (05-04); 2026-04-14T11:34:44Z (05-05)
-Stopped at: Completed 05-05-PLAN.md (ReferencePanel) — Phase 5 Wave 2 progress: 05-04 + 05-05 done (5/7 plans)
+Last session: 2026-04-14T11:21:53Z (05-06)
+Stopped at: Completed 05-06-PLAN.md (StatePanel) — Phase 5 Wave 3 progress: 05-06 done (6/7 plans); 05-07 running in parallel
 Resume file: None
