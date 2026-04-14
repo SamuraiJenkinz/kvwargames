@@ -35,9 +35,12 @@ export interface GameStore {
   gameConfig: GameConfig | null
   configJson: string
   briefText: string
+  /** Source of the current draft config. 'brief' = generated via GenerateBriefPanel, 'load' = user-entered/EDIP default, null = no draft yet. */
+  draftSource: 'brief' | 'load' | null
   setGameConfig: (cfg: GameConfig) => void
   setConfigJson: (json: string) => void
   setBriefText: (text: string) => void
+  setDraftSource: (source: 'brief' | 'load' | null) => void
 
   // Game state
   gameState: GameState | null
@@ -294,6 +297,7 @@ export const useGameStore = create<GameStore>()(
         gameConfig: null,
         configJson: initialConfigJson,
         briefText: '',
+        draftSource: null,
         setGameConfig: (cfg) =>
           set((state) => {
             state.gameConfig = cfg
@@ -305,6 +309,10 @@ export const useGameStore = create<GameStore>()(
         setBriefText: (text) =>
           set((state) => {
             state.briefText = text
+          }),
+        setDraftSource: (source) =>
+          set((s) => {
+            s.draftSource = source
           }),
 
         // Game state
@@ -446,6 +454,7 @@ export const useGameStore = create<GameStore>()(
             state.gameConfig = null
             state.configJson = JSON.stringify(EDIP_CONFIG, null, 2)
             state.briefText = ''
+            state.draftSource = null
             state.gameState = null
             state.messages = []
             state.llmHistory = []
@@ -475,6 +484,7 @@ export const useGameStore = create<GameStore>()(
             state.gameConfig = null
             state.configJson = JSON.stringify(EDIP_CONFIG, null, 2)
             state.briefText = ''
+            state.draftSource = null
             state.gameState = null
             state.messages = []
             state.loading = false

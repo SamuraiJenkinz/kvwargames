@@ -1032,4 +1032,44 @@ describe('gameStore', () => {
       await waitFor(() => expect(getState().loading).toBe(false))
     })
   })
+
+  // ─── draftSource (Phase 7 Task 2a) ─────────────────────────────────────────
+
+  describe('draftSource', () => {
+    const { getState } = useGameStore
+
+    beforeEach(() => {
+      useGameStore.setState({ draftSource: null })
+    })
+
+    it('setDraftSource updates draftSource to brief', () => {
+      getState().setDraftSource('brief')
+      expect(getState().draftSource).toBe('brief')
+    })
+
+    it('setDraftSource updates draftSource to load', () => {
+      getState().setDraftSource('load')
+      expect(getState().draftSource).toBe('load')
+    })
+
+    it('setDraftSource updates draftSource to null', () => {
+      getState().setDraftSource('brief')
+      getState().setDraftSource(null)
+      expect(getState().draftSource).toBeNull()
+    })
+
+    it('newGame resets draftSource to null', () => {
+      getState().setDraftSource('brief')
+      expect(getState().draftSource).toBe('brief')
+      getState().newGame()
+      expect(getState().draftSource).toBeNull()
+    })
+
+    it('resetGame resets draftSource to null', () => {
+      getState().setDraftSource('load')
+      expect(getState().draftSource).toBe('load')
+      getState().resetGame()
+      expect(getState().draftSource).toBeNull()
+    })
+  })
 })
