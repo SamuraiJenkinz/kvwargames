@@ -53,7 +53,12 @@ describe('parsePersonaResponse — happy paths', () => {
     const raw = JSON.stringify({
       responses: [
         makePersona('kent', {
-          stateUpdate: { teams: { team1: { po: { legitimacy: 2 } } } },
+          // Arbitrary JSON payload for the parser's round-trip preservation test —
+          // the parser does not validate the inner shape of stateUpdate beyond
+          // "non-null object", so we cast through unknown.
+          stateUpdate: {
+            teams: { team1: { po: { legitimacy: 2 } } },
+          } as unknown as PersonaResponse['stateUpdate'],
         }),
       ],
     })

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import { useGameStore } from '@/lib/gameStore'
 import { MOCK_GAME_STATE, MOCK_MESSAGES } from '@/mocks/mockGameState'
+import type { GameState } from '@/types/game'
 import StatePanel from './StatePanel'
 
 vi.mock('zustand')
@@ -32,7 +33,7 @@ describe('StatePanel', () => {
 
   it('renders legitimacy signed value "+1" (edipLegitimacy = 1)', () => {
     useGameStore.setState({ gameState: MOCK_GAME_STATE, messages: MOCK_MESSAGES })
-    const { container } = render(<StatePanel />)
+    render(<StatePanel />)
     // "+1" appears in legitimacy track header span (no class) + resource-po spans
     // Assert via the bare span in TrackBar header which has no extra class
     const plusOnes = screen.getAllByText('+1')
@@ -174,5 +175,122 @@ describe('StatePanel', () => {
     useGameStore.setState({ gameState: null, messages: [] })
     const { container } = render(<StatePanel />)
     expect(container.firstChild).toBeNull()
+  })
+
+  // ─── Delta diff + ghost labels (Plan 06-09) ──────────────────────────────────
+
+  describe('delta ghost labels', () => {
+    it('initial render shows no ghost labels (prevStateRef null on mount)', () => {
+      useGameStore.setState({ gameState: MOCK_GAME_STATE, messages: MOCK_MESSAGES })
+      render(<StatePanel />)
+      // No ghost element should render on first pass
+      const severityGhost = screen.queryByTestId('trackbar-ghost-severity')
+      const legitimacyGhost = screen.queryByTestId('trackbar-ghost-legitimacy')
+      expect(severityGhost).toBeNull()
+      expect(legitimacyGhost).toBeNull()
+    })
+
+    it('renders severity ghost "+1" when crisisSeverity increments after mount', () => {
+      useGameStore.setState({ gameState: MOCK_GAME_STATE, messages: MOCK_MESSAGES })
+      render(<StatePanel />)
+      // Simulate a state update that bumps severity by 1
+      const updated: GameState = {
+        ...MOCK_GAME_STATE,
+        crisisSeverity: MOCK_GAME_STATE.crisisSeverity + 1,
+      }
+      act(() => {
+        useGameStore.setState({ gameState: updated })
+      })
+      const ghost = screen.getByTestId('trackbar-ghost-severity')
+      expect(ghost).toBeInTheDocument()
+      expect(ghost.textContent).toBe('+1')
+    })
+
+    it('crisisSeverity decrease (-2) tints favourable (green, text-track-readiness)', () => {
+      useGameStore.setState({ gameState: MOCK_GAME_STATE, messages: MOCK_MESSAGES })
+      render(<StatePanel />)
+      const updated: GameState = {
+        ...MOCK_GAME_STATE,
+        crisisSeverity: MOCK_GAME_STATE.crisisSeverity - 2,
+      }
+      act(() => {
+        useGameStore.setState({ gameState: updated })
+      })
+      const ghost = screen.getByTestId('trackbar-ghost-severity')
+      expect(ghost.textContent).toBe('-2')
+      expect(ghost.className).toContain('text-track-readiness')
+      expect(ghost.className).not.toContain('text-crisis-security')
+    })
+
+    it('crisisSeverity increase (+2) tints unfavourable (red, text-crisis-security)', () => {
+      useGameStore.setState({ gameState: MOCK_GAME_STATE, messages: MOCK_MESSAGES })
+      render(<StatePanel />)
+      const updated: GameState = {
+        ...MOCK_GAME_STATE,
+        crisisSeverity: MOCK_GAME_STATE.crisisSeverity + 2,
+      }
+      act(() => {
+        useGameStore.setState({ gameState: updated })
+      })
+      const ghost = screen.getByTestId('trackbar-ghost-severity')
+      expect(ghost.textContent).toBe('+2')
+      expect(ghost.className).toContain('text-crisis-security')
+      expect(ghost.className).not.toContain('text-track-readiness')
+    })
+
+    it('edipLegitimacy decrease tints unfavourable (text-crisis-security)', () => {
+      useGameStore.setState({ gameState: MOCK_GAME_STATE, messages: MOCK_MESSAGES })
+      render(<StatePanel />)
+      const updated: GameState = {
+        ...MOCK_GAME_STATE,
+        edipLegitimacy: MOCK_GAME_STATE.edipLegitimacy - 1,
+      }
+      act(() => {
+        useGameStore.setState({ gameState: updated })
+      })
+      const ghost = screen.getByTestId('trackbar-ghost-legitimacy')
+      expect(ghost.textContent).toBe('-1')
+      expect(ghost.className).toContain('text-crisis-security')
+    })
+
+    it('edipLegitimacy increase tints favourable (text-track-readiness)', () => {
+      useGameStore.setState({ gameState: MOCK_GAME_STATE, messages: MOCK_MESSAGES })
+      render(<StatePanel />)
+      const updated: GameState = {
+        ...MOCK_GAME_STATE,
+        edipLegitimacy: MOCK_GAME_STATE.edipLegitimacy + 1,
+      }
+      act(() => {
+        useGameStore.setState({ gameState: updated })
+      })
+      const ghost = screen.getByTestId('trackbar-ghost-legitimacy')
+      expect(ghost.textContent).toBe('+1')
+      expect(ghost.className).toContain('text-track-readiness')
+    })
+
+    it('zero delta is a no-op (no ghost rendered)', () => {
+      useGameStore.setState({ gameState: MOCK_GAME_STATE, messages: MOCK_MESSAGES })
+      render(<StatePanel />)
+      // Re-set with same values — deltas compute to 0 → no ghost
+      act(() => {
+        useGameStore.setState({ gameState: { ...MOCK_GAME_STATE } })
+      })
+      expect(screen.queryByTestId('trackbar-ghost-severity')).toBeNull()
+      expect(screen.queryByTestId('trackbar-ghost-legitimacy')).toBeNull()
+    })
+
+    it('ghost element carries animate-[ghostFade_2500ms_ease-out_both] class', () => {
+      useGameStore.setState({ gameState: MOCK_GAME_STATE, messages: MOCK_MESSAGES })
+      render(<StatePanel />)
+      const updated: GameState = {
+        ...MOCK_GAME_STATE,
+        crisisSeverity: MOCK_GAME_STATE.crisisSeverity + 1,
+      }
+      act(() => {
+        useGameStore.setState({ gameState: updated })
+      })
+      const ghost = screen.getByTestId('trackbar-ghost-severity')
+      expect(ghost.className).toContain('animate-[ghostFade_2500ms_ease-out_both]')
+    })
   })
 })
