@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 8 (QA & Credential Audit — final phase) — in progress. Plans 08-01 (stateUpdater boundary coverage), 08-04 (backend error-injection tests), and 08-05 (debrief bucketing fix + multi-trigger static prompt coverage) complete. Remaining: 08-02 live run, 08-03 credential audit.
+**Current focus:** Phase 8 (QA & Credential Audit — final phase) — in progress. Plans 08-01, 08-03, 08-04, 08-05 complete (boundary coverage, credential audit, error-injection tests, debrief bucketing fix + multi-trigger static prompt coverage). Remaining: 08-02 live run.
 
 ## Current Position
 
 Phase: 8 of 8 (QA & Credential Audit) — in progress
-Plan: 3 of 5 complete in current phase (08-01, 08-04, 08-05 done; 08-02, 08-03 pending)
-Status: Plan 08-05 complete. `debriefExporter.ts` bucketing loop now halts at `lastDebriefIdx` via an index-based for + `break` (STATE.md line 217 duplication bug RESOLVED). Regression guard added to debriefExporter.test.ts Group 3 that would have caught the original bug. Block-8 routing-rule text-presence test added to promptBuilder.test.ts asserting multi-trigger keywords (Round start, Card play, National action, Dispute, Threshold warning, Debrief) + fixed Kent → Finch → Chen order + 1-3 personas cap — static-side half of Phase 8 success criterion #5 (behavioural half deferred to 08-02-LIVE-RUN.md). 515/515 frontend tests + typecheck + build all clean. 3 atomic commits (17ff1a0, 8aaf7dd, 949d135).
-Last activity: 2026-04-14 — Plan 08-05 complete; commits 17ff1a0, 8aaf7dd, 949d135.
+Plan: 4 of 5 complete in current phase (08-01, 08-03, 08-04, 08-05 done; 08-02 pending)
+Status: Plan 08-03 complete. Produced `.planning/phases/08-qa-credential-audit/08-03-CREDENTIAL-AUDIT.md` — verbatim-grep credential audit. Five source-code grep invariants all PASS (EXIT=1 / zero matches): Authorization, Bearer, api_key|apiKey|API_KEY, sk-, api.openai.com|LLM_ENDPOINT. `git check-ignore -v backend/.env` confirms `.gitignore:9` coverage. Both `.env.example` files pass `grep -E "sk-|[a-z0-9]{32,}"` (EXIT=1). 7-step Key Rotation Checklist codifies operator response to STATE.md line 218 (Phase 6/7 OpenAI key transcript-paste leak); §4.2 identifies DevTools console output as actual leak vector and specifies redaction rules for 08-02 live-run transcript capture. Network evidence cross-referenced as forward dependency on 08-02 (not yet produced). Out-of-scope log covers SAST/CVE/pentest/backend grep per 08-CONTEXT. Zero deviations. Commit 20445fa.
+Last activity: 2026-04-14 — Plan 08-03 complete; commit 20445fa.
 
-Progress: [█████████████░] 95% (37/39 plans) — Phase 8 has 5 plans total (08-01, 08-04, 08-05 done; 08-02, 08-03 pending)
+Progress: [█████████████░] 97% (38/39 plans) — Phase 8 has 5 plans total (08-01, 08-03, 08-04, 08-05 done; 08-02 pending)
 
 ## Performance Metrics
 
@@ -212,6 +212,12 @@ Recent decisions affecting current work:
 - 08-05: Block-8 routing-rule presence test added to promptBuilder.test.ts — asserts verbatim substrings (Round start, Card play, National action, Dispute, Threshold warning, Debrief, Kent → Finch → Chen, 1-3 personas cap). Isolates Block 8 via `indexOf('## 8. Routing Rules')` + `indexOf('## 9. JSON Output Schema')` slice. Read buildBlock8() before writing assertions to avoid string drift.
 - 08-05: Behavioural multi-trigger assertion (single facilitator message → 2-3 distinct personas, no duplicates, additive state updates) explicitly deferred to 08-02-LIVE-RUN.md. Test file comment cross-references 08-02.
 - 08-05: Group 3b multi-divider Pitfall 4 verified (no new test) — `lastDebriefIdx = 4`; INTERIM_DEBRIEF_MSG (idx 1) and R2_PLAY_MSG (idx 3) correctly remain bucketed in their rounds; FINAL_DEBRIEF_MSG (idx 5) correctly in `## Debrief` only.
+- 08-03: All five client-side credential greps (Authorization, Bearer, api_key|apiKey|API_KEY, sk-, api.openai.com|LLM_ENDPOINT) return EXIT=1 / zero matches on 2026-04-14 — credential isolation has held since Phase 2. Verbatim command + empty stdout + EXIT=1 pasted in audit doc for reproducibility.
+- 08-03: Phase 6/7 key-in-chat-logs leak vector identified as **transcript paste** (DevTools console output with outbound payload pasted into planning docs), NOT source-code contamination or network-layer defect. §4.2 of audit doc codifies redaction rules for 08-02 live-run transcript capture specifically.
+- 08-03: Key Rotation Checklist step 1 = revoke-before-issue (not the conventional issue-then-revoke) — minimizes concurrent-validity window when old key is known-leaked. Explicit decision documented in audit §4.1 step 1.
+- 08-03: Backend-side credential grep deliberately out of scope — `backend/app/routers/llm.py` legitimately uses `Authorization` default header + reads `LLM_API_KEY` from settings; blanket backend grep would produce intended matches and teach nothing. Logged in audit §5 so future auditors know it was considered.
+- 08-03: Forward-dependency to `08-02-LIVE-RUN.md` handled inline — audit §3 cites the cross-reference + expected contents + pass/fail revision rule ("if live run reveals Authorization header on browser→backend request, audit verdict must be revised to FAIL"). Keeps 08-03 in Wave 1 without blocking on Wave 2.
+- 08-03: Section 4 heading wording constrained by plan verify rule `grep -c "Key Rotation Checklist" == 1` — verdict summary paragraph reworded to "rotation checklist" after initial draft double-matched. Exact-phrase discipline maintained to satisfy automation.
 
 ### Pending Todos
 
@@ -228,6 +234,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Plan 08-05 complete
-Stopped at: Plan 08-05 closed. debriefExporter.ts bucketing loop halts at lastDebriefIdx (fix 17ff1a0); regression test added to debriefExporter.test.ts Group 3 (test 8aaf7dd); block-8 multi-trigger routing-rule text-presence test added to promptBuilder.test.ts (test 949d135). STATE.md line 217 follow-up RESOLVED. Phase 8 success criterion #5 static-side coverage complete; behavioural half deferred to 08-02-LIVE-RUN.md. 515/515 frontend tests + typecheck + build all clean. Three of five Phase 8 plans complete (08-01, 08-04, 08-05). Resume: Plan 08-02 (live-run artifact capture for Scenario 2 at 5 rounds against real corporate LLM — behavioural multi-trigger assertion is a deliverable here) or Plan 08-03 (credential audit).
+Last session: 2026-04-14 — Plan 08-03 complete
+Stopped at: Plan 08-03 closed. `08-03-CREDENTIAL-AUDIT.md` produced with verbatim grep evidence (five source-code invariants all PASS / EXIT=1), `.env` gitignore proof (`.gitignore:9`), `.env.example` cleanliness for both root and backend, 7-step Key Rotation Checklist (addresses STATE.md line 218 ops note — Phase 6/7 transcript-paste leak vector codified), forward-dependency cross-reference to `08-02-LIVE-RUN.md` for network-side evidence (Wave 2 produces that), out-of-scope log for SAST/CVE/pentest/backend-grep. Zero deviations. Commit 20445fa. Four of five Phase 8 plans complete (08-01, 08-03, 08-04, 08-05); only Plan 08-02 (live-run artifact capture against real corporate LLM) remains. Resume: Plan 08-02 — behavioural multi-trigger assertion + network-evidence HAR are its deliverables, and it closes out Phase 8 (and the milestone).
 Resume file: None
