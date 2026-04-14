@@ -21,10 +21,6 @@ describe('gameStore', () => {
   // ─── Initial State ──────────────────────────────────────────────────────────
 
   describe('initial state', () => {
-    it('phase is setup', () => {
-      expect(getState().phase).toBe('setup')
-    })
-
     it('setupMode is home', () => {
       expect(getState().setupMode).toBe('home')
     })
@@ -64,10 +60,6 @@ describe('gameStore', () => {
   describe('initGame', () => {
     beforeEach(() => {
       initS1()
-    })
-
-    it('sets phase to game', () => {
-      expect(getState().phase).toBe('game')
     })
 
     it('sets gameConfig to the provided config', () => {
@@ -158,10 +150,6 @@ describe('gameStore', () => {
       getState().setLoading(true)
       getState().setActiveTab('actions')
       getState().resetGame()
-    })
-
-    it('returns phase to setup', () => {
-      expect(getState().phase).toBe('setup')
     })
 
     it('gameConfig is null after reset', () => {
@@ -337,9 +325,9 @@ describe('gameStore', () => {
       })
 
       it('null/undefined fields are no-ops (only provided fields update)', () => {
-        const beforeState = getState().gameState!
-        const prevCrisisState = beforeState.crisisState
-        const prevEdipLeg = beforeState.edipLegitimacy
+        const beforeState = getState().gameState
+        const prevCrisisState = beforeState?.crisisState
+        const prevEdipLeg = beforeState?.edipLegitimacy
 
         // Only update crisisSeverity, leave others untouched
         getState().applyStateUpdate({ crisisSeverity: 2 })
@@ -365,11 +353,6 @@ describe('gameStore', () => {
   // ─── Simple Setters ─────────────────────────────────────────────────────────
 
   describe('simple setters', () => {
-    it('setPhase changes phase', () => {
-      getState().setPhase('game')
-      expect(getState().phase).toBe('game')
-    })
-
     it('setSetupMode changes setupMode', () => {
       getState().setSetupMode('load')
       expect(getState().setupMode).toBe('load')
