@@ -400,4 +400,73 @@ describe('gameStore', () => {
       expect(getState().activeTab).toBe('actions')
     })
   })
+
+  // ─── advanceRound ───────────────────────────────────────────────────────────
+
+  describe('advanceRound', () => {
+    it('increments round and appends round_divider + kent stub when gameState is active', () => {
+      initS1()
+      // S1 starts at round 1; advance to round 2
+      expect(getState().gameState?.round).toBe(1)
+      getState().advanceRound()
+      expect(getState().gameState?.round).toBe(2)
+      const msgs = getState().messages
+      expect(msgs).toHaveLength(2)
+      expect(msgs[0].type).toBe('round_divider')
+      expect(msgs[0].label).toBe('Round 2')
+      expect(msgs[1].type).toBe('persona')
+      expect(msgs[1].speaker).toBe('kent')
+    })
+
+    it('is a no-op when gameState is null', () => {
+      // Do NOT call initS1 — gameState remains null
+      expect(getState().gameState).toBeNull()
+      getState().advanceRound()
+      expect(getState().messages).toHaveLength(0)
+      expect(getState().gameState).toBeNull()
+    })
+  })
+
+  // ─── triggerDebrief ─────────────────────────────────────────────────────────
+
+  describe('triggerDebrief', () => {
+    it('appends exactly 2 messages: debrief_divider with label DEBRIEF and a facilitator stub', () => {
+      getState().triggerDebrief()
+      const msgs = getState().messages
+      expect(msgs).toHaveLength(2)
+      expect(msgs[0].type).toBe('debrief_divider')
+      expect(msgs[0].label).toBe('DEBRIEF')
+      expect(msgs[1].type).toBe('facilitator')
+    })
+  })
+
+  // ─── sendFacilitatorMessage ─────────────────────────────────────────────────
+
+  describe('sendFacilitatorMessage', () => {
+    it('appends a facilitator message and sets loading=true for non-empty text', () => {
+      getState().sendFacilitatorMessage('hello')
+      const msgs = getState().messages
+      expect(msgs).toHaveLength(1)
+      expect(msgs[0].type).toBe('facilitator')
+      expect(msgs[0].text).toBe('hello')
+      expect(getState().loading).toBe(true)
+    })
+
+    it('trims whitespace: "  hi  " is stored as "hi"', () => {
+      getState().sendFacilitatorMessage('  hi  ')
+      expect(getState().messages[0].text).toBe('hi')
+    })
+
+    it('is a no-op for whitespace-only input "   "', () => {
+      getState().sendFacilitatorMessage('   ')
+      expect(getState().messages).toHaveLength(0)
+      expect(getState().loading).toBe(false)
+    })
+
+    it('is a no-op for empty string ""', () => {
+      getState().sendFacilitatorMessage('')
+      expect(getState().messages).toHaveLength(0)
+      expect(getState().loading).toBe(false)
+    })
+  })
 })
