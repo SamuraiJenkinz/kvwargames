@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** Phase 6 (LLM Integration) — COMPLETE. 06-09 delivered state-visibility polish (delta ghost labels + cell pulse); Phase 7 (config generation) ready to begin.
+**Current focus:** Phase 7 (Debrief, Export & Config Generation) — In progress. 07-01 debrief export foundation complete. 07-03 config generation from brief complete (smoke test 3/3 briefs passed). 07-02 (debrief button wiring) and 07-04 (config validator) remain.
 
 ## Current Position
 
 Phase: 7 of 8 (Debrief, Export & Config Generation) — In progress
-Plan: 1 of 4 in current phase (07-01 complete)
-Status: 07-01 complete — debrief export foundation delivered. GameStore extended with stateSnapshots/gameEnded. debriefExporter.ts created with pure markdown generator + Firefox-safe download. 442/442 tests green (+36 new). Typecheck clean. Build clean.
-Last activity: 2026-04-14 — 07-01 complete (store snapshot slices + debriefExporter)
+Plan: 3 of 4 in current phase (07-01 and 07-03 complete; 07-02 and 07-04 remaining)
+Status: 07-03 complete — CONFIG_GEN rewrite + json_object mode, draftSource store plumbing, GenerateBriefPanel full implementation, 3/3 smoke test briefs passed. 458/458 tests green. Typecheck clean. Build clean.
+Last activity: 2026-04-14 — 07-03 complete (backend prompt rewrite + GenerateBriefPanel + smoke test approved)
 
-Progress: [█████████████░] 89% (31/35 plans)
+Progress: [█████████████░] 91% (32/35 plans)
 
 ## Performance Metrics
 
@@ -187,6 +187,12 @@ Recent decisions affecting current work:
 - 07-01: ## Debrief anchor = LAST debrief_divider via reduce() pattern — first-divider anchor wrongly swallows post-interim round content into Debrief section.
 - 07-01: PERSONA_META displayName values are short names: 'Kent', 'Finch', 'Chen'. Plan test example of 'Kent Voss' was incorrect.
 - 07-01: ChatMessage has no teamId field — team code rendered as '—' in debrief transcripts. Plan 07-02 may extend if persona-team mapping needed.
+- 07-03: draftSource store field (not component state) — 'brief' set by GenerateBriefPanel on success, reset to null by newGame()/resetGame(). setConfigJson does NOT clear it; UI sets provenance explicitly via setDraftSource.
+- 07-03: json_object mode unconditional in config_gen.py payload + comment-documented fallback — non-OpenAI upstream rejects with 400 → surfaces as LLM_UPSTREAM_ERROR. Ops removes the line; no env flag.
+- 07-03: AbortController per-component via useRef inside GenerateBriefPanel — fresh ref each Generate click, aborted on unmount. Independent of gameStore.runLLMTurn controller.
+- 07-03: System prompt uses condensed EDIP single-scenario/single-team exemplar (not full 194-line config). Literal 'JSON' in both prompt header and RULES section (OpenAI json_object requirement).
+- 07-03: Post-success triple store write order: setConfigJson → setDraftSource('brief') → setSetupMode('load') — panel unmounts naturally on mode switch.
+- 07-03: PARSE_FAILURE handled frontend-side — if JSON.parse(data.text) throws, inline error shown, raw logged to console.error, brief preserved. Schema validation deferred to 07-04.
 
 ### Pending Todos
 
@@ -197,10 +203,10 @@ None.
 - Phase 6 research flag: Corporate LLM endpoint response structure may deviate from standard OpenAI format — make extraction path configurable in `config.py` before hardcoding; verify against actual endpoint
 - Phase 6 research flag (MEASURED 06-04, RESOLVED 06-08): Token budget for system prompt is **5124 tokens** on the EDIP config. 06-08 Task 1 reduced HISTORY_WINDOW_N 6 → 2 against gpt-4 8k assumption (total 6724 / 7500 safe ceiling). See .planning/phases/06-llm-integration/06-08-BUDGET.md. Remaining Phase 8 follow-up: confirm actual corporate context window with ops; if >8k, raise SAFE_CONTEXT_CEILING_TOKENS + HISTORY_WINDOW_N accordingly
 - Phase 6 research flag: Corporate proxy timeout (est. 30s) vs LLM generation time (25–35s) — verify actual timeout with ops team before Phase 6 completes
-- Phase 7 research flag: Config generation prompt needs testing against 3 brief types to establish reliability threshold
+- Phase 8 follow-up: DEV-mode GuardedGameScreen re-seeds mock EDIP state on New Game from /game — clicking New Game while on /game re-runs seedMockState() instead of redirecting to /setup. Workaround: navigate to / directly or use pnpm build && pnpm preview for smoke testing. Root: DEV && gameState === null guard does not distinguish initial load from intentional new-game reset.
 
 ## Session Continuity
 
-Last session: 2026-04-14 — Plan 07-01 complete (debrief export foundation)
-Stopped at: Plan 07-01 complete — GameStore extended with stateSnapshots/gameEnded/setters; debriefExporter.ts created with generateDebriefMarkdown + downloadDebrief + filename helpers. 2 atomic commits: 8d2f244 feat(07-01) store stateSnapshots + gameEnded; 3f10910 feat(07-01) debriefExporter. 442/442 tests passing (+36 over 406 baseline); typecheck clean; build clean. Ready for 07-02 (button wiring + End Game semantics split).
+Last session: 2026-04-14 — Plan 07-03 complete (config generation from brief — smoke test 3/3 briefs passed)
+Stopped at: Plan 07-03 complete — Backend CONFIG_GEN rewrite + json_object mode (3ad65e3); store draftSource + setDraftSource (64a106c); GenerateBriefPanel + HomeScreen enable + SetupScreen wire + LoadConfigPanel back-nav (13dabd4). Smoke test: 3/3 briefs passed (cyber grid, EU energy, pandemic). 458/458 tests passing; typecheck clean; build clean. Ready for 07-02 (debrief button wiring) and 07-04 (config validator).
 Resume file: None
