@@ -1,0 +1,95 @@
+# Requirements: War Game Engine — v1.1
+
+**Defined:** 2026-04-15
+**Core Value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking — the tool must enhance the human facilitation team, never slow it down or break immersion.
+
+**Milestone goal:** Close the operational gaps surfaced by the v1.0 live run and the HTTP deploy incident — so the next live exercise starts from a known-good pipeline.
+
+## v1.1 Requirements
+
+### Health Check — Backend
+
+- [ ] **HEALTH-01**: Backend exposes `GET /api/health/llm` that performs a minimal authenticated round-trip to the corporate LLM endpoint
+- [ ] **HEALTH-02**: Response returns `{ ok: true, latencyMs }` on success
+- [ ] **HEALTH-03**: Response returns `{ ok: false, status, code, hint }` on failure (HTTP status, error code, actionable hint like "Check LLM_API_KEY in .env")
+- [ ] **HEALTH-04**: Endpoint uses a minimal prompt (~50 tokens) to minimise cost per check
+- [ ] **HEALTH-05**: Endpoint honours the same `LLM_EXTRA_HEADERS` / auth-mode config as `/api/llm`
+- [ ] **HEALTH-06**: Endpoint times out after 15s and returns `ok: false` with timeout hint
+
+### Health Check — Frontend
+
+- [ ] **HEALTH-07**: Setup screen shows a status indicator (green dot = healthy, red dot = failed, grey/spinner = checking)
+- [ ] **HEALTH-08**: Status indicator auto-checks on setup-screen mount
+- [ ] **HEALTH-09**: Status indicator shows a "Re-check" button the facilitator can click
+- [ ] **HEALTH-10**: On failure, status panel displays the actionable error from the backend (status code + hint)
+- [ ] **HEALTH-11**: "Launch Scenario" button is disabled while status is failed or checking
+- [ ] **HEALTH-12**: Successful check displays latency (e.g. "Connected — 820ms")
+
+### Polish — Routing
+
+- [ ] **ROUTE-01**: `/game` route with null `gameState` redirects to `/setup` unconditionally (no DEV auto-seed)
+- [ ] **ROUTE-02**: Removing DEV auto-seed eliminates the React setState-during-render warning at `gameStore.ts:304`
+
+### Polish — Debrief
+
+- [ ] **DEBRIEF-01**: Facilitator input text captured in debrief export preserves the first character (no "ound 1..." truncation)
+
+### Polish — Prompt Engineering
+
+- [ ] **PROMPT-01**: Crisis state auto-advances from "No Crisis" → "Supply Crisis" → "Security-Related Supply Crisis" when severity thresholds are crossed
+- [ ] **PROMPT-02**: Transition rule documented in system prompt so Finch persona triggers it reliably
+- [ ] **PROMPT-03**: Verified empirically via replay of the v1.0 Scenario 2 live run (severity=4 must trigger the transition)
+
+## Future Requirements (deferred to v2+)
+
+### Observability
+
+- Streaming LLM responses token-by-token (if corporate endpoint supports SSE)
+- Session analytics dashboard (response times, token usage, persona distribution)
+
+### Config UX
+
+- Visual config editor (form-based, not raw JSON)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| HTTPS / TLS | Infrastructure concern; handled via reverse proxy on target server, not app code |
+| Game header live health widget | Setup-screen gate is sufficient; keeps in-game UI minimal (per v1.0 core value) |
+| Token usage / response-time analytics | Deferred to v2 session analytics candidate |
+| Retry budget / circuit breaker on health endpoint | Manual re-check button covers facilitator intent; automated retries add complexity |
+
+## Traceability
+
+Filled during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| HEALTH-01 | — | Pending |
+| HEALTH-02 | — | Pending |
+| HEALTH-03 | — | Pending |
+| HEALTH-04 | — | Pending |
+| HEALTH-05 | — | Pending |
+| HEALTH-06 | — | Pending |
+| HEALTH-07 | — | Pending |
+| HEALTH-08 | — | Pending |
+| HEALTH-09 | — | Pending |
+| HEALTH-10 | — | Pending |
+| HEALTH-11 | — | Pending |
+| HEALTH-12 | — | Pending |
+| ROUTE-01 | — | Pending |
+| ROUTE-02 | — | Pending |
+| DEBRIEF-01 | — | Pending |
+| PROMPT-01 | — | Pending |
+| PROMPT-02 | — | Pending |
+| PROMPT-03 | — | Pending |
+
+**Coverage:**
+- v1.1 requirements: 18 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 18 ⚠️
+
+---
+*Requirements defined: 2026-04-15*
+*Last updated: 2026-04-15 after v1.1 definition*
