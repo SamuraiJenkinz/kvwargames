@@ -237,3 +237,61 @@ describe('measurePromptTokens', () => {
     expect(tokens).toBeGreaterThan(0)
   })
 })
+
+// ─── crisisState transition rule (PROMPT-01/PROMPT-02) ──────────────────────
+// Mechanical guardrail for the load-bearing Block 7 Finch MUST + Block 9
+// "Crisis State Transition Rules" subsection. These inline snapshots lock
+// the exact rule text so silent regressions during future prompt edits fail
+// CI. If either snapshot below fails, read
+//   .planning/phases/12-crisis-state-prompt-engineering/12-PROMPT-ENGINEERING-NOTES.md
+// BEFORE updating the snapshot — the rule text is load-bearing for Scenario 2
+// severity escalation producing a crisisState update.
+
+describe('crisisState transition rule (PROMPT-01/PROMPT-02)', () => {
+  it('Block 7 Finch persona section matches locked snapshot', () => {
+    // If this snapshot fails, read
+    // .planning/phases/12-crisis-state-prompt-engineering/12-PROMPT-ENGINEERING-NOTES.md
+    // before updating it.
+    const prompt = buildSystemPrompt(config, makeMockState())
+    const finchStart = prompt.indexOf('### Finch')
+    const chenStart = prompt.indexOf('### Chen', finchStart)
+    expect(finchStart).toBeGreaterThan(0)
+    expect(chenStart).toBeGreaterThan(finchStart)
+    const finchSection = prompt.slice(finchStart, chenStart).trimEnd()
+    expect(finchSection).toMatchInlineSnapshot(`
+      "### Finch
+      Voice: Precise, data-driven, consequential. Intelligence/adversary analyst. Names costs, probabilities, escalation paths. No hedging language.
+      MUST:
+        - Open with the adversary action or inject.
+        - Name concrete second-order effects.
+        - Flag escalation thresholds (crisisSeverity movements).
+        - Advance crisisState per the threshold rules in Block 9 when crisisSeverity crosses 2 or 3.
+      MUST NOT:
+        - Do not moralise.
+        - Do not run consensus process — that is Kent.
+        - Do not recommend operational fixes — that is Chen."
+    `)
+  })
+
+  it('Block 9 "Crisis State Transition Rules" subsection matches locked snapshot', () => {
+    // If this snapshot fails, read
+    // .planning/phases/12-crisis-state-prompt-engineering/12-PROMPT-ENGINEERING-NOTES.md
+    // before updating it. The three canonical literal strings
+    // ("No Crisis" | "Supply Crisis" | "Security-Related Supply Crisis")
+    // and the thresholds 2 and 3 are load-bearing.
+    const prompt = buildSystemPrompt(config, makeMockState())
+    const ruleStart = prompt.indexOf('Crisis State Transition Rules')
+    const clampStart = prompt.indexOf('Clamp ranges', ruleStart)
+    expect(ruleStart).toBeGreaterThan(0)
+    expect(clampStart).toBeGreaterThan(ruleStart)
+    const ruleSection = prompt.slice(ruleStart, clampStart).trimEnd()
+    expect(ruleSection).toMatchInlineSnapshot(`
+      "Crisis State Transition Rules (Finch MUST emit these in stateUpdate):
+      - When crisisSeverity reaches 2 AND crisisState is "No Crisis":
+        set crisisState to "Supply Crisis"
+      - When crisisSeverity reaches 3 AND crisisState is not "Security-Related Supply Crisis":
+        set crisisState to "Security-Related Supply Crisis"
+      These transitions are emitted in the same turn the threshold is crossed. Kent and Chen do NOT emit crisisState transitions."
+    `)
+  })
+})

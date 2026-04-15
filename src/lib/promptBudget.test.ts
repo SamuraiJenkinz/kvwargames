@@ -78,6 +78,15 @@ describe('reportPromptBudget — EDIP config + fresh gameState', () => {
     )
   })
 
+  it('PROMPT-budget: withinLimit is true with current prompt (no regression)', () => {
+    // Promoted from an informational boolean check to a hard assertion so any
+    // future token regression (e.g. prompt-engineering edits that blow the
+    // 7500-token ceiling) fails CI instead of silently console.info-ing
+    // withinLimit: false. See 12-RESEARCH.md Risk 4.
+    expect(report.withinLimit).toBe(true)
+    expect(report.totalCeilingEstimate).toBeLessThanOrEqual(7500)
+  })
+
   it('[06-08] empirical capture — console.info full report for BUDGET.md', () => {
     // This emission is the single source of truth for the empirical
     // systemPromptTokens number written into 06-08-BUDGET.md. The executor

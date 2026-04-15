@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { applyStateUpdatePure, CLAMP_RANGES } from './stateUpdater'
+import { parsePersonaResponse } from './responseParser'
 import type { GameState, StateUpdate, TeamState } from '@/types/game'
 
 // ─── Test Fixtures ────────────────────────────────────────────────────────────
@@ -438,5 +439,90 @@ describe('applyStateUpdatePure — team-field null/undefined no-op', () => {
     const { nextState, clampLog } = applyStateUpdatePure(state, update)
     expect(nextState.teams.find((t) => t.id === 'A')!.pc).toBe(4)
     expect(clampLog).toEqual([])
+  })
+})
+
+// ─── crisisState pass-through (PROMPT-01) ───────────────────────────────────
+// Integration: a raw Finch JSON response carrying a crisisState transition
+// must flow through parsePersonaResponse → applyStateUpdatePure and land on
+// gameState.crisisState with exact string equality. stateUpdater.ts passes
+// crisisState through with no enum validation (per 12-RESEARCH.md Q6), so
+// the exact literal string shipped in the prompt is what the LLM must emit
+// verbatim.
+
+describe('crisisState pass-through (PROMPT-01)', () => {
+  it('parses and applies crisisState: "Security-Related Supply Crisis" end-to-end', () => {
+    const jsonString = JSON.stringify({
+      responses: [
+        {
+          speaker: 'finch',
+          message:
+            'Adversary tempo is escalating; supply corridors are now a contested space.',
+          stateUpdate: {
+            crisisSeverity: 4,
+            crisisState: 'Security-Related Supply Crisis',
+          },
+          flag: null,
+        },
+      ],
+    })
+
+    const result = parsePersonaResponse(jsonString)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return // type narrowing for tsc
+
+    const finchResponse = result.value.responses.find(
+      (r) => r.speaker === 'finch',
+    )
+    expect(finchResponse).toBeDefined()
+    const finchStateUpdate = finchResponse!.stateUpdate as StateUpdate
+    expect(finchStateUpdate).not.toBeNull()
+
+    const initialState = makeState({
+      crisisSeverity: 2,
+      crisisState: 'Supply Crisis',
+    })
+    const { nextState } = applyStateUpdatePure(initialState, finchStateUpdate)
+
+    // Exact string equality — the canonical literal must pass through
+    // untransformed (stateUpdater.ts lines 120–122, no enum validation).
+    expect(nextState.crisisState).toBe('Security-Related Supply Crisis')
+    // Clamp confirms severity=4 (within 0..5) passes through to state.
+    expect(nextState.crisisSeverity).toBe(4)
+  })
+
+  it('parses and applies crisisState: "Supply Crisis" at the severity=2 transition', () => {
+    const jsonString = JSON.stringify({
+      responses: [
+        {
+          speaker: 'finch',
+          message:
+            'Stock draw-downs have crossed the operational threshold; this is now a supply crisis.',
+          stateUpdate: {
+            crisisSeverity: 2,
+            crisisState: 'Supply Crisis',
+          },
+          flag: null,
+        },
+      ],
+    })
+
+    const result = parsePersonaResponse(jsonString)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+
+    const finchResponse = result.value.responses.find(
+      (r) => r.speaker === 'finch',
+    )
+    const finchStateUpdate = finchResponse!.stateUpdate as StateUpdate
+
+    const initialState = makeState({
+      crisisSeverity: 1,
+      crisisState: 'No Crisis',
+    })
+    const { nextState } = applyStateUpdatePure(initialState, finchStateUpdate)
+
+    expect(nextState.crisisState).toBe('Supply Crisis')
+    expect(nextState.crisisSeverity).toBe(2)
   })
 })
