@@ -27,8 +27,8 @@
 
 ### Polish — Routing
 
-- [ ] **ROUTE-01**: `/game` route with null `gameState` redirects to `/setup` unconditionally (no DEV auto-seed)
-- [ ] **ROUTE-02**: Removing DEV auto-seed eliminates the React setState-during-render warning at `gameStore.ts:304`
+- [x] **ROUTE-01**: `/game` route with null `gameState` redirects to `/setup` unconditionally (no DEV auto-seed)
+- [x] **ROUTE-02**: Removing DEV auto-seed eliminates the React setState-during-render warning at `gameStore.ts:304`
 
 ### Polish — Debrief
 
@@ -76,8 +76,8 @@
 | HEALTH-10 | Phase 10 | Complete |
 | HEALTH-11 | Phase 10 | Complete |
 | HEALTH-12 | Phase 10 | Complete |
-| ROUTE-01 | Phase 11 | Pending |
-| ROUTE-02 | Phase 11 | Pending |
+| ROUTE-01 | Phase 11 | Complete |
+| ROUTE-02 | Phase 11 | Complete |
 | DEBRIEF-01 | Phase 11 | Complete (browser artifact) |
 | PROMPT-01 | Phase 12 | Pending |
 | PROMPT-02 | Phase 12 | Pending |

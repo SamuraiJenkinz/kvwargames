@@ -159,7 +159,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 11-01: Null-state redirect fix (ROUTE-01/02) and R1 input first-character strip fix (DEBRIEF-01)
+- [x] 11-01: Null-state redirect fix (ROUTE-01/02) and R1 input first-character strip fix (DEBRIEF-01)
 
 ---
 

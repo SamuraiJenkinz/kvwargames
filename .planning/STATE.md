@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 
 ## Current Position
 
-Phase: 10 of 12 (LLM Health Check — Frontend) — **complete ✓ verified**
-Plan: 02 of 02 complete (10-02 LoadConfigPanel integration shipped)
-Status: Phase 10 verified 5/5 must-haves; HEALTH-07..12 marked Complete in REQUIREMENTS.md. Ready for Phase 11 (polish bug fixes).
-Last activity: 2026-04-15 — Phase 10 verified; ROADMAP and REQUIREMENTS updated
+Phase: 11 of 12 (Polish Bug Fixes) — **complete ✓ verified**
+Plan: 01 of 01 complete (11-01 polish-bug-fixes shipped; Task 2 took Branch B)
+Status: Phase 11 verified 4/4 must-haves; ROUTE-01, ROUTE-02 marked Complete in REQUIREMENTS.md (DEBRIEF-01 closed earlier as browser artifact with regression guard). Ready for Phase 12 (crisis state prompt engineering).
+Last activity: 2026-04-15 — Phase 11 verified; console clean across three facilitation paths; debrief export preserved leading "I" on real download
 
-Progress: [████████░░░░] 39/48 v1.0 plans complete + 4 v1.1 plans (Phase 9 + Phase 10 done)
+Progress: [█████████░░░] 39/48 v1.0 plans complete + 5 v1.1 plans (Phases 9, 10, 11 done)
 
 ## Performance Metrics
 
@@ -29,7 +29,8 @@ Progress: [████████░░░░] 39/48 v1.0 plans complete + 4 v
 | 1–8 (all v1.0) | 39/39 | Complete |
 | 9 (v1.1) | 2/2 | Complete |
 | 10 (v1.1) | 2/2 | Complete |
-| 11–12 (v1.1) | 0/TBD | Not started |
+| 11 (v1.1) | 1/1 | Complete |
+| 12 (v1.1) | 0/TBD | Not started |
 
 *Remaining v1.1 plan counts to be confirmed during phase planning*
 
