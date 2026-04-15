@@ -141,8 +141,8 @@ Plans:
 **Plans**: TBD (estimate 2–3 plans)
 
 Plans:
-- [ ] 10-01: Health status indicator component (spinner / green / red states)
-- [ ] 10-02: Auto-check on mount, Re-check button, error display, Launch gate
+- [x] 10-01: Health status indicator component (spinner / green / red states)
+- [x] 10-02: Auto-check on mount, Re-check button, error display, Launch gate
 
 ---
 
@@ -195,6 +195,6 @@ Plans:
 | 7. Debrief, Export, Config Generation | v1.0 | 4/4 | Complete | 2026-04-15 |
 | 8. QA and Credential Audit | v1.0 | 5/5 | Complete | 2026-04-15 |
 | 9. LLM Health Check — Backend | v1.1 | 2/2 | Complete | 2026-04-15 |
-| 10. LLM Health Check — Frontend | v1.1 | 0/2 | Not started | - |
+| 10. LLM Health Check — Frontend | v1.1 | 2/2 | Complete | 2026-04-15 |
 | 11. Polish Bug Fixes | v1.1 | 0/1 | Not started | - |
 | 12. Crisis State Prompt Engineering | v1.1 | 0/3 | Not started | - |

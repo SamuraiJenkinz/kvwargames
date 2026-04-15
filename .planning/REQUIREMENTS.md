@@ -18,12 +18,12 @@
 
 ### Health Check — Frontend
 
-- [ ] **HEALTH-07**: Setup screen shows a status indicator (green dot = healthy, red dot = failed, grey/spinner = checking)
-- [ ] **HEALTH-08**: Status indicator auto-checks on setup-screen mount
-- [ ] **HEALTH-09**: Status indicator shows a "Re-check" button the facilitator can click
-- [ ] **HEALTH-10**: On failure, status panel displays the actionable error from the backend (status code + hint)
-- [ ] **HEALTH-11**: "Launch Scenario" button is disabled while status is failed or checking
-- [ ] **HEALTH-12**: Successful check displays latency (e.g. "Connected — 820ms")
+- [x] **HEALTH-07**: Setup screen shows a status indicator (green dot = healthy, red dot = failed, grey/spinner = checking)
+- [x] **HEALTH-08**: Status indicator auto-checks on setup-screen mount
+- [x] **HEALTH-09**: Status indicator shows a "Re-check" button the facilitator can click
+- [x] **HEALTH-10**: On failure, status panel displays the actionable error from the backend (status code + hint)
+- [x] **HEALTH-11**: "Launch Scenario" button is disabled while status is failed or checking
+- [x] **HEALTH-12**: Successful check displays latency (e.g. "Connected — 820ms")
 
 ### Polish — Routing
 
@@ -70,12 +70,12 @@
 | HEALTH-04 | Phase 9 | Complete |
 | HEALTH-05 | Phase 9 | Complete |
 | HEALTH-06 | Phase 9 | Complete |
-| HEALTH-07 | Phase 10 | Pending |
-| HEALTH-08 | Phase 10 | Pending |
-| HEALTH-09 | Phase 10 | Pending |
-| HEALTH-10 | Phase 10 | Pending |
-| HEALTH-11 | Phase 10 | Pending |
-| HEALTH-12 | Phase 10 | Pending |
+| HEALTH-07 | Phase 10 | Complete |
+| HEALTH-08 | Phase 10 | Complete |
+| HEALTH-09 | Phase 10 | Complete |
+| HEALTH-10 | Phase 10 | Complete |
+| HEALTH-11 | Phase 10 | Complete |
+| HEALTH-12 | Phase 10 | Complete |
 | ROUTE-01 | Phase 11 | Pending |
 | ROUTE-02 | Phase 11 | Pending |
 | DEBRIEF-01 | Phase 11 | Pending |
