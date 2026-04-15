@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 ## Current Position
 
 Phase: 12 of 12 (Crisis-State Prompt Engineering) — **in progress**
-Plan: 01 of 02 complete (12-01 encoded the Finch crisisState transition rule in Block 7 + Block 9 and locked it in with snapshot + round-trip + budget guardrails; 12-02 writes the standalone notes file and performs Tier B live-LLM replay)
-Status: 12-01 shipped. 534 tests pass. totalCeilingEstimate=6858 (642-token headroom under 7500 ceiling). Ready for Plan 12-02.
-Last activity: 2026-04-15 — Completed 12-01-PLAN.md (2 tasks, 2 commits, +6 tests)
+Plan: 02 of 02 **in progress** — Task 1 shipped (notes + verification scaffold), **paused at Task 2 checkpoint** (human-verify: Tier B live-LLM replay)
+Status: 12-02 Task 1 committed at `b6b6271` — two new docs under `.planning/phases/12-crisis-state-prompt-engineering/`: `12-PROMPT-ENGINEERING-NOTES.md` (standalone reference) + `12-LIVE-VERIFICATION.md` (pre-run scaffold with R3 inject captured verbatim, 2 TODO placeholders for the live replay). Awaiting operator PASS / FAIL / RETRY signal on the Task 2 human-verify checkpoint before Task 3 finalises REQUIREMENTS.md and writes 12-02-SUMMARY.md.
+Last activity: 2026-04-15 — Committed 12-02 Task 1 (b6b6271); paused at Task 2 Tier B live-LLM replay checkpoint
 
-Progress: [█████████░░░] 39/48 v1.0 plans complete + 6 v1.1 plans (Phases 9, 10, 11 done; Phase 12 Plan 01 done)
+Progress: [█████████░░░] 39/48 v1.0 plans complete + 6 v1.1 plans complete + 1 in progress (Phase 12 Plan 02 Task 1/3)
 
 ## Performance Metrics
 
@@ -30,7 +30,7 @@ Progress: [█████████░░░] 39/48 v1.0 plans complete + 6 v
 | 9 (v1.1) | 2/2 | Complete |
 | 10 (v1.1) | 2/2 | Complete |
 | 11 (v1.1) | 1/1 | Complete |
-| 12 (v1.1) | 1/2 | In progress (12-01 done; 12-02 open) |
+| 12 (v1.1) | 1/2 | In progress (12-01 done; 12-02 Task 1 shipped, paused at Task 2 live-LLM checkpoint) |
 
 *Remaining v1.1 plan counts to be confirmed during phase planning*
 
@@ -88,6 +88,6 @@ See `.planning/milestones/v1.0-MILESTONE-AUDIT.md` for full list:
 
 ## Session Continuity
 
-Last session: 2026-04-15T19:24:14Z
-Stopped at: Completed 12-01-PLAN.md (2 tasks, 2 commits, 534 tests passing, 6 new tests added)
-Resume file: None — continue with Plan 12-02 (standalone notes file + Tier B live-LLM replay)
+Last session: 2026-04-15 (12-02 Task 1 shipped)
+Stopped at: Paused at 12-02 Task 2 — Tier B live-LLM replay human-verify checkpoint. Operator must start backend+frontend, run Scenario 2 to R3, capture the R3 round-start LLM response, paste the raw JSON + PASS/FAIL verdict into `12-LIVE-VERIFICATION.md` §4 and §5, then signal PASS / FAIL: <reason> / RETRY.
+Resume file: `.planning/phases/12-crisis-state-prompt-engineering/12-02-PLAN.md` Task 2 `<how-to-verify>` block (full procedure + cost note)
