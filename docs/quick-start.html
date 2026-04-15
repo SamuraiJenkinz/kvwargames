@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KV WarGame — Quick Start</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #17212B;
+    --ink-soft: #2B3A4A;
+    --slate: #5A6773;
+    --pewter: #8995A0;
+    --mist: #B8C2CC;
+    --fog: #D9DFE4;
+    --linen: #EFF2F5;
+    --surface: #FAFBFC;
+    --navy: #203548;
+    --accent: #3F5C78;
+    --kent:  #5B9BD5;
+    --finch: #DFA02A;
+    --chen:  #2BC48A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--linen);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body { padding: 72px 24px 96px; }
+
+  .container { max-width: 720px; margin: 0 auto; }
+
+  /* Wordmark */
+  .wordmark {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--slate);
+    margin-bottom: 96px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .wordmark .divider { flex: 1; height: 1px; background: var(--fog); margin: 0 32px; }
+
+  /* Hero */
+  .hero { margin-bottom: 80px; }
+
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 32px;
+  }
+
+  h1 {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 52px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 32px;
+  }
+
+  .hero-body {
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--slate);
+    max-width: 560px;
+    font-weight: 300;
+  }
+
+  /* Sections */
+  .section { margin-bottom: 72px; }
+
+  h2 {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    margin-bottom: 8px;
+    padding-top: 40px;
+    border-top: 1px solid var(--fog);
+  }
+
+  .step-meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--pewter);
+    margin-bottom: 24px;
+  }
+
+  p {
+    margin-bottom: 20px;
+    color: var(--ink-soft);
+    font-size: 16px;
+  }
+
+  p + p { margin-top: 0; }
+
+  strong { font-weight: 500; color: var(--ink); }
+  em { font-style: italic; }
+
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--fog); }
+  a:hover { border-bottom-color: var(--accent); }
+
+  /* Ordered list — editorial feel */
+  ol.steps {
+    counter-reset: step;
+    list-style: none;
+    margin-top: 32px;
+  }
+
+  ol.steps li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--fog);
+  }
+  ol.steps li:first-child { border-top: 1px solid var(--fog); }
+
+  ol.steps li::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--pewter);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+  }
+
+  ol.steps .step-title {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.005em;
+    line-height: 1.35;
+  }
+
+  ol.steps .step-body { color: var(--ink-soft); font-size: 15.5px; line-height: 1.65; }
+  ol.steps .step-body p { margin-bottom: 12px; }
+  ol.steps .step-body p:last-child { margin-bottom: 0; }
+
+  /* Keyboard keys */
+  kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--surface);
+    border: 1px solid var(--fog);
+    border-radius: 3px;
+    padding: 2px 7px;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+
+  /* Inline code */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--surface);
+    border: 1px solid var(--fog);
+    border-radius: 2px;
+    padding: 1px 6px;
+    color: var(--navy);
+  }
+
+  /* Personas inline */
+  .persona-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: 'EB Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 15.5px;
+    color: var(--ink);
+  }
+  .persona-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    transform: translateY(-1px);
+  }
+  .persona-chip.kent  .persona-dot { background: var(--kent);  }
+  .persona-chip.finch .persona-dot { background: var(--finch); }
+  .persona-chip.chen  .persona-dot { background: var(--chen);  }
+
+  /* Aside (tip / note) */
+  aside.note {
+    border-left: 1px solid var(--accent);
+    padding: 4px 0 4px 24px;
+    margin: 24px 0;
+    color: var(--slate);
+    font-size: 14.5px;
+    line-height: 1.7;
+  }
+  aside.note .note-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 6px;
+  }
+  aside.note strong { color: var(--ink); font-weight: 500; }
+
+  /* Pull-quote */
+  .pull {
+    border-top: 1px solid var(--fog);
+    border-bottom: 1px solid var(--fog);
+    padding: 48px 0;
+    margin: 56px 0;
+    text-align: center;
+  }
+  .pull-text {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 24px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--ink);
+    max-width: 520px;
+    margin: 0 auto;
+    letter-spacing: -0.005em;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 96px;
+    padding-top: 32px;
+    border-top: 1px solid var(--fog);
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: var(--pewter);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    display: flex;
+    justify-content: space-between;
+  }
+  footer a { color: var(--pewter); border: none; }
+  footer a:hover { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    body { padding: 48px 20px 72px; }
+    h1 { font-size: 40px; }
+    h2 { font-size: 26px; }
+    .hero-body { font-size: 16px; }
+    ol.steps li { grid-template-columns: 40px 1fr; gap: 16px; }
+    .wordmark { margin-bottom: 64px; }
+    .wordmark .divider { margin: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="wordmark">
+    <span>KV WarGame</span>
+    <span class="divider"></span>
+    <span>Quick Start</span>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">For the facilitator</p>
+    <h1>Your first five minutes.</h1>
+    <p class="hero-body">
+      This is all you need to open the tool, launch a scenario, and put a question
+      to the AI table. Read it once before your session. Keep the longer
+      <a href="user-guide.html">user guide</a> within reach for everything else.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2>Before you begin</h2>
+    <p class="step-meta">Prerequisites</p>
+    <p>
+      Your IT team will have given you a URL — something like
+      <code>http://wargame.internal:8000</code>. You will run everything in a browser
+      on the facilitation laptop. There is no login, no install, no app store.
+      Chrome, Edge, or Firefox are all fine.
+    </p>
+    <p>
+      The tool does not replace you. It adds three AI voices —
+      <span class="persona-chip kent"><span class="persona-dot"></span>Kent Valentina</span>,
+      <span class="persona-chip finch"><span class="persona-dot"></span>Alistair Finch</span>, and
+      <span class="persona-chip chen"><span class="persona-dot"></span>Michael Chen</span> —
+      that respond in-character to what you describe at the table. You run the room;
+      the tool tracks state and keeps the fiction coherent.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2>The five steps</h2>
+
+    <ol class="steps">
+
+      <li>
+        <div>
+          <div class="step-title">Open the app and choose a path.</div>
+          <div class="step-body">
+            <p>
+              Load the URL. You will see two cards:
+              <strong>Load Config / EDIP Default</strong> and <strong>Generate from Brief</strong>.
+              For your first session, pick the first one. The EDIP scenario is pre-loaded.
+            </p>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div>
+          <div class="step-title">Review the JSON and launch.</div>
+          <div class="step-body">
+            <p>
+              The editor shows the scenario config. You do not need to edit it — just scroll
+              through the summary on the right: two scenarios, four teams, eleven cards.
+              Click <strong>Launch Scenario 1</strong> to begin.
+            </p>
+            <aside class="note">
+              <span class="note-label">Tip</span>
+              If you pasted your own JSON and the Launch buttons are grey, check the red
+              error note beneath the editor — it names the line and column of the problem.
+            </aside>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div>
+          <div class="step-title">Orient yourself to the game screen.</div>
+          <div class="step-body">
+            <p>
+              Three columns. The <strong>left</strong> shows live state — crisis severity, legitimacy,
+              and the four team resource cards. The <strong>centre</strong> is the chat feed where the
+              personas will respond. The <strong>right</strong> is a reference panel with tabs for
+              cards, national actions, and a facilitator guide. You will consult it often.
+            </p>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div>
+          <div class="step-title">Send your first event.</div>
+          <div class="step-body">
+            <p>
+              Type a short, in-world description into the input bar at the bottom — for example,
+              <em>&ldquo;Team A announces they are rushing an industrial stockpile to the border.&rdquo;</em>
+              Press <kbd>Enter</kbd>. One to three personas will answer in character. The state panel on
+              the left may animate as resources change.
+            </p>
+            <aside class="note">
+              <span class="note-label">If something goes wrong</span>
+              A red bubble with a <strong>Retry</strong> button means the AI reply was malformed —
+              not your fault. Click Retry. Your message, the personas, and the state are
+              preserved.
+            </aside>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div>
+          <div class="step-title">Advance rounds, and end when ready.</div>
+          <div class="step-body">
+            <p>
+              When the table is ready to move forward, click <strong>Advance to Round 2</strong>.
+              <span class="persona-chip finch"><span class="persona-dot"></span>Finch</span>
+              delivers the round&rsquo;s inject, then
+              <span class="persona-chip kent"><span class="persona-dot"></span>Kent</span>
+              frames the key tension. When the session is over, press
+              <strong>End Game &amp; Debrief</strong> — all three personas give closing remarks,
+              then a <strong>Download Debrief</strong> button appears. It saves a Markdown file
+              of the full transcript.
+            </p>
+          </div>
+        </div>
+      </li>
+
+    </ol>
+  </section>
+
+  <div class="pull">
+    <p class="pull-text">
+      &ldquo;The tool listens and responds. The facilitator holds the room.&rdquo;
+    </p>
+  </div>
+
+  <section class="section">
+    <h2>What to do next</h2>
+    <p>
+      Run a practice session before your first live one. Ten minutes of Scenario 1 with
+      imagined events will tell you more than any guide. When you are ready for the deeper
+      dive — state clamping, card routing, generating a new scenario from a brief, the
+      debrief format — read the <a href="user-guide.html">full user guide</a>.
+    </p>
+  </section>
+
+  <footer>
+    <span>KV WarGame</span>
+    <span>Quick Start v1</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
