@@ -156,7 +156,7 @@ Plans:
   2. The browser console is free of the "setState called during render" warning at `gameStore.ts:304` during normal facilitation use
   3. Round 1 facilitator input text in the downloaded debrief export starts with its actual first character — no "ound 1 is now live..." truncation
 
-**Plans**: TBD (estimate 1–2 plans)
+**Plans**: 1 plan
 
 Plans:
 - [ ] 11-01: Null-state redirect fix (ROUTE-01/02) and R1 input first-character strip fix (DEBRIEF-01)
