@@ -173,12 +173,11 @@ Plans:
   2. Replaying the v1.0 Scenario 2 live run — specifically the turn where severity reached 4 — produces a response that includes the expected `crisisState` transition in its JSON output
   3. The transition rule is documented in the prompt engineering notes so future prompt edits preserve it
 
-**Plans**: TBD (estimate 2–3 plans)
+**Plans**: 2 plans
 
 Plans:
-- [ ] 12-01: Diagnose v1.0 system prompt — identify missing or ambiguous transition rule
-- [ ] 12-02: Update system prompt with explicit crisisState transition rule
-- [ ] 12-03: Empirical verification — replay Scenario 2 severity=4 trigger against real LLM
+- [ ] 12-01-PLAN.md — Encode crisisState transition rule in promptBuilder.ts (Block 7 Finch MUST + Block 9 subsection + JSDoc), lock with Vitest inline snapshots, parser/applier round-trip test, and promoted budget assertion
+- [ ] 12-02-PLAN.md — Write 12-PROMPT-ENGINEERING-NOTES.md, run Tier B live-LLM replay of Scenario 2 R3 severity escalation, capture evidence to 12-LIVE-VERIFICATION.md, flip PROMPT-01/02/03 to Complete
 
 ---
 
