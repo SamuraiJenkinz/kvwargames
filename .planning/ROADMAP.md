@@ -17,7 +17,7 @@ Build a three-persona AI facilitation console for live policy tabletop exercises
 - [x] **Phase 5: Game Screen Layout** — Three-column layout, chat feed, state dashboard, reference panel (all mock data)
 - [x] **Phase 6: LLM Integration** — Prompt builder, persona routing, state updater, response handling, context windowing (highest risk)
 - [x] **Phase 7: Debrief, Export & Config Generation** — Markdown debrief export, wire generate-from-brief to backend
-- [ ] **Phase 8: QA & Credential Audit** — Full 5-round scenario run, credential audit, boundary value testing
+- [x] **Phase 8: QA & Credential Audit** — Full 5-round scenario run, credential audit, boundary value testing
 
 ## Phase Details
 
@@ -186,4 +186,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Game Screen Layout | 7/7 | ✓ Verified | 2026-04-14 |
 | 6. LLM Integration | 9/9 | ✓ Verified | 2026-04-14 |
 | 7. Debrief, Export & Config Generation | 4/4 | ✓ Verified | 2026-04-14 |
-| 8. QA & Credential Audit | 0/5 | Not started | - |
+| 8. QA & Credential Audit | 5/5 | ✓ Verified | 2026-04-15 |
