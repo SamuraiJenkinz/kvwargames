@@ -2,30 +2,34 @@
 
 ## What This Is
 
-A three-persona AI-powered facilitation tool for structured policy tabletop exercises. It runs alongside a human facilitation team during live wargame sessions — three expert AI personas (Kent Valentina, Dr. Alistair Finch, Dr. Michael Chen) respond in-character to events described by the facilitator, while tracking game state across teams, resources, and crisis escalation. v1.0 shipped 2026-04-15 and has been validated with a full 5-round Scenario 2 run against a real corporate LLM.
+A three-persona AI-powered facilitation tool for structured policy tabletop exercises. It runs alongside a human facilitation team during live wargame sessions — three expert AI personas (Kent Valentina, Dr. Alistair Finch, Dr. Michael Chen) respond in-character to events described by the facilitator, while tracking game state across teams, resources, and crisis escalation. v1.0 shipped 2026-04-15, validated with a full 5-round Scenario 2 run against a real corporate LLM. v1.1 shipped the same day, closing the four operational gaps that run surfaced: the setup screen now gates Launch on a live LLM health check, direct `/game` navigation with no loaded state redirects cleanly to `/setup`, the React setState-during-render warning is gone, and Finch now reliably auto-advances `crisisState` when severity crosses the documented thresholds (verified empirically via Tier B live-LLM replay).
 
 ## Core Value
 
 Three AI personas respond in-character to facilitator input with accurate, live game state tracking — the tool must enhance the human facilitation team, never slow it down or break immersion.
 
-## Current State (post-v1.0)
+## Current State (post-v1.1)
 
-- **Shipped:** v1.0 MVP on 2026-04-15 (see `.planning/MILESTONES.md`)
-- **Scope delivered:** 75/75 v1 requirements, 39 plans across 8 phases, PASS-WITH-POLISH on Scenario 2 live run
-- **Deployment:** Windows Server scheduled-task deployment committed (`4c388e2`); facilitator guides committed (`574efe3`)
-- **Codebase:** 11.1K LOC TypeScript/TSX (frontend) + 1.2K LOC Python (backend); 515/515 frontend + 12/12 backend tests green
-- **Audit status:** `tech_debt` (non-blocking; items logged in `.planning/milestones/v1.0-MILESTONE-AUDIT.md`)
-- **Post-v1.0 hotfix:** `crypto.randomUUID` fallback for non-secure (HTTP) contexts — Send button broken on HTTP deploy (commit `474c1f6`, 2026-04-15)
+- **Shipped:** v1.0 MVP + v1.1 Pre-live-run hardening, both on 2026-04-15 (see `.planning/MILESTONES.md`)
+- **v1.1 scope delivered:** 18/18 v1.1 requirements, 7 plans across 4 phases (9–12), Tier B live-LLM replay PASS on the Scenario-2 R3 crisisState transition
+- **Deployment:** Windows Server scheduled-task deployment committed (`4c388e2`); facilitator guides committed (`574efe3`); crypto.randomUUID fallback for HTTP contexts (`474c1f6`)
+- **Codebase:** 11.9K LOC TypeScript/TSX (frontend) + 1.6K LOC Python (backend); 534/534 frontend + 17/17 backend tests green; `tsc -b && vite build` succeeds
+- **Audit status:** v1.1 audit `tech_debt` (non-blocking; sole item was a ROADMAP.md doc-drift line, resolved during milestone completion). Full audit report at `.planning/milestones/v1.1-MILESTONE-AUDIT.md`
+- **Pipeline ready for next live exercise:** health-gate + crisisState rule + clean routing all verified end-to-end
 
-## Current Milestone: v1.1 Pre-live-run hardening
+## Next Milestone Goals
 
-**Goal:** Close the operational gaps surfaced by the v1.0 live run and the HTTP deploy incident — so the next live exercise starts from a known-good pipeline.
+Not yet scoped. Run `/gsd:new-milestone` to move into questioning → research → requirements → roadmap.
 
-**Target features:**
-- LLM health indicator on setup screen (full auth round-trip; auto on mount + manual re-check; blocks Launch + shows actionable error on failure)
-- Remove DEV-seed setState-during-render warning at `gameStore.ts:304` (redirect `/game` with null state to `/setup` unconditionally)
-- R1 facilitator input first-character strip fix (debrief export cosmetic — "ound 1 is now live...")
-- `crisisState` auto-advance prompt-engineering review (severity reached 4 in live run but state never transitioned)
+Candidate focus areas surfaced during v1.1 (all deferred as out-of-scope then):
+
+- **Streaming LLM responses** token-by-token if the corporate endpoint supports SSE — would reduce perceived latency during Finch's longer responses
+- **Session analytics dashboard** — response times, token usage, persona distribution, crisis-state transitions over a game
+- **Visual config editor** (form-based, not raw JSON) — lowers the config-authoring barrier for facilitators who did not write the EDIP canonical config
+- **Observability hardening** — structured logging of the 8-code health taxonomy over time, stale-localStorage detection on setup
+- **HTTPS / TLS** — deferred as infrastructure (reverse-proxy) rather than app-code concern, but may warrant documentation pass
+
+None of these are committed. The next milestone should start from a fresh questioning pass, not a pre-selected backlog.
 
 ## Requirements
 
@@ -48,15 +52,18 @@ Three AI personas respond in-character to facilitator input with accurate, live 
 - ✓ Responsive layout (1280px+ primary, tablet-usable) — v1.0
 - ✓ Context window hardening (N=2, measured 6724 tokens < 7500 safe ceiling) — v1.0
 - ✓ Credential audit — zero browser-side Authorization / Bearer / api-key headers — v1.0
+- ✓ Backend `GET /api/health/llm` with 8-code error taxonomy and 15s SLA — v1.1
+- ✓ Setup-screen LLM health indicator — auto-check on mount, Re-check button, Launch gated on `healthStatus === 'ok'` — v1.1
+- ✓ Null-state `/game` redirects silently to `/setup` (DEV auto-seed removed; setState-during-render warning eliminated) — v1.1
+- ✓ DEBRIEF-01 regression guard — R1 facilitator input first-character preserved in debrief export (browser/OS artifact confirmed; pure-function pipeline clean) — v1.1
+- ✓ crisisState auto-advance rule encoded (Block 7 Finch MUST + Block 9 subsection) — v1.1
+- ✓ crisisState rule empirically verified via Tier B live-LLM replay — Finch emitted transition at severity=4 on Scenario 2 R3 — v1.1
 
-### Active (v1.1 scope)
+### Active
 
-- [ ] LLM health indicator on setup screen — full auth round-trip, auto + manual re-check, blocks Launch with actionable error
-- [ ] Fix DEV-seed setState-during-render warning at `gameStore.ts:304`
-- [ ] R1 input first-character strip cosmetic fix in debrief export
-- [ ] `crisisState` auto-advance prompt-engineering review
+None. No requirements scoped for the next milestone yet — run `/gsd:new-milestone` to define.
 
-### Deferred (v2+ candidates, not in v1.1)
+### Deferred (v2+ candidates)
 
 - Streaming LLM responses token-by-token (if corporate endpoint supports SSE)
 - Session analytics dashboard (response times, token usage, persona distribution)
@@ -112,6 +119,14 @@ Three AI personas respond in-character to facilitator input with accurate, live 
 | No server-side JSON parsing of LLM config output (02-03) | Frontend owns validation so errors reach facilitator | ✓ Good |
 | Halt debrief bucketing loop at lastDebriefIdx (08-05) | Post-debrief messages were double-rendering in Round-N transcripts | ✓ Good — end-to-end verified in 08-02 live run |
 | Run milestone audit before completion (v1 audit 2026-04-14) | Verify requirements coverage, integration, flows before tagging | ✓ Good — surfaced non-blocking tech debt cleanly |
+| Health endpoint reuses LLM env config (v1.1) | Zero-config parity with `/api/llm`; no separate credentials | ✓ Good — Azure and OpenAI deployments both work without config drift |
+| Health endpoint always returns HTTP 200, body.ok carries signal (v1.1) | Monitoring tools treating non-2xx as outage are not misled | ✓ Good — stable contract for the frontend badge |
+| Exception-handler ordering load-bearing and commented (v1.1) | Later handlers are superclasses; refactor regressions must be prevented | ✓ Good — in-code comment survives linter churn |
+| DEV auto-seed removed entirely, not flag-hidden (v1.1) | Dead code reintroduces the bug; ship-fast rule | ✓ Good — setState-during-render eliminated by construction |
+| DEBRIEF-01 Branch B: regression test retained, no source edit (v1.1) | Test-first diagnosis showed pure-function pipeline clean; v1.0 truncation was browser/OS download artifact | ✓ Good — invariant pinned; no speculative source churn |
+| Block 9 transition subsection added alongside (not replacing) clamp-range line (v1.1) | Transition documents the TRIGGER, clamp documents ALLOWED VALUES; both coexist | ✓ Good — RESEARCH.md Risk 3 resolved |
+| `withinLimit` promoted from informational to hard CI assertion (v1.1) | Future prompt edits that blow past 7500-token ceiling must fail CI | ✓ Good — 642-token headroom tracked |
+| Tier B replay path (a) full R1→R2→R3, not localStorage seed (v1.1) | Most-faithful replay against real endpoint; raw JSON is the PASS artifact | ✓ Good — first-call PASS, no retries; Tier B pattern now reusable |
 
 ---
-*Last updated: 2026-04-15 after v1.1 milestone start*
+*Last updated: 2026-04-15 after v1.1 milestone completion*
