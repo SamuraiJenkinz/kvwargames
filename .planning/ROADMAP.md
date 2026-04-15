@@ -118,12 +118,11 @@ Plans:
   4. The endpoint respects the same `LLM_EXTRA_HEADERS` / auth-mode env vars as `/api/llm` — no separate credential config needed
   5. A check that hangs returns `ok: false` with a timeout hint after 15 seconds, not an unclosed connection
 
-**Plans**: TBD (estimate 2–3 plans)
+**Plans**: 2 (consolidated during planning)
 
 Plans:
-- [ ] 09-01: `GET /api/health/llm` endpoint with success/failure response shapes
-- [ ] 09-02: Timeout handling (15s) and LLM_EXTRA_HEADERS / auth-mode parity
-- [ ] 09-03: Backend test coverage for health endpoint (success, auth failure, timeout)
+- [x] 09-01: `GET /api/health/llm` endpoint (success/failure shapes, auth parity, 15s timeout, 8-code taxonomy)
+- [x] 09-02: Backend test coverage (success, auth failure, timeout, auth-mode parity, extra-headers parity)
 
 ---
 
@@ -195,7 +194,7 @@ Plans:
 | 6. LLM Integration | v1.0 | 9/9 | Complete | 2026-04-14 |
 | 7. Debrief, Export, Config Generation | v1.0 | 4/4 | Complete | 2026-04-15 |
 | 8. QA and Credential Audit | v1.0 | 5/5 | Complete | 2026-04-15 |
-| 9. LLM Health Check — Backend | v1.1 | 0/3 | Not started | - |
+| 9. LLM Health Check — Backend | v1.1 | 2/2 | Complete | 2026-04-15 |
 | 10. LLM Health Check — Frontend | v1.1 | 0/2 | Not started | - |
 | 11. Polish Bug Fixes | v1.1 | 0/1 | Not started | - |
 | 12. Crisis State Prompt Engineering | v1.1 | 0/3 | Not started | - |

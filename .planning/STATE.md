@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 
 ## Current Position
 
-Phase: 9 of 12 (LLM Health Check — Backend) — **complete**
+Phase: 9 of 12 (LLM Health Check — Backend) — **complete ✓ verified**
 Plan: 02 of 02 complete (09-02 pytest coverage shipped)
-Status: Phase 9 backend wave complete; ready for Phase 10 (frontend health indicator)
-Last activity: 2026-04-15 — 09-02 shipped 5 pytest scenarios for /api/health/llm (success, 401, timeout, auth-mode parity, extra-headers parity); full backend suite 17/17 green
+Status: Phase 9 verified 5/5 must-haves; ready for Phase 10 (frontend health indicator)
+Last activity: 2026-04-15 — Phase 9 verified, HEALTH-01..06 marked Complete in REQUIREMENTS.md
 
-Progress: [████████░░░░] 39/48 v1.0 plans complete + 2/TBD v1.1 plans
+Progress: [████████░░░░] 39/48 v1.0 plans complete + 2 v1.1 plans (Phase 9 done)
 
 ## Performance Metrics
 
@@ -27,9 +27,10 @@ Progress: [████████░░░░] 39/48 v1.0 plans complete + 2/T
 | Phase | Plans | Status |
 |-------|-------|--------|
 | 1–8 (all v1.0) | 39/39 | Complete |
-| 9–12 (v1.1) | 0/TBD | Not started |
+| 9 (v1.1) | 2/2 | Complete |
+| 10–12 (v1.1) | 0/TBD | Not started |
 
-*v1.1 plan counts to be confirmed during phase planning*
+*Remaining v1.1 plan counts to be confirmed during phase planning*
 
 ## Accumulated Context
 
@@ -68,5 +69,5 @@ See `.planning/milestones/v1.0-MILESTONE-AUDIT.md` for full list:
 ## Session Continuity
 
 Last session: 2026-04-15
-Stopped at: Completed 09-02-PLAN.md (pytest coverage shipped, commit 58f9dad). Phase 9 backend wave done.
+Stopped at: Phase 9 verified (VERIFICATION.md passed 5/5); REQUIREMENTS + ROADMAP updated. Ready for Phase 10.
 Resume file: None

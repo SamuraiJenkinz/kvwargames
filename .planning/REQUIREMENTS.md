@@ -9,12 +9,12 @@
 
 ### Health Check — Backend
 
-- [ ] **HEALTH-01**: Backend exposes `GET /api/health/llm` that performs a minimal authenticated round-trip to the corporate LLM endpoint
-- [ ] **HEALTH-02**: Response returns `{ ok: true, latencyMs }` on success
-- [ ] **HEALTH-03**: Response returns `{ ok: false, status, code, hint }` on failure (HTTP status, error code, actionable hint like "Check LLM_API_KEY in .env")
-- [ ] **HEALTH-04**: Endpoint uses a minimal prompt (~50 tokens) to minimise cost per check
-- [ ] **HEALTH-05**: Endpoint honours the same `LLM_EXTRA_HEADERS` / auth-mode config as `/api/llm`
-- [ ] **HEALTH-06**: Endpoint times out after 15s and returns `ok: false` with timeout hint
+- [x] **HEALTH-01**: Backend exposes `GET /api/health/llm` that performs a minimal authenticated round-trip to the corporate LLM endpoint
+- [x] **HEALTH-02**: Response returns `{ ok: true, latencyMs }` on success
+- [x] **HEALTH-03**: Response returns `{ ok: false, status, code, hint }` on failure (HTTP status, error code, actionable hint like "Check LLM_API_KEY in .env")
+- [x] **HEALTH-04**: Endpoint uses a minimal prompt (~50 tokens) to minimise cost per check
+- [x] **HEALTH-05**: Endpoint honours the same `LLM_EXTRA_HEADERS` / auth-mode config as `/api/llm`
+- [x] **HEALTH-06**: Endpoint times out after 15s and returns `ok: false` with timeout hint
 
 ### Health Check — Frontend
 
@@ -64,12 +64,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HEALTH-01 | Phase 9 | Pending |
-| HEALTH-02 | Phase 9 | Pending |
-| HEALTH-03 | Phase 9 | Pending |
-| HEALTH-04 | Phase 9 | Pending |
-| HEALTH-05 | Phase 9 | Pending |
-| HEALTH-06 | Phase 9 | Pending |
+| HEALTH-01 | Phase 9 | Complete |
+| HEALTH-02 | Phase 9 | Complete |
+| HEALTH-03 | Phase 9 | Complete |
+| HEALTH-04 | Phase 9 | Complete |
+| HEALTH-05 | Phase 9 | Complete |
+| HEALTH-06 | Phase 9 | Complete |
 | HEALTH-07 | Phase 10 | Pending |
 | HEALTH-08 | Phase 10 | Pending |
 | HEALTH-09 | Phase 10 | Pending |
