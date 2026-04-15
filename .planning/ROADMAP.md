@@ -176,8 +176,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 12-01-PLAN.md — Encode crisisState transition rule in promptBuilder.ts (Block 7 Finch MUST + Block 9 subsection + JSDoc), lock with Vitest inline snapshots, parser/applier round-trip test, and promoted budget assertion
-- [ ] 12-02-PLAN.md — Write 12-PROMPT-ENGINEERING-NOTES.md, run Tier B live-LLM replay of Scenario 2 R3 severity escalation, capture evidence to 12-LIVE-VERIFICATION.md, flip PROMPT-01/02/03 to Complete
+- [x] 12-01-PLAN.md — Encode crisisState transition rule in promptBuilder.ts (Block 7 Finch MUST + Block 9 subsection + JSDoc), lock with Vitest inline snapshots, parser/applier round-trip test, and promoted budget assertion
+- [x] 12-02-PLAN.md — Write 12-PROMPT-ENGINEERING-NOTES.md, run Tier B live-LLM replay of Scenario 2 R3 severity escalation, capture evidence to 12-LIVE-VERIFICATION.md, flip PROMPT-01/02/03 to Complete
 
 ---
 
@@ -196,4 +196,4 @@ Plans:
 | 9. LLM Health Check — Backend | v1.1 | 2/2 | Complete | 2026-04-15 |
 | 10. LLM Health Check — Frontend | v1.1 | 2/2 | Complete | 2026-04-15 |
 | 11. Polish Bug Fixes | v1.1 | 0/1 | Not started | - |
-| 12. Crisis State Prompt Engineering | v1.1 | 0/3 | Not started | - |
+| 12. Crisis State Prompt Engineering | v1.1 | 2/2 | Complete | 2026-04-15 |
