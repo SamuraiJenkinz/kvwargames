@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 
 ## Current Position
 
-Phase: 9 of 12 (LLM Health Check — Backend) — **complete ✓ verified**
-Plan: 02 of 02 complete (09-02 pytest coverage shipped)
-Status: Phase 9 verified 5/5 must-haves; ready for Phase 10 (frontend health indicator)
-Last activity: 2026-04-15 — Phase 9 verified, HEALTH-01..06 marked Complete in REQUIREMENTS.md
+Phase: 10 of 12 (LLM Health Check — Frontend) — **in progress**
+Plan: 01 of 02 complete (10-01 HealthBadge component shipped)
+Status: HealthBadge component + types + 9 tests committed; ready for 10-02 (LoadConfigPanel integration)
+Last activity: 2026-04-15 — Completed 10-01-health-badge-component-PLAN.md
 
-Progress: [████████░░░░] 39/48 v1.0 plans complete + 2 v1.1 plans (Phase 9 done)
+Progress: [████████░░░░] 39/48 v1.0 plans complete + 3 v1.1 plans (Phase 9 + 10-01 done)
 
 ## Performance Metrics
 
@@ -28,7 +28,8 @@ Progress: [████████░░░░] 39/48 v1.0 plans complete + 2 v
 |-------|-------|--------|
 | 1–8 (all v1.0) | 39/39 | Complete |
 | 9 (v1.1) | 2/2 | Complete |
-| 10–12 (v1.1) | 0/TBD | Not started |
+| 10 (v1.1) | 1/2 | In progress (10-01 done) |
+| 11–12 (v1.1) | 0/TBD | Not started |
 
 *Remaining v1.1 plan counts to be confirmed during phase planning*
 
@@ -54,6 +55,11 @@ From 09-02 execution (2026-04-15):
 - One-shot sanity check performed: temporarily breaking health.py's auth construction to `Authorization: Bearer <key>` confirmed BOTH parity tests fail with the expected diagnostics — parity tests have real teeth against Pitfall 1 (future contributor copying config_gen.py's hardcoded Bearer pattern)
 - TLS-vs-network branch remains untested (MockTransport can't simulate SSL errors cleanly); revisit if a real-world TLS failure surfaces
 
+From 10-01 execution (2026-04-15):
+- lucide-react@^1.8.0 `Loader2` confirmed available at runtime — RESEARCH.md Open Question 2 resolved, no CSS fallback needed
+- Test 7 (Re-check in-flight) requires controlled Promise pattern: `mockResolvedValueOnce` resolves synchronously within `userEvent.click`, skipping the transient checking state; exposed `resolve` handle lets test assert disabled button state before fetch completes
+- 9 tests written (vs 7 required) — Tests 8/9 split onStatusChange callback coverage into separate ok/failed cases for assertion clarity; still within plan scope
+
 ### Open Blockers
 
 None.
@@ -68,6 +74,6 @@ See `.planning/milestones/v1.0-MILESTONE-AUDIT.md` for full list:
 
 ## Session Continuity
 
-Last session: 2026-04-15
-Stopped at: Phase 9 verified (VERIFICATION.md passed 5/5); REQUIREMENTS + ROADMAP updated. Ready for Phase 10.
-Resume file: None
+Last session: 2026-04-15T17:30:02Z
+Stopped at: Completed 10-01-health-badge-component-PLAN.md (3 tasks, 3 commits, 9 tests passing)
+Resume file: None — continue with 10-02-loadconfig-integration-PLAN.md
