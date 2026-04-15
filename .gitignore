@@ -2,7 +2,9 @@
 node_modules/
 
 # Build output
-dist/
+# dist/ IS tracked — the Windows Server deploy uses clone-and-run, so the
+# production build must ship in the repo. Rebuild with `pnpm build` before
+# committing any frontend change so the server sees the latest bundle.
 dist-ssr/
 
 # Environment files — .env.example IS tracked (safe), actual .env files are NOT

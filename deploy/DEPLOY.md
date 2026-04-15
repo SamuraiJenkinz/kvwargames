@@ -17,30 +17,20 @@ Windows Server via Task Scheduler — no NSSM, no third-party supervisors.
 
 On the server:
 
+- **git** on `PATH` (check: `git --version`)
 - **Python 3.11+** installed and on `PATH` (check: `python --version` from an elevated prompt)
 - **Administrator** access for the one-time `install.ps1` run (SYSTEM-level scheduled task registration requires it)
 - **TCP port 8000** (or your chosen `APP_PORT`) free and — if clients connect over the LAN — allowed through Windows Firewall
 - Internet or an internal PyPI mirror reachable for `pip install`
 
-On a dev machine:
-
-- Node 22+ / pnpm to run `pnpm build` and produce the `dist/` folder that the backend serves
+**Node / pnpm are NOT required on the server.** The production frontend bundle (`dist/`) is committed to the repo, so cloning gives you a ready-to-deploy tree. Frontend rebuilds happen on a dev machine and are committed before push.
 
 ## First install
 
 ```powershell
-# --- On dev machine ---
-pnpm install
-pnpm build                      # produces .\dist\
-
-# Copy the whole repo to the server. Include at minimum:
-#   backend\, dist\, deploy\, .env.example
-# Exclude: node_modules\, src\, .planning\, tests, your local .env
-
-robocopy . \\SERVER\C$\WarGame /E /XD node_modules .planning src /XF .env
-
-
 # --- On the server (elevated PowerShell) ---
+cd C:\
+git clone https://github.com/SamuraiJenkinz/kvwargames.git WarGame
 cd C:\WarGame
 powershell.exe -ExecutionPolicy Bypass -File .\deploy\install.ps1
 ```
@@ -104,18 +94,17 @@ Use a different `APP_PORT` in `.env` and the rule, if 8000 is already claimed.
 ## Updating to a new version
 
 ```powershell
-# --- On dev machine ---
-pnpm build
-
-# Sync new code to server (robocopy preserves .env + logs + .venv as long as
-# you don't include them in the mirror source).
-robocopy . \\SERVER\C$\WarGame /E /XD node_modules .planning src .venv logs /XF .env
-
 # --- On the server (elevated) ---
+cd C:\WarGame
+git pull
 .\deploy\update.ps1
 ```
 
 `update.ps1` stops the task, reinstalls deps, imports `app.main` to confirm the new code loads, then restarts the task. If the import fails the task stays stopped so you don't crash-loop on broken code.
+
+**If `git pull` shows a merge conflict on `.env`:** your `.env` is (correctly) gitignored, so this should not happen. If it does, resolve by keeping the local `.env` — it holds the production `LLM_API_KEY`.
+
+**Frontend changes only reach the server after a `pnpm build` + commit on a dev machine.** `dist/` is tracked in the repo precisely so the server needs no Node toolchain — but that also means a frontend edit that isn't rebuilt and committed won't appear in production until it is.
 
 ## Logs
 
