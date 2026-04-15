@@ -36,9 +36,9 @@
 
 ### Polish — Prompt Engineering
 
-- [ ] **PROMPT-01**: Crisis state auto-advances from "No Crisis" → "Supply Crisis" → "Security-Related Supply Crisis" when severity thresholds are crossed
-- [ ] **PROMPT-02**: Transition rule documented in system prompt so Finch persona triggers it reliably
-- [ ] **PROMPT-03**: Verified empirically via replay of the v1.0 Scenario 2 live run (severity=4 must trigger the transition)
+- [x] **PROMPT-01**: Crisis state auto-advances from "No Crisis" → "Supply Crisis" → "Security-Related Supply Crisis" when severity thresholds are crossed
+- [x] **PROMPT-02**: Transition rule documented in system prompt so Finch persona triggers it reliably
+- [x] **PROMPT-03**: Verified empirically via replay of the v1.0 Scenario 2 live run (severity=4 must trigger the transition) (closed 2026-04-15 — Tier B live-LLM replay PASS recorded at `.planning/phases/12-crisis-state-prompt-engineering/12-LIVE-VERIFICATION.md`)
 
 ## Future Requirements (deferred to v2+)
 
@@ -79,9 +79,9 @@
 | ROUTE-01 | Phase 11 | Complete |
 | ROUTE-02 | Phase 11 | Complete |
 | DEBRIEF-01 | Phase 11 | Complete (browser artifact) |
-| PROMPT-01 | Phase 12 | Pending |
-| PROMPT-02 | Phase 12 | Pending |
-| PROMPT-03 | Phase 12 | Pending |
+| PROMPT-01 | Phase 12 | Complete |
+| PROMPT-02 | Phase 12 | Complete |
+| PROMPT-03 | Phase 12 | Complete (evidence: `12-LIVE-VERIFICATION.md`) |
 
 **Coverage:**
 - v1.1 requirements: 18 total
