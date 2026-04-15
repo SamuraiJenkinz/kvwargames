@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 
 ## Current Position
 
-Phase: 10 of 12 (LLM Health Check — Frontend) — **in progress**
-Plan: 01 of 02 complete (10-01 HealthBadge component shipped)
-Status: HealthBadge component + types + 9 tests committed; ready for 10-02 (LoadConfigPanel integration)
-Last activity: 2026-04-15 — Completed 10-01-health-badge-component-PLAN.md
+Phase: 10 of 12 (LLM Health Check — Frontend) — **complete**
+Plan: 02 of 02 complete (10-02 LoadConfigPanel integration shipped)
+Status: Phase 10 fully complete — HealthBadge wired into LoadConfigPanel, launchDisabled gate active, 528 tests green
+Last activity: 2026-04-15 — Completed 10-02-loadconfig-integration-PLAN.md
 
-Progress: [████████░░░░] 39/48 v1.0 plans complete + 3 v1.1 plans (Phase 9 + 10-01 done)
+Progress: [████████░░░░] 39/48 v1.0 plans complete + 4 v1.1 plans (Phase 9 + Phase 10 done)
 
 ## Performance Metrics
 
@@ -28,7 +28,7 @@ Progress: [████████░░░░] 39/48 v1.0 plans complete + 3 v
 |-------|-------|--------|
 | 1–8 (all v1.0) | 39/39 | Complete |
 | 9 (v1.1) | 2/2 | Complete |
-| 10 (v1.1) | 1/2 | In progress (10-01 done) |
+| 10 (v1.1) | 2/2 | Complete |
 | 11–12 (v1.1) | 0/TBD | Not started |
 
 *Remaining v1.1 plan counts to be confirmed during phase planning*
@@ -60,6 +60,11 @@ From 10-01 execution (2026-04-15):
 - Test 7 (Re-check in-flight) requires controlled Promise pattern: `mockResolvedValueOnce` resolves synchronously within `userEvent.click`, skipping the transient checking state; exposed `resolve` handle lets test assert disabled button state before fetch completes
 - 9 tests written (vs 7 required) — Tests 8/9 split onStatusChange callback coverage into separate ok/failed cases for assertion clarity; still within plan scope
 
+From 10-02 execution (2026-04-15):
+- `waitFor` deadlocks under `vi.useFakeTimers()` because it polls via `setInterval` which fake timers intercept; solution is `flushMicrotasks()` helper (`await act(async () => { await Promise.resolve() })`) for Promise-only async under fake timers
+- Health-gate tests that use `waitFor` moved to a separate describe block with real timers to avoid the fake-timer/polling conflict — cleaner than per-test timer switching
+- Phase 10 fully complete: HEALTH-07 through HEALTH-12 all covered; 528 tests green
+
 ### Open Blockers
 
 None.
@@ -74,6 +79,6 @@ See `.planning/milestones/v1.0-MILESTONE-AUDIT.md` for full list:
 
 ## Session Continuity
 
-Last session: 2026-04-15T17:30:02Z
-Stopped at: Completed 10-01-health-badge-component-PLAN.md (3 tasks, 3 commits, 9 tests passing)
-Resume file: None — continue with 10-02-loadconfig-integration-PLAN.md
+Last session: 2026-04-15T17:36:28Z
+Stopped at: Completed 10-02-loadconfig-integration-PLAN.md (2 tasks, 2 commits, 528 tests passing)
+Resume file: None — continue with Phase 11 (ROUTE-01/02 + DEBRIEF-01 consolidated fixes)
