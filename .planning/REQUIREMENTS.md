@@ -32,7 +32,7 @@
 
 ### Polish — Debrief
 
-- [ ] **DEBRIEF-01**: Facilitator input text captured in debrief export preserves the first character (no "ound 1..." truncation)
+- [x] **DEBRIEF-01**: Facilitator input text captured in debrief export preserves the first character (no "ound 1..." truncation) (closed 2026-04-15 — not reproducible in pure function pipeline; assumed browser/OS download artifact from v1.0 live run, regression test in debriefExporter.test.ts pins the invariant)
 
 ### Polish — Prompt Engineering
 
@@ -78,7 +78,7 @@
 | HEALTH-12 | Phase 10 | Complete |
 | ROUTE-01 | Phase 11 | Pending |
 | ROUTE-02 | Phase 11 | Pending |
-| DEBRIEF-01 | Phase 11 | Pending |
+| DEBRIEF-01 | Phase 11 | Complete (browser artifact) |
 | PROMPT-01 | Phase 12 | Pending |
 | PROMPT-02 | Phase 12 | Pending |
 | PROMPT-03 | Phase 12 | Pending |

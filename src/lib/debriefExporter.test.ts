@@ -347,3 +347,44 @@ describe('downloadDebrief', () => {
     expect(revokeObjectURLMock).toHaveBeenCalledWith('blob:mock-url')
   })
 })
+
+// ─── Group 5: DEBRIEF-01 regression ──────────────────────────────────────────
+
+describe('generateDebriefMarkdown — DEBRIEF-01 regression', () => {
+  it('DEBRIEF-01 regression: R1 facilitator message preserves leading character', () => {
+    // Arrange a DebriefSnapshot where Round 1's first facilitator message text
+    // starts with "Round 1 is now live..." — the exact string from the v1.0 live
+    // run that was observed as "ound 1 is now live..." in the downloaded export.
+    const messages: ChatMessage[] = [
+      {
+        id: 'f1',
+        type: 'facilitator',
+        text: 'Round 1 is now live. Kent, set the scene.',
+        timestamp: '10:00',
+      },
+      {
+        id: 'd1',
+        type: 'debrief_divider',
+        label: 'DEBRIEF',
+        isDebrief: true,
+        timestamp: '11:00',
+      },
+      {
+        id: 'p1',
+        type: 'persona',
+        speaker: 'kent',
+        text: 'Debrief response.',
+        timestamp: '11:01',
+      },
+    ]
+    const snapshot: DebriefSnapshot = {
+      ...baseSnapshot,
+      messages,
+    }
+    const md = generateDebriefMarkdown(snapshot)
+    // Must NOT appear — this is the truncated bug string
+    expect(md).not.toContain('**Facilitator:** ound 1 is now live')
+    // Must appear — full text preserved, leading "R" intact
+    expect(md).toContain('**Facilitator:** Round 1 is now live')
+  })
+})
