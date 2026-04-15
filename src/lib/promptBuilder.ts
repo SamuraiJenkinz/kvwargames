@@ -1,3 +1,12 @@
+/**
+ * System prompt builder for the three-persona LLM call.
+ *
+ * LOAD-BEARING: The Finch crisisState transition rule (Block 7 MUST + Block 9
+ * "Crisis State Transition Rules" subsection) is empirically required to make
+ * Scenario 2 severity escalation produce a crisisState update. Before editing
+ * those sections, read:
+ *   .planning/phases/12-crisis-state-prompt-engineering/12-PROMPT-ENGINEERING-NOTES.md
+ */
 import type { GameConfig, GameState, TeamConfig, TeamState } from '@/types/game'
 
 // ─── Persona Prompt Definitions ──────────────────────────────────────────────
@@ -28,6 +37,7 @@ const PERSONA_PROMPT_DEFS = {
       'Open with the adversary action or inject.',
       'Name concrete second-order effects.',
       'Flag escalation thresholds (crisisSeverity movements).',
+      'Advance crisisState per the threshold rules in Block 9 when crisisSeverity crosses 2 or 3.',
     ],
     mustNot: [
       'Do not moralise.',
@@ -210,6 +220,13 @@ function buildBlock9(): string {
     '```',
     '',
     'stateUpdate is a DELTA — only include fields that actually changed this turn. Omit unchanged fields entirely (STATE-03).',
+    '',
+    'Crisis State Transition Rules (Finch MUST emit these in stateUpdate):',
+    '- When crisisSeverity reaches 2 AND crisisState is "No Crisis":',
+    '  set crisisState to "Supply Crisis"',
+    '- When crisisSeverity reaches 3 AND crisisState is not "Security-Related Supply Crisis":',
+    '  set crisisState to "Security-Related Supply Crisis"',
+    'These transitions are emitted in the same turn the threshold is crossed. Kent and Chen do NOT emit crisisState transitions.',
     '',
     'Clamp ranges (produce in-range values):',
     '- crisisSeverity: 0–5 (integer)',
