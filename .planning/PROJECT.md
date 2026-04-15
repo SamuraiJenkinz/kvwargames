@@ -15,6 +15,17 @@ Three AI personas respond in-character to facilitator input with accurate, live 
 - **Deployment:** Windows Server scheduled-task deployment committed (`4c388e2`); facilitator guides committed (`574efe3`)
 - **Codebase:** 11.1K LOC TypeScript/TSX (frontend) + 1.2K LOC Python (backend); 515/515 frontend + 12/12 backend tests green
 - **Audit status:** `tech_debt` (non-blocking; items logged in `.planning/milestones/v1.0-MILESTONE-AUDIT.md`)
+- **Post-v1.0 hotfix:** `crypto.randomUUID` fallback for non-secure (HTTP) contexts — Send button broken on HTTP deploy (commit `474c1f6`, 2026-04-15)
+
+## Current Milestone: v1.1 Pre-live-run hardening
+
+**Goal:** Close the operational gaps surfaced by the v1.0 live run and the HTTP deploy incident — so the next live exercise starts from a known-good pipeline.
+
+**Target features:**
+- LLM health indicator on setup screen (full auth round-trip; auto on mount + manual re-check; blocks Launch + shows actionable error on failure)
+- Remove DEV-seed setState-during-render warning at `gameStore.ts:304` (redirect `/game` with null state to `/setup` unconditionally)
+- R1 facilitator input first-character strip fix (debrief export cosmetic — "ound 1 is now live...")
+- `crisisState` auto-advance prompt-engineering review (severity reached 4 in live run but state never transitioned)
 
 ## Requirements
 
@@ -38,19 +49,19 @@ Three AI personas respond in-character to facilitator input with accurate, live 
 - ✓ Context window hardening (N=2, measured 6724 tokens < 7500 safe ceiling) — v1.0
 - ✓ Credential audit — zero browser-side Authorization / Bearer / api-key headers — v1.0
 
-### Active (next milestone candidates)
+### Active (v1.1 scope)
 
-Phase 9 polish backlog from 08-02 live run:
+- [ ] LLM health indicator on setup screen — full auth round-trip, auto + manual re-check, blocks Launch with actionable error
+- [ ] Fix DEV-seed setState-during-render warning at `gameStore.ts:304`
+- [ ] R1 input first-character strip cosmetic fix in debrief export
+- [ ] `crisisState` auto-advance prompt-engineering review
 
-- [ ] Fix DEV-seed setState-during-render warning at `gameStore.ts:304` (recommended: remove DEV auto-seed, redirect `/game` with null state to `/setup` unconditionally)
-- [ ] R1 facilitator input first-character strip cosmetic fix ("ound 1 is now live..." appears in debrief export)
-- [ ] `crisisState` auto-advance prompt-engineering review — severity reached 4 in live run but state never transitioned
+### Deferred (v2+ candidates, not in v1.1)
 
-Broader v2 candidates (captured in archived REQUIREMENTS.md):
-
-- [ ] Streaming LLM responses token-by-token (if corporate endpoint supports SSE)
-- [ ] Session analytics dashboard (response times, token usage, persona distribution)
-- [ ] Visual config editor (form-based, not raw JSON)
+- Streaming LLM responses token-by-token (if corporate endpoint supports SSE)
+- Session analytics dashboard (response times, token usage, persona distribution)
+- Visual config editor (form-based, not raw JSON)
+- HTTPS deployment on target server (infrastructure, not app code — handled outside GSD cycle)
 
 ### Out of Scope
 
@@ -103,4 +114,4 @@ Broader v2 candidates (captured in archived REQUIREMENTS.md):
 | Run milestone audit before completion (v1 audit 2026-04-14) | Verify requirements coverage, integration, flows before tagging | ✓ Good — surfaced non-blocking tech debt cleanly |
 
 ---
-*Last updated: 2026-04-15 after v1.0 milestone completion*
+*Last updated: 2026-04-15 after v1.1 milestone start*
