@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 
 ## Current Position
 
-Phase: 9 of 12 (LLM Health Check — Backend) — in progress
-Plan: 01 of 02 complete (09-01 health endpoint shipped)
-Status: Plan 09-01 complete; ready to execute 09-02 (health-endpoint tests)
-Last activity: 2026-04-15 — 09-01 shipped GET /api/health/llm with 8-code taxonomy
+Phase: 9 of 12 (LLM Health Check — Backend) — **complete**
+Plan: 02 of 02 complete (09-02 pytest coverage shipped)
+Status: Phase 9 backend wave complete; ready for Phase 10 (frontend health indicator)
+Last activity: 2026-04-15 — 09-02 shipped 5 pytest scenarios for /api/health/llm (success, 401, timeout, auth-mode parity, extra-headers parity); full backend suite 17/17 green
 
-Progress: [████████░░░░] 39/48 v1.0 plans complete + 1/TBD v1.1 plans
+Progress: [████████░░░░] 39/48 v1.0 plans complete + 2/TBD v1.1 plans
 
 ## Performance Metrics
 
@@ -48,6 +48,11 @@ From 09-01 execution (2026-04-15):
 - Health endpoint always returns HTTP 200 (body.ok carries the signal) — stable contract Phase 10 depends on
 - Exception handler order (Timeout→HTTPStatus→Connect→Request→Exception) is load-bearing and commented in-code because subclass-safety is invisible to linters
 
+From 09-02 execution (2026-04-15):
+- Held test file to required 5-test floor (208 lines) — additional 403/404/429/500/network/invalid_response scenarios NOT added; judgment call that adding them would reduce readability without materially increasing signal given the generic Exception branch is covered transitively and 09-01 exercised the taxonomy by construction
+- One-shot sanity check performed: temporarily breaking health.py's auth construction to `Authorization: Bearer <key>` confirmed BOTH parity tests fail with the expected diagnostics — parity tests have real teeth against Pitfall 1 (future contributor copying config_gen.py's hardcoded Bearer pattern)
+- TLS-vs-network branch remains untested (MockTransport can't simulate SSL errors cleanly); revisit if a real-world TLS failure surfaces
+
 ### Open Blockers
 
 None.
@@ -63,5 +68,5 @@ See `.planning/milestones/v1.0-MILESTONE-AUDIT.md` for full list:
 ## Session Continuity
 
 Last session: 2026-04-15
-Stopped at: Completed 09-01-PLAN.md (health endpoint shipped, 2 commits: e34b91d, 8f79641)
+Stopped at: Completed 09-02-PLAN.md (pytest coverage shipped, commit 58f9dad). Phase 9 backend wave done.
 Resume file: None
