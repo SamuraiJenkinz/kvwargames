@@ -6,6 +6,8 @@ import type { ParseResult } from '@/lib/jsonValidation'
 import { validateGameConfig, type ValidationError } from '@/lib/configValidator'
 import JsonEditor from './JsonEditor'
 import ScenarioSummary from './ScenarioSummary'
+import HealthBadge from './HealthBadge'
+import type { HealthStatus } from '@/types/health'
 
 // ─── LoadConfigPanel ──────────────────────────────────────────────────────────
 
@@ -42,6 +44,11 @@ export default function LoadConfigPanel() {
     const v = validateGameConfig(initial.value as unknown)
     return v.ok ? [] : v.errors
   })
+
+  // Health check gates Launch. Seed 'checking' so Launch is disabled on initial mount
+  // before the first /api/health/llm response lands. HealthBadge (rendered below) fires
+  // the fetch on its own mount and calls setHealthStatus via its onStatusChange prop.
+  const [healthStatus, setHealthStatus] = useState<HealthStatus>('checking')
 
   // Track the last successfully-parsed scenario count so we can render
   // disabled (not hidden) Launch buttons even when JSON is currently invalid.
@@ -91,9 +98,12 @@ export default function LoadConfigPanel() {
     ? parseResult.value.scenarios.length
     : lastValidScenarioCount.current
 
-  // Launch is disabled when JSON fails to parse OR when deep schema validation errors remain.
-  // "disabled-not-hidden" invariant from plan 04-04 is preserved — buttons always render.
-  const launchDisabled = !parseResult.ok || validationErrors.length > 0
+  // Launch is disabled when JSON parse fails, when schema validation has errors,
+  // OR when the LLM health check is still running / has failed. Locked decision
+  // (CONTEXT.md): no "launch anyway" override — the whole point of Phase 10 is
+  // preventing broken-pipeline live runs.
+  const launchDisabled =
+    !parseResult.ok || validationErrors.length > 0 || healthStatus !== 'ok'
 
   return (
     <main className="min-h-screen bg-[var(--color-bg-base)] p-6 text-[var(--color-text-primary)]">
@@ -191,6 +201,11 @@ export default function LoadConfigPanel() {
             </p>
           )}
 
+          {/* LLM health indicator — auto-checks on mount, gates Launch.
+              Sits directly above Launch buttons so the status + hint are
+              the explanation for a disabled button (no tooltip duplication). */}
+          <HealthBadge onStatusChange={setHealthStatus} />
+
           {/* Launch buttons — always rendered once scenarioCount is known;
               disabled (not hidden) when JSON is invalid */}
           {scenarioCount !== null && (
@@ -207,7 +222,13 @@ export default function LoadConfigPanel() {
                     onClick={() => handleLaunch(i)}
                     disabled={launchDisabled}
                     aria-disabled={launchDisabled}
-                    title={launchDisabled ? 'Fix JSON errors to launch' : undefined}
+                    title={
+                      launchDisabled
+                        ? healthStatus !== 'ok'
+                          ? 'LLM health check must pass before launching'
+                          : 'Fix JSON errors to launch'
+                        : undefined
+                    }
                     className={
                       !launchDisabled
                         ? 'rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-panel)] px-4 py-2 text-[var(--color-text-primary)] transition hover:border-[var(--color-border-muted)]'
