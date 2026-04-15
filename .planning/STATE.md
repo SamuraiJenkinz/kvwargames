@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-04-15)
 
 ## Current Position
 
-Phase: 12 of 12 (Crisis-State Prompt Engineering) — **in progress**
-Plan: 02 of 02 **in progress** — Task 1 shipped (notes + verification scaffold), **paused at Task 2 checkpoint** (human-verify: Tier B live-LLM replay)
-Status: 12-02 Task 1 committed at `b6b6271` — two new docs under `.planning/phases/12-crisis-state-prompt-engineering/`: `12-PROMPT-ENGINEERING-NOTES.md` (standalone reference) + `12-LIVE-VERIFICATION.md` (pre-run scaffold with R3 inject captured verbatim, 2 TODO placeholders for the live replay). Awaiting operator PASS / FAIL / RETRY signal on the Task 2 human-verify checkpoint before Task 3 finalises REQUIREMENTS.md and writes 12-02-SUMMARY.md.
-Last activity: 2026-04-15 — Committed 12-02 Task 1 (b6b6271); paused at Task 2 Tier B live-LLM replay checkpoint
+Phase: 12 of 12 (Crisis-State Prompt Engineering) — **plans complete ✓** (phase-level verifier pending)
+Plan: 02 of 02 **complete** — Tier B live-LLM replay PASS; PROMPT-01/02/03 marked Complete in REQUIREMENTS.md
+Status: 12-02 closed. Finch emitted `{crisisSeverity: 4, crisisState: "Security-Related Supply Crisis"}` in the same stateUpdate on R3 of Scenario 2, plus a corroborating flag. Raw response captured verbatim in `.planning/phases/12-crisis-state-prompt-engineering/12-LIVE-VERIFICATION.md` §4; PASS verdict in §5. REQUIREMENTS.md 18/18 Complete — ready for v1.1 milestone audit.
+Last activity: 2026-04-15 — Phase 12 plan 02 complete; live-LLM replay PASS; PROMPT-01/02/03 marked Complete in REQUIREMENTS.md
 
-Progress: [█████████░░░] 39/48 v1.0 plans complete + 6 v1.1 plans complete + 1 in progress (Phase 12 Plan 02 Task 1/3)
+Progress: [████████████] 39/48 v1.0 plans complete + 8 v1.1 plans complete (Phases 9, 10, 11, 12 all plan-complete)
 
 ## Performance Metrics
 
@@ -30,7 +30,7 @@ Progress: [█████████░░░] 39/48 v1.0 plans complete + 6 v
 | 9 (v1.1) | 2/2 | Complete |
 | 10 (v1.1) | 2/2 | Complete |
 | 11 (v1.1) | 1/1 | Complete |
-| 12 (v1.1) | 1/2 | In progress (12-01 done; 12-02 Task 1 shipped, paused at Task 2 live-LLM checkpoint) |
+| 12 (v1.1) | 2/2 | Complete (12-01 rule encoded + locked; 12-02 Tier B live-LLM PASS + docs) |
 
 *Remaining v1.1 plan counts to be confirmed during phase planning*
 
@@ -74,6 +74,14 @@ From 12-01 execution (2026-04-15):
 - Promoted `expect(report.withinLimit).toBe(true)` from informational boolean to hard CI assertion; current empirical budget: systemPromptTokens=5258, totalCeilingEstimate=6858, ceiling=7500 (642-token headroom)
 - PROMPT-01 closed (rule encoded); PROMPT-02 closed (source-side JSDoc + snapshot breadcrumbs); PROMPT-03 still open pending 12-02 Tier B live-LLM replay
 
+From 12-02 execution (2026-04-15):
+- Tier B live-LLM replay PASSED on first run with no retries — Finch's stateUpdate contained `{crisisSeverity: 4, crisisState: "Security-Related Supply Crisis"}` plus a corroborating flag, on R3 of Scenario 2 with Block 7 Finch MUST + Block 9 transition rules in place. Raw JSON captured verbatim at `.planning/phases/12-crisis-state-prompt-engineering/12-LIVE-VERIFICATION.md` §4
+- Operator path used: full R1→R2→R3 replay (option a), not localStorage seed (option b) — most-faithful replay against the real endpoint
+- Finch emitted severity=4 (not 2 as in the seeded baseline expectation) — the R3 inject magnitude pushed her past the 3-threshold directly. Rule held: same-turn transition still fired. Validates the Block 9 phrasing handles the "skip a threshold" case, not just "cross by 1" cases
+- PROMPT-01/02/03 all flipped to Complete in REQUIREMENTS.md; v1.1 coverage 18/18; Phase 12 (last v1.1 phase) closed — ready for v1.1 milestone audit
+- Established Tier B pattern (reusable): encode rule in code → lock with snapshot + round-trip tests → empirically replay against live endpoint → commit the raw response as the evidence record (the evidence file IS the PASS artifact, not a test output)
+- Established four-hop traceability chain: promptBuilder.ts JSDoc → 12-PROMPT-ENGINEERING-NOTES.md §5 → 12-LIVE-VERIFICATION.md → 08-02-LIVE-RUN.md (any link walkable either direction)
+
 ### Open Blockers
 
 None.
@@ -88,6 +96,6 @@ See `.planning/milestones/v1.0-MILESTONE-AUDIT.md` for full list:
 
 ## Session Continuity
 
-Last session: 2026-04-15 (12-02 Task 1 shipped)
-Stopped at: Paused at 12-02 Task 2 — Tier B live-LLM replay human-verify checkpoint. Operator must start backend+frontend, run Scenario 2 to R3, capture the R3 round-start LLM response, paste the raw JSON + PASS/FAIL verdict into `12-LIVE-VERIFICATION.md` §4 and §5, then signal PASS / FAIL: <reason> / RETRY.
-Resume file: `.planning/phases/12-crisis-state-prompt-engineering/12-02-PLAN.md` Task 2 `<how-to-verify>` block (full procedure + cost note)
+Last session: 2026-04-15 (12-02 Task 3 finalized — Phase 12 plan-complete)
+Stopped at: Phase 12 all plans complete. Tier B live-LLM PASS captured; REQUIREMENTS.md 18/18 Complete; 12-02-SUMMARY.md written. Phase-level verifier (`/gsd:close-phase` or equivalent) has not yet run — that step composes the phase-level rollup, possibly updates ROADMAP.md, and can kick off the v1.1 milestone audit.
+Resume file: None — ready for v1.1 milestone audit.
