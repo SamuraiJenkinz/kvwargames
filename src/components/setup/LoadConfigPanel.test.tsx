@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, act, fireEvent } from '@testing-library/react'
+import { render, screen, act, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import LoadConfigPanel from './LoadConfigPanel'
 import { AppRoutes } from '@/App'
@@ -37,14 +37,38 @@ function edipJsonWithCorruptPc(): string {
   return JSON.stringify(cfg, null, 2)
 }
 
+/**
+ * Default health ok response — returned by the beforeEach stub so all existing
+ * tests that assert Launch is enabled have health resolve to 'ok' automatically.
+ */
+function healthOkResponse(): Response {
+  return new Response(JSON.stringify({ ok: true, latencyMs: 100 }), { status: 200 })
+}
+
+/**
+ * Flush the microtask queue so that mockResolvedValue promises complete and
+ * React state updates are processed. Works correctly alongside vi.useFakeTimers()
+ * because Promise microtasks are not intercepted by fake timers.
+ */
+async function flushMicrotasks() {
+  await act(async () => {
+    await Promise.resolve()
+  })
+}
+
 // ─── LoadConfigPanel — disabled Launch buttons on invalid JSON ────────────────
 
 describe('LoadConfigPanel', () => {
   beforeEach(() => {
     vi.useFakeTimers()
+    // Default: health check returns ok so existing Launch-enabled assertions hold.
+    // Individual health-gate tests below override with mockResolvedValueOnce.
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(healthOkResponse()))
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.clearAllMocks()
     vi.useRealTimers()
   })
 
@@ -61,7 +85,11 @@ describe('LoadConfigPanel', () => {
       </MemoryRouter>,
     )
 
-    // Confirm buttons are initially enabled (valid JSON on mount)
+    // Flush microtasks so the health fetch promise resolves (mockResolvedValue).
+    // healthStatus transitions checking → ok, enabling Launch for valid JSON.
+    await flushMicrotasks()
+
+    // Confirm buttons are now enabled (valid JSON + health ok)
     const initialButtons = screen.getAllByRole('button', { name: /Launch Scenario/i })
     expect(initialButtons.length).toBeGreaterThan(0)
     initialButtons.forEach((b) => expect(b).not.toBeDisabled())
@@ -85,6 +113,7 @@ describe('LoadConfigPanel', () => {
     buttons.forEach((b) => {
       expect(b).toBeDisabled()
       expect(b).toHaveAttribute('aria-disabled', 'true')
+      // JSON error blocks launch (health is ok, so JSON hint shown)
       expect(b).toHaveAttribute('title', 'Fix JSON errors to launch')
     })
   })
@@ -204,6 +233,10 @@ describe('LoadConfigPanel', () => {
       vi.advanceTimersByTime(350)
     })
 
+    // Flush microtasks to let the health fetch promise resolve (health was already
+    // resolving from mount; this ensures state is settled before asserting enabled)
+    await flushMicrotasks()
+
     // Banner should be gone, Launch buttons should be enabled
     const alerts = screen.queryAllByRole('alert')
     alerts.forEach((alert) => {
@@ -246,6 +279,136 @@ describe('LoadConfigPanel', () => {
     // Each error path lives in a <li> with a mono-font span
     const listItems = alert.querySelectorAll('li')
     expect(listItems.length).toBeGreaterThanOrEqual(4)
+  })
+})
+
+// ─── health gate on launchDisabled ───────────────────────────────────────────
+// These tests use REAL timers (not fake) so that waitFor polling works correctly.
+// The existing describe block uses vi.useFakeTimers() for the 300ms debounce;
+// health-gate tests don't need debounce control so real timers are simpler.
+
+describe('health gate on launchDisabled', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn())
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.clearAllMocks()
+  })
+
+  it('Launch is disabled while health check is in-flight (checking state)', async () => {
+    // fetch never resolves — badge stays in 'checking' state indefinitely
+    vi.mocked(fetch).mockImplementation(() => new Promise<Response>(() => {}))
+
+    useGameStore.setState({ configJson: EDIP_JSON, draftSource: null })
+
+    render(
+      <MemoryRouter>
+        <LoadConfigPanel />
+      </MemoryRouter>,
+    )
+
+    // Badge is in checking state (fetch never resolves) — Launch must be disabled
+    const launchButtons = screen.getAllByRole('button', { name: /Launch Scenario/i })
+    expect(launchButtons.length).toBeGreaterThan(0)
+    launchButtons.forEach((b) => {
+      expect(b).toBeDisabled()
+    })
+  })
+
+  it('Launch is disabled when health check fails, even with valid JSON', async () => {
+    // fetch returns an auth failure response
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          ok: false,
+          code: 'auth_error',
+          status: 401,
+          hint: 'Authentication failed — check LLM_API_KEY in .env',
+          latencyMs: 120,
+        }),
+        { status: 200 },
+      ),
+    )
+
+    useGameStore.setState({ configJson: EDIP_JSON, draftSource: null })
+
+    render(
+      <MemoryRouter>
+        <LoadConfigPanel />
+      </MemoryRouter>,
+    )
+
+    // Wait for badge to show the failure text (health resolved to 'failed')
+    await waitFor(() =>
+      expect(screen.getByText(/401 — Authentication/)).toBeInTheDocument(),
+    )
+
+    // Launch buttons must remain disabled despite valid JSON
+    const launchButtons = screen.getAllByRole('button', { name: /Launch Scenario/i })
+    expect(launchButtons.length).toBeGreaterThan(0)
+    launchButtons.forEach((b) => {
+      expect(b).toBeDisabled()
+    })
+  })
+
+  it('Launch becomes enabled when health is ok AND JSON parses AND validation passes', async () => {
+    // fetch returns healthy response
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, latencyMs: 100 }), { status: 200 }),
+    )
+
+    useGameStore.setState({ configJson: EDIP_JSON, draftSource: null })
+
+    render(
+      <MemoryRouter>
+        <LoadConfigPanel />
+      </MemoryRouter>,
+    )
+
+    // Wait for badge to show connected state (health resolved to 'ok')
+    await waitFor(() =>
+      expect(screen.getByText(/Connected — 100ms/)).toBeInTheDocument(),
+    )
+
+    // Launch buttons should now be enabled (health ok + valid JSON + validation passes)
+    const launchButtons = screen.getAllByRole('button', { name: /Launch Scenario/i })
+    expect(launchButtons.length).toBeGreaterThan(0)
+    launchButtons.forEach((b) => {
+      expect(b).not.toBeDisabled()
+    })
+  })
+
+  it('Launch stays disabled when health is ok but JSON is invalid', async () => {
+    // fetch returns healthy response
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, latencyMs: 100 }), { status: 200 }),
+    )
+
+    // Seed with invalid JSON that fails parseConfigJson
+    useGameStore.setState({ configJson: '{ broken json', draftSource: null })
+
+    render(
+      <MemoryRouter>
+        <LoadConfigPanel />
+      </MemoryRouter>,
+    )
+
+    // Wait for badge to show green (health ok) — proves health alone is not sufficient
+    await waitFor(() =>
+      expect(screen.getByText(/Connected — 100ms/)).toBeInTheDocument(),
+    )
+
+    // With invalid JSON on mount, scenarioCount is null → no Launch buttons rendered.
+    // But if any Launch buttons exist, they must be disabled.
+    // This proves the conjunction gate: health=ok but JSON invalid → no enabled launch.
+    const launchButtons = screen.queryAllByRole('button', { name: /Launch Scenario/i })
+    launchButtons.forEach((b) => {
+      expect(b).toBeDisabled()
+    })
+    // Additionally assert the JSON parse error alert is shown
+    expect(screen.getByRole('alert')).toBeInTheDocument()
   })
 })
 
