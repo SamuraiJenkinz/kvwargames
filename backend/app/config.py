@@ -17,6 +17,9 @@ Optional env vars (have defaults):
                           (default: 'Bearer ' — trailing space intentional so that
                           f"{prefix}{key}".strip() yields "Bearer <key>". Set to ''
                           for Azure OpenAI, which expects the raw key with no prefix).
+  APP_HOST              - Host interface uvicorn binds to (default: '127.0.0.1' for dev).
+                          Set to '0.0.0.0' for LAN-accessible deployment.
+  APP_PORT              - TCP port uvicorn binds to (default: 8000).
 """
 
 import json
@@ -39,6 +42,10 @@ class Settings(BaseSettings):
     llm_extra_headers: str = "{}"
     llm_auth_header_name: str = "Authorization"
     llm_auth_value_prefix: str = "Bearer "
+
+    # Server bind — defaults preserve dev behavior (localhost only)
+    app_host: str = "127.0.0.1"
+    app_port: int = 8000
 
     def get_extra_headers(self) -> dict:
         """Parse llm_extra_headers JSON string safely. Returns {} on parse error."""
