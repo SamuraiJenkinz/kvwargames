@@ -33,7 +33,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import get_settings
-from .routers import config_gen, llm
+from .routers import config_gen, health, llm
 
 
 class SPAStaticFiles(StaticFiles):
@@ -107,8 +107,11 @@ async def validation_error_handler(request, exc: RequestValidationError) -> JSON
     )
 
 
-# Routers — order matters if paths overlap; LLM and config_gen are distinct prefixes
+# Routers — order matters if paths overlap; LLM, health, and config_gen are distinct prefixes.
+# All API routers MUST be registered before the SPA static mount below, otherwise the
+# catch-all static handler will shadow them and return index.html for API paths.
 app.include_router(llm.router)
+app.include_router(health.router)
 app.include_router(config_gen.router)
 
 # SPA static files — MUST be last so API routes registered above are never swallowed.
