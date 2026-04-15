@@ -19,6 +19,15 @@ import { callLLMProxy, LLM_FRONTEND_TIMEOUT_MS } from '@/lib/llmClient'
 import { parsePersonaResponse } from '@/lib/responseParser'
 import { applyStateUpdatePure, type ClampLog } from '@/lib/stateUpdater'
 
+// crypto.randomUUID is only available in secure contexts (HTTPS/localhost).
+// Deployments over plain HTTP need a fallback — ids are only used as React
+// keys and chat message identifiers, not for security.
+const safeRandomId = (): string => {
+  const c = (globalThis as { crypto?: Crypto }).crypto
+  if (c && typeof c.randomUUID === 'function') return c.randomUUID()
+  return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
+}
+
 // ─── Store Interface ─────────────────────────────────────────────────────────
 
 export interface PendingControlBanner {
@@ -117,7 +126,7 @@ function formatTime(): string {
 
 function buildPersonaMessage(r: PersonaResponse, revealDelay: number): ChatMessage {
   return {
-    id: crypto.randomUUID(),
+    id: safeRandomId(),
     type: 'persona',
     speaker: r.speaker as PersonaId,
     text: r.message,
@@ -136,7 +145,7 @@ interface ErrorMessageInit {
 
 function buildErrorMessage(init: ErrorMessageInit): ChatMessage {
   return {
-    id: crypto.randomUUID(),
+    id: safeRandomId(),
     type: 'error',
     text: init.message,
     errorCode: init.code,
@@ -522,7 +531,7 @@ export const useGameStore = create<GameStore>()(
             if (!s.gameState) return
             s.gameState.round = newRound
             s.messages.push({
-              id: crypto.randomUUID(),
+              id: safeRandomId(),
               type: 'round_divider',
               label: `Round ${newRound}`,
               timestamp: formatTime(),
@@ -549,7 +558,7 @@ export const useGameStore = create<GameStore>()(
           const prefixedInput = '[DEBRIEF_TRIGGER] Facilitator-requested debrief.'
           set((s) => {
             s.messages.push({
-              id: crypto.randomUUID(),
+              id: safeRandomId(),
               type: 'debrief_divider',
               label: 'DEBRIEF',
               timestamp: formatTime(),
@@ -580,7 +589,7 @@ export const useGameStore = create<GameStore>()(
           set((s) => {
             s.gameEnded = true
             s.messages.push({
-              id: crypto.randomUUID(),
+              id: safeRandomId(),
               type: 'debrief_divider',
               label: 'DEBRIEF',
               timestamp: formatTime(),
@@ -602,7 +611,7 @@ export const useGameStore = create<GameStore>()(
           if (trimmed === '' || get().loading || get().gameEnded) return
           set((state) => {
             state.messages.push({
-              id: crypto.randomUUID(),
+              id: safeRandomId(),
               type: 'facilitator',
               speaker: 'facilitator',
               text: trimmed,
