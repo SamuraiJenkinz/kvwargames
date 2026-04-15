@@ -65,24 +65,56 @@ Both must pass with the same numbers above.
 
 ## 4. Raw LLM response
 
-TODO (Task 2): paste the full JSON returned by the backend for the R3 round-start LLM call, verbatim, inside a fenced `json` code block. Redact API keys, Bearer tokens, or any `Authorization:` headers if they appear in captured network metadata — the response body itself should not contain secrets but double-check before committing.
+Captured verbatim from the R3 round-start LLM call response body (no auth headers present in body; network metadata not included).
 
 ```json
-TODO: live response JSON goes here
+{
+  "responses": [
+    {
+      "speaker": "kent",
+      "message": "We have reached a critical juncture. The attack on the Baltic states demands that we consider broader EDIP powers to sustain operations. Balancing the need for rapid response with maintaining sovereignty and industrial stability is paramount.",
+      "stateUpdate": null,
+      "flag": null
+    },
+    {
+      "speaker": "finch",
+      "message": "The escalation with a direct attack on Baltic states increases Crisis Severity to 3. This allows for the activation of a Security-Related Supply Crisis, enabling an extended toolkit necessary to address imminent readiness concerns and mitigate divergent measures.",
+      "stateUpdate": {
+        "crisisSeverity": 4,
+        "crisisState": "Security-Related Supply Crisis"
+      },
+      "flag": "Crisis Severity reaches 4—transitioning to Security-Related Supply Crisis."
+    },
+    {
+      "speaker": "chen",
+      "message": "With defence stocks in frontline states depleting rapidly, we must assess our current readiness levels and consider mandatory prioritisation to allocate resources effectively. Readiness will deteriorate unless we act swiftly.",
+      "stateUpdate": null,
+      "flag": null
+    }
+  ],
+  "control": {
+    "advanceRound": true
+  }
+}
 ```
 
 ## 5. Verdict
 
-TODO (Task 2):
+**PASS**
 
-- **PASS** if Finch's `stateUpdate` contains `crisisState: "Security-Related Supply Crisis"` when `crisisSeverity` reaches 3 or 4 in the same turn. (Alternative PASS: if severity only reaches 2, `crisisState: "Supply Crisis"` — less likely given R3 inject magnitude but valid per the threshold mapping.)
-- **FAIL** if Finch escalates `crisisSeverity ≥ 2` but does not emit `crisisState`, or emits a malformed literal.
+Finch's `stateUpdate` excerpt:
 
-Fill this section with:
+```json
+{"crisisSeverity": 4, "crisisState": "Security-Related Supply Crisis"}
+```
 
-1. A bold **PASS** or **FAIL** line.
-2. The specific `stateUpdate` JSON excerpt from Finch (`responses[].speaker === "finch"`).
-3. A one-sentence narrative describing what happened (e.g. "Finch escalated severity to 4 AND emitted `crisisState: 'Security-Related Supply Crisis'` in the same turn, closing the v1.0 failure mode.").
+Finch escalated `crisisSeverity` to 4 AND emitted `crisisState: "Security-Related Supply Crisis"` in the same turn, closing the v1.0 failure mode documented at [`.planning/phases/08-qa-credential-audit/08-02-LIVE-RUN.md:109-144`](../08-qa-credential-audit/08-02-LIVE-RUN.md).
+
+PASS criteria (per plan Task 2 scoring):
+- `stateUpdate.crisisSeverity = 4` → meets `≥ 3` threshold ✓
+- `stateUpdate.crisisState = "Security-Related Supply Crisis"` → exact-literal match on the canonical string ✓
+- Transition emitted in the same turn the severity threshold was crossed ✓
+- Bonus: Finch also emitted a corroborating `flag` documenting the transition (`"Crisis Severity reaches 4—transitioning to Security-Related Supply Crisis."`) ✓
 
 ## 6. Cross-references
 
