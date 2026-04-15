@@ -413,14 +413,11 @@ describe('health gate on launchDisabled', () => {
 })
 
 // ─── AppRoutes guard — /game redirects to /setup when gameState is null ───────
-// This tests the production contract (DEV=false). In DEV mode the guard instead
-// seeds mock state via seedMockState() — that path is not exercised here.
+// GuardedGameScreen unconditionally redirects to /setup when gameState is null.
+// (DEV auto-seed was removed in Phase 11 — ROUTE-01/02.)
 
 describe('AppRoutes', () => {
-  it('redirects /game to /setup when gameState is null (production path, DEV=false)', () => {
-    // Simulate production: disable DEV seed path so the null-guard redirect fires.
-    vi.stubEnv('DEV', false)
-
+  it('redirects /game to /setup when gameState is null', () => {
     useGameStore.setState({ gameState: null, setupMode: 'home' })
 
     render(
@@ -433,7 +430,5 @@ describe('AppRoutes', () => {
     expect(
       screen.getByText(/EDIP Wargame Facilitator/i),
     ).toBeInTheDocument()
-
-    vi.unstubAllEnvs()
   })
 })

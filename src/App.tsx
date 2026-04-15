@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router'
 import { useGameStore } from '@/lib/gameStore'
-import { seedMockState } from '@/mocks/seedMockState'
 import SetupScreen from '@/components/setup/SetupScreen'
 import GameScreen from '@/components/game/GameScreen'
 
@@ -10,22 +9,11 @@ import GameScreen from '@/components/game/GameScreen'
  * Renders GameScreen when gameState is set; redirects to /setup (replace) when null.
  * `replace` prevents a history entry so the browser back button cannot bounce
  * back to /game from /setup.
- *
- * DEV shortcut: when import.meta.env.DEV is true and gameState is null, seeds
- * mock state synchronously then returns null (triggering an immediate re-render
- * with the seeded state). Production dead-code elimination strips this branch.
  */
 function GuardedGameScreen() {
   const gameState = useGameStore((s) => s.gameState)
 
   if (gameState === null) {
-    if (import.meta.env.DEV) {
-      // Dev convenience: seed mock state synchronously so the game screen
-      // renders immediately without going through the Launch flow.
-      seedMockState()
-      // Fall through and render below — the next render will have state.
-      return null
-    }
     return <Navigate to="/setup" replace />
   }
 
