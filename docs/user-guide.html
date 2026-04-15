@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KV WarGame — User Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #17212B;
+    --ink-soft: #2B3A4A;
+    --slate: #5A6773;
+    --pewter: #8995A0;
+    --mist: #B8C2CC;
+    --fog: #D9DFE4;
+    --linen: #EFF2F5;
+    --surface: #FAFBFC;
+    --navy: #203548;
+    --accent: #3F5C78;
+    --kent:  #5B9BD5;
+    --finch: #DFA02A;
+    --chen:  #2BC48A;
+    --alert: #B35C5C;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--linen);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body { padding: 72px 24px 96px; }
+
+  .layout {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 72px;
+  }
+
+  /* Sticky nav */
+  nav.toc {
+    position: sticky;
+    top: 72px;
+    align-self: start;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--slate);
+  }
+
+  nav.toc .toc-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--pewter);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--fog);
+  }
+
+  nav.toc ol { list-style: none; counter-reset: toc; }
+  nav.toc li {
+    counter-increment: toc;
+    padding: 6px 0;
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 4px;
+    align-items: baseline;
+  }
+  nav.toc li::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--pewter);
+    letter-spacing: 0.05em;
+  }
+  nav.toc a {
+    color: var(--slate);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    line-height: 1.4;
+  }
+  nav.toc a:hover { color: var(--ink); border-bottom-color: var(--fog); }
+
+  main { min-width: 0; max-width: 720px; }
+
+  /* Wordmark */
+  .wordmark {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--slate);
+    margin-bottom: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .wordmark .divider { flex: 1; height: 1px; background: var(--fog); margin: 0 32px; }
+
+  /* Hero */
+  .hero { margin-bottom: 96px; }
+
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 32px;
+  }
+
+  h1 {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 52px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 32px;
+  }
+
+  .hero-body {
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--slate);
+    max-width: 560px;
+    font-weight: 300;
+  }
+
+  /* Sections */
+  section.chapter { margin-bottom: 80px; scroll-margin-top: 72px; }
+
+  h2 {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    margin-bottom: 8px;
+    padding-top: 48px;
+    border-top: 1px solid var(--fog);
+  }
+
+  .chapter-meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--pewter);
+    margin-bottom: 28px;
+  }
+
+  h3 {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-top: 40px;
+    margin-bottom: 14px;
+    letter-spacing: -0.005em;
+  }
+
+  h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-top: 32px;
+    margin-bottom: 14px;
+  }
+
+  p {
+    margin-bottom: 20px;
+    color: var(--ink-soft);
+    font-size: 16px;
+  }
+
+  p + p { margin-top: 0; }
+
+  strong { font-weight: 500; color: var(--ink); }
+  em { font-style: italic; }
+
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--fog); }
+  a:hover { border-bottom-color: var(--accent); }
+
+  ul.clean {
+    list-style: none;
+    margin: 20px 0;
+  }
+  ul.clean li {
+    position: relative;
+    padding-left: 20px;
+    padding-bottom: 10px;
+    color: var(--ink-soft);
+    font-size: 15.5px;
+    line-height: 1.65;
+  }
+  ul.clean li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 8px;
+    height: 1px;
+    background: var(--pewter);
+  }
+
+  /* Keyboard keys */
+  kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--surface);
+    border: 1px solid var(--fog);
+    border-radius: 3px;
+    padding: 2px 7px;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--surface);
+    border: 1px solid var(--fog);
+    border-radius: 2px;
+    padding: 1px 6px;
+    color: var(--navy);
+  }
+
+  /* Persona block */
+  .personas { display: grid; gap: 40px; margin-top: 40px; }
+
+  .persona {
+    border-left: 1px solid var(--fog);
+    padding-left: 28px;
+  }
+  .persona.kent  { border-left-color: var(--kent);  }
+  .persona.finch { border-left-color: var(--finch); }
+  .persona.chen  { border-left-color: var(--chen);  }
+
+  .persona-role {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .persona-name {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 24px;
+    color: var(--ink);
+    margin-bottom: 10px;
+    letter-spacing: -0.005em;
+  }
+  .persona-voice {
+    font-size: 15px;
+    color: var(--slate);
+    font-style: italic;
+    font-family: 'EB Garamond', Georgia, serif;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .persona-triggers {
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+  }
+  .persona-triggers .label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--pewter);
+    display: block;
+    margin-bottom: 4px;
+    margin-top: 8px;
+  }
+
+  /* Persona chip inline */
+  .persona-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    font-family: 'EB Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 15.5px;
+    color: var(--ink);
+  }
+  .persona-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    transform: translateY(-1px);
+  }
+  .persona-chip.kent  .persona-dot { background: var(--kent);  }
+  .persona-chip.finch .persona-dot { background: var(--finch); }
+  .persona-chip.chen  .persona-dot { background: var(--chen);  }
+
+  /* Panel diagram */
+  .panel-diagram {
+    margin: 32px 0;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    border: 1px solid var(--fog);
+    background: var(--surface);
+    min-height: 220px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+  .panel-diagram > div {
+    padding: 24px;
+    border-right: 1px solid var(--fog);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .panel-diagram > div:last-child { border-right: none; }
+  .panel-diagram .panel-label { color: var(--pewter); font-size: 10px; }
+  .panel-diagram .panel-hint {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--slate);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Definition list */
+  dl.defs {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    column-gap: 32px;
+    row-gap: 0;
+  }
+  dl.defs dt {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    padding: 20px 0;
+    border-top: 1px solid var(--fog);
+  }
+  dl.defs dd {
+    padding: 20px 0;
+    border-top: 1px solid var(--fog);
+    font-size: 15.5px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+  }
+  dl.defs dt:first-of-type, dl.defs dd:first-of-type { border-top: none; padding-top: 8px; }
+
+  /* Message type swatch */
+  .msg-type {
+    margin-top: 24px;
+    padding: 20px 24px;
+    border: 1px solid var(--fog);
+    background: var(--surface);
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+  .msg-type + .msg-type { margin-top: 12px; }
+  .msg-type .msg-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    padding-top: 2px;
+  }
+  .msg-type .msg-body { font-size: 14.5px; color: var(--ink-soft); line-height: 1.6; }
+  .msg-type .msg-body strong { font-family: 'EB Garamond', Georgia, serif; font-weight: 400; font-size: 17px; color: var(--ink); display: block; margin-bottom: 6px; font-style: italic; }
+
+  /* Aside */
+  aside.note {
+    border-left: 1px solid var(--accent);
+    padding: 4px 0 4px 24px;
+    margin: 24px 0;
+    color: var(--slate);
+    font-size: 14.5px;
+    line-height: 1.7;
+  }
+  aside.note.warn { border-left-color: var(--alert); }
+  aside.note .note-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 6px;
+  }
+  aside.note.warn .note-label { color: var(--alert); }
+  aside.note strong { color: var(--ink); font-weight: 500; }
+
+  /* Shortcut table */
+  table.shortcuts {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+    font-size: 14.5px;
+  }
+  table.shortcuts td {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--fog);
+    color: var(--ink-soft);
+    vertical-align: top;
+  }
+  table.shortcuts tr:first-child td { border-top: 1px solid var(--fog); }
+  table.shortcuts td:first-child { width: 180px; white-space: nowrap; }
+
+  /* Footer */
+  footer {
+    grid-column: 1 / -1;
+    margin-top: 96px;
+    padding-top: 32px;
+    border-top: 1px solid var(--fog);
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: var(--pewter);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    display: flex;
+    justify-content: space-between;
+  }
+  footer a { color: var(--pewter); border: none; }
+  footer a:hover { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 32px; }
+    nav.toc { position: static; margin-bottom: 16px; }
+    nav.toc ol { columns: 2; column-gap: 32px; }
+    body { padding: 48px 20px 72px; }
+  }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 38px; }
+    h2 { font-size: 26px; }
+    .hero-body { font-size: 16px; }
+    dl.defs { grid-template-columns: 1fr; row-gap: 0; }
+    dl.defs dt { padding-bottom: 4px; }
+    dl.defs dd { padding-top: 4px; border-top: none; }
+    .msg-type { grid-template-columns: 1fr; gap: 8px; }
+    .panel-diagram { grid-template-columns: 1fr; min-height: 0; }
+    .panel-diagram > div { border-right: none; border-bottom: 1px solid var(--fog); }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <nav class="toc">
+    <div class="toc-label">Contents</div>
+    <ol>
+      <li><a href="#what">What this tool is</a></li>
+      <li><a href="#personas">The three personas</a></li>
+      <li><a href="#setup">The setup screen</a></li>
+      <li><a href="#game">The game screen</a></li>
+      <li><a href="#messages">Message types</a></li>
+      <li><a href="#running">Running a session</a></li>
+      <li><a href="#state">Live game state</a></li>
+      <li><a href="#reference">The reference panel</a></li>
+      <li><a href="#errors">When something goes wrong</a></li>
+      <li><a href="#ending">Ending and exporting</a></li>
+      <li><a href="#security">Security posture</a></li>
+      <li><a href="#shortcuts">Quick reference</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <header class="wordmark">
+      <span>KV WarGame</span>
+      <span class="divider"></span>
+      <span>User Guide</span>
+    </header>
+
+    <section class="hero">
+      <p class="eyebrow">Facilitator handbook &middot; Version 1</p>
+      <h1>A quiet instrument for a loud table.</h1>
+      <p class="hero-body">
+        This guide walks you through everything the tool does, in the order you are
+        likely to use it. Read it once end-to-end before your first live session, and
+        keep it open in a second tab during the session as a reference. If you only
+        have five minutes, use the <a href="quick-start.html">quick start</a> instead.
+      </p>
+    </section>
+
+    <!-- 01 -->
+    <section class="chapter" id="what">
+      <h2>What this tool is</h2>
+      <p class="chapter-meta">Chapter 01 &middot; Mental model</p>
+
+      <p>
+        KV WarGame is a facilitation console for live policy tabletop exercises. It
+        runs alongside you — not in place of you — during a session of the
+        <em>EDIP Security of Supply Wargame</em> or any scenario you load into it.
+      </p>
+      <p>
+        The central idea is simple: three AI personas listen to what you describe
+        at the table and respond in character. The tool also tracks game state —
+        crisis severity, legitimacy, and each team&rsquo;s resources — and keeps the
+        fiction coherent as the scenario escalates. You run the room. The tool
+        listens, speaks, and remembers.
+      </p>
+
+      <h3>What it is not</h3>
+      <ul class="clean">
+        <li>It is not a player-facing tool. Players are at a physical table.</li>
+        <li>It is not a game engine that plays the scenario for you. You advance rounds, you play cards at the table, you make the calls.</li>
+        <li>It is not multi-user. One facilitator operates the app on a laptop for each session.</li>
+        <li>It does not persist anything between sessions. Close the tab and the game is gone. Export the debrief before you leave.</li>
+      </ul>
+    </section>
+
+    <!-- 02 -->
+    <section class="chapter" id="personas">
+      <h2>The three personas</h2>
+      <p class="chapter-meta">Chapter 02 &middot; Who speaks, and when</p>
+
+      <p>
+        Each persona has a distinct voice, domain, and a set of triggers the tool
+        uses to decide who should speak. You will come to recognise them quickly by
+        their colour, their tone, and the kinds of facts they reach for.
+      </p>
+
+      <div class="personas">
+
+        <div class="persona kent">
+          <div class="persona-role">Chair &middot; Framing &amp; Legitimacy</div>
+          <div class="persona-name">Kent Valentina</div>
+          <p class="persona-voice">
+            &ldquo;Let us pause on the process here. Before we decide, we should be
+            clear what we are deciding and on what authority.&rdquo;
+          </p>
+          <div class="persona-triggers">
+            <span class="label">Speaks when</span>
+            Round starts &middot; disputes &middot; institutional or political card plays &middot; debrief framing.
+          </div>
+        </div>
+
+        <div class="persona finch">
+          <div class="persona-role">Analyst &middot; Evidence &amp; Consequence</div>
+          <div class="persona-name">Alistair Finch</div>
+          <p class="persona-voice">
+            &ldquo;On the numbers — Team B&rsquo;s readiness falls below threshold in two
+            rounds if this continues. That is consequential.&rdquo;
+          </p>
+          <div class="persona-triggers">
+            <span class="label">Speaks when</span>
+            Round inject delivery &middot; adversary or disruption cards &middot; escalation events &middot; threshold warnings.
+          </div>
+        </div>
+
+        <div class="persona chen">
+          <div class="persona-role">Engineer &middot; Process &amp; Operations</div>
+          <div class="persona-name">Michael Chen</div>
+          <p class="persona-voice">
+            &ldquo;Operationally, the supply line runs through three nodes — if any
+            one of them drops out, the whole flow collapses.&rdquo;
+          </p>
+          <div class="persona-triggers">
+            <span class="label">Speaks when</span>
+            Technical or operational card plays &middot; readiness changes &middot; procedural challenges &middot; debrief lessons.
+          </div>
+        </div>
+
+      </div>
+
+      <aside class="note">
+        <span class="note-label">On ordering</span>
+        When multiple personas speak in the same turn, they always appear in the
+        order Kent &rarr; Finch &rarr; Chen. This is enforced by the tool, not by the
+        model — the fiction stays stable even if the AI returns them out of order.
+      </aside>
+    </section>
+
+    <!-- 03 -->
+    <section class="chapter" id="setup">
+      <h2>The setup screen</h2>
+      <p class="chapter-meta">Chapter 03 &middot; Getting to a launched scenario</p>
+
+      <p>
+        The first screen you see offers two paths.
+      </p>
+
+      <h3>Load Config &middot; EDIP Default</h3>
+      <p>
+        The standard path. Opens a JSON editor pre-populated with the EDIP Security
+        of Supply Wargame — two scenarios, four teams, eleven EDIP cards, four
+        national actions. On the right you see a live summary of the parsed config.
+        Below the editor are <strong>Launch Scenario 1</strong> and
+        <strong>Launch Scenario 2</strong> buttons. Clicking one initialises the
+        game and takes you to the game screen.
+      </p>
+      <p>
+        You can edit the JSON directly — change team names, adjust starting resource
+        values, rewrite the inject text — and the summary will update after a brief
+        debounce. If you break the JSON, a red error note below the editor tells you
+        the line and column of the problem, and the Launch buttons grey out until
+        the JSON parses again.
+      </p>
+
+      <h3>Generate from Brief</h3>
+      <p>
+        For when you want a custom scenario. A free-text field accepts a description
+        of the situation you want to simulate — a domain, a set of actors, a
+        triggering event. The tool calls the LLM, produces a full JSON config
+        matching the EDIP shape, and drops it into the same editor as above so you
+        can review and edit before launching.
+      </p>
+      <p>
+        Generated configs are validated field-by-field. If the model produces a team
+        with a PC value outside the allowed range, the editor shows an amber banner
+        naming the exact field — e.g.
+        <code>teams[2].pc: expected number 0-6, got 9</code> — and disables the Launch
+        buttons until you correct it (or re-generate).
+      </p>
+
+      <aside class="note">
+        <span class="note-label">First time</span>
+        For your first session, always use the EDIP default. The canonical scenario
+        has been playtested. Custom briefs are a v1 feature but reward familiarity
+        with the base game.
+      </aside>
+    </section>
+
+    <!-- 04 -->
+    <section class="chapter" id="game">
+      <h2>The game screen</h2>
+      <p class="chapter-meta">Chapter 04 &middot; Anatomy of the interface</p>
+
+      <p>
+        The game screen is three columns with a sticky header and a sticky input
+        bar. Every element has a purpose; nothing is decorative.
+      </p>
+
+      <div class="panel-diagram" aria-hidden="true">
+        <div>
+          <span class="panel-label">Left</span>
+          <span class="panel-hint">State panel — severity, legitimacy, teams</span>
+        </div>
+        <div>
+          <span class="panel-label">Centre</span>
+          <span class="panel-hint">Chat feed — facilitator and persona messages</span>
+        </div>
+        <div>
+          <span class="panel-label">Right</span>
+          <span class="panel-hint">Reference — cards, actions, guide</span>
+        </div>
+      </div>
+
+      <h3>The header</h3>
+      <p>
+        Sticks to the top of the screen. Shows the app wordmark, the game name, the
+        scenario, the round counter, and the current crisis state as a coloured
+        badge. A <strong>New Game</strong> button on the right returns to setup and
+        resets the store.
+      </p>
+
+      <h3>The facilitator input</h3>
+      <p>
+        Sticks to the bottom. On the left are action buttons — <strong>Advance to
+        Round N</strong>, <strong>Request Debrief Now</strong>, and when applicable
+        <strong>End Game &amp; Debrief</strong>. On the right is a text field for
+        typing events. <kbd>Enter</kbd> sends; <kbd>Shift</kbd> + <kbd>Enter</kbd>
+        adds a new line. While the AI is thinking, the input and all action buttons
+        are disabled.
+      </p>
+    </section>
+
+    <!-- 05 -->
+    <section class="chapter" id="messages">
+      <h2>Message types</h2>
+      <p class="chapter-meta">Chapter 05 &middot; Reading the chat feed</p>
+
+      <p>
+        The feed renders seven kinds of message. Recognising them quickly is the
+        single most useful facilitation skill.
+      </p>
+
+      <div class="msg-type">
+        <div class="msg-label">Persona</div>
+        <div class="msg-body">
+          <strong>A named AI voice, in character.</strong>
+          Coloured avatar with the persona&rsquo;s initials (KV / AF / MC), the
+          persona name, a timestamp, and a 2 – 4 sentence message in a tinted
+          bubble. An amber inline flag underneath marks something for your
+          attention — e.g. <em>&ldquo;Note: Team B at PC threshold&rdquo;</em>.
+        </div>
+      </div>
+
+      <div class="msg-type">
+        <div class="msg-label">Facilitator</div>
+        <div class="msg-body">
+          <strong>What you typed.</strong>
+          Right-aligned dark bubble with the label FACILITATOR and a timestamp.
+          Shows exactly what the AI received — useful when a response surprises you.
+        </div>
+      </div>
+
+      <div class="msg-type">
+        <div class="msg-label">Round divider</div>
+        <div class="msg-body">
+          <strong>A round transition.</strong>
+          Full-width horizontal line with a round label badge in the centre.
+          Written into the feed when you press <strong>Advance to Round N</strong>.
+        </div>
+      </div>
+
+      <div class="msg-type">
+        <div class="msg-label">Debrief divider</div>
+        <div class="msg-body">
+          <strong>The closing bell.</strong>
+          An amber-coloured variant of the round divider that marks the start of
+          the debrief phase. The <strong>Download Debrief</strong> button becomes
+          available after this appears.
+        </div>
+      </div>
+
+      <div class="msg-type">
+        <div class="msg-label">Error</div>
+        <div class="msg-body">
+          <strong>Something went wrong with the AI call.</strong>
+          Red-tinted bubble with an error code, a short explanation, a collapsible
+          disclosure showing the raw AI response, and a <strong>Retry</strong> button.
+          See <a href="#errors">Chapter 09</a> for what the common codes mean.
+        </div>
+      </div>
+
+      <div class="msg-type">
+        <div class="msg-label">Loading</div>
+        <div class="msg-body">
+          <strong>The AI is thinking.</strong>
+          A short animated three-dot indicator. Disappears when the response arrives
+          or an error is raised.
+        </div>
+      </div>
+
+      <div class="msg-type">
+        <div class="msg-label">Control banner</div>
+        <div class="msg-body">
+          <strong>The AI has flagged a game-control decision for you.</strong>
+          Appears below the facilitator input as an amber banner when the AI signals
+          e.g. a threshold crossing that deserves explicit facilitator acknowledgement.
+          Confirm or dismiss to continue.
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section class="chapter" id="running">
+      <h2>Running a session</h2>
+      <p class="chapter-meta">Chapter 06 &middot; The moves you will make</p>
+
+      <h3>Describing events</h3>
+      <p>
+        Treat the input bar as a stage direction, not a prompt. Short, concrete,
+        in-world descriptions work best. Good:
+        <em>&ldquo;Team C plays Emergency Stockpile Release. Team A objects on legitimacy grounds.&rdquo;</em>
+        Less good: <em>&ldquo;What happens if a team does a stockpile thing?&rdquo;</em>
+      </p>
+      <p>
+        The personas will decide who responds based on the content. Card plays
+        usually produce one or two voices; disputes and debriefs tend to produce all
+        three.
+      </p>
+
+      <h3>Advancing a round</h3>
+      <p>
+        When the table is ready to move forward, press the
+        <strong>Advance to Round N</strong> button. The feed shows a round divider,
+        then <span class="persona-chip finch"><span class="persona-dot"></span>Finch</span>
+        delivers the round&rsquo;s inject, and
+        <span class="persona-chip kent"><span class="persona-dot"></span>Kent</span>
+        frames the key tension for discussion. The round counter in the header
+        increments.
+      </p>
+
+      <h3>Requesting a debrief mid-game</h3>
+      <p>
+        The <strong>Request Debrief Now</strong> button gives you an interim
+        pulse-check — all three personas reflect on the session to this point
+        without ending it. Useful for longer games or when the table seems stuck.
+      </p>
+
+      <h3>Cards and national actions</h3>
+      <p>
+        You do not click cards in the interface — you play them at the physical
+        table and describe the play in the input. The tool routes to the right
+        persona based on the card&rsquo;s category. Use the
+        <a href="#reference">reference panel</a> to confirm the correct card name,
+        category, and effect before announcing a play.
+      </p>
+
+      <aside class="note">
+        <span class="note-label">Rhythm</span>
+        A healthy session has the facilitator speaking, the AI replying, and the
+        table responding — in that order. If the AI feels like it is leading,
+        slow down and describe more of what has just happened at the table before
+        advancing.
+      </aside>
+    </section>
+
+    <!-- 07 -->
+    <section class="chapter" id="state">
+      <h2>Live game state</h2>
+      <p class="chapter-meta">Chapter 07 &middot; Reading the left-hand panel</p>
+
+      <p>
+        The state panel is the live dashboard. All values update automatically
+        from AI responses — you do not edit them directly.
+      </p>
+
+      <dl class="defs">
+        <dt>Crisis severity</dt>
+        <dd>
+          A track bar from 0 to 5, shown in red. Represents how acute the crisis is
+          right now. Transitions up or down as the fiction develops.
+        </dd>
+
+        <dt>EDIP legitimacy</dt>
+        <dd>
+          A centre-zero track bar from &minus;2 to &thinsp;+2, shown in blue.
+          Represents institutional credibility of the EDIP response. Positive is
+          better; negative signals erosion.
+        </dd>
+
+        <dt>Team resource grid</dt>
+        <dd>
+          One card per team, each with six fields: PC (political capital), PO
+          (political outlook), RDY (readiness), STK (stock), CRM (crisis reserve
+          materials), IC (industrial capacity). Values are clamped to valid ranges
+          silently — the AI cannot push a value out of bounds.
+        </dd>
+
+        <dt>PC warning badge</dt>
+        <dd>
+          Appears on a team card when political capital is low.
+          <strong>STRAINED</strong> (amber) at PC = 1; <strong>CRISIS</strong>
+          (red, blinking) at PC = 0. A crisis team cannot act until it recovers.
+        </dd>
+
+        <dt>Persona indicators</dt>
+        <dd>
+          Three coloured dots with names at the bottom of the panel. Indicate which
+          personas are &ldquo;active&rdquo; for the current round — a subtle signal
+          that changes across a scenario.
+        </dd>
+      </dl>
+
+      <aside class="note">
+        <span class="note-label">Silent clamping</span>
+        If the AI attempts to set a value outside its valid range — for example,
+        pushing crisis severity to 7 — the tool clamps to the maximum silently. No
+        error is shown to you. This is by design; the fiction continues, and the
+        state stays coherent.
+      </aside>
+    </section>
+
+    <!-- 08 -->
+    <section class="chapter" id="reference">
+      <h2>The reference panel</h2>
+      <p class="chapter-meta">Chapter 08 &middot; Right-hand tabs</p>
+
+      <p>
+        Three tabs. Scroll position is preserved per tab, so you can flip between
+        them without losing your place.
+      </p>
+
+      <h3>Cards</h3>
+      <p>
+        A list of all EDIP cards in the loaded scenario, grouped visually by
+        category colour (crisis state, monitoring, prioritisation soft /
+        hard, demand coordination, production acceleration, transfers). Click a
+        card to see its full detail: ID, category, name, timing, requirements, and
+        effect.
+      </p>
+
+      <h3>Actions</h3>
+      <p>
+        Two sections. <strong>National Actions</strong> — the four actions any team
+        can take, with name, summary, and political cost. <strong>Unique Team
+        Powers</strong> — one ability per team, indexed by the team letter (A, B,
+        C, D).
+      </p>
+
+      <h3>Guide</h3>
+      <p>
+        The facilitator&rsquo;s own reference: the objective, red lines and PC
+        thresholds, the voting rule (Support &ge; 3, Objections &le; 1), resource
+        tokens, the EO response mechanic, and input guidance. Skim it at the start
+        of each session.
+      </p>
+    </section>
+
+    <!-- 09 -->
+    <section class="chapter" id="errors">
+      <h2>When something goes wrong</h2>
+      <p class="chapter-meta">Chapter 09 &middot; Error states and recovery</p>
+
+      <p>
+        The tool is designed to fail without losing your session. In practice this
+        means you will occasionally see red bubbles and should know what they tell
+        you.
+      </p>
+
+      <h3>Red error bubble</h3>
+      <p>
+        The AI returned a response the tool could not parse, or the backend could
+        not reach the LLM. The bubble shows an error code in brackets — for example
+        <code>[PARSE_FAILURE]</code>, <code>[LLM_TIMEOUT]</code>,
+        <code>[LLM_UNREACHABLE]</code> — followed by a short explanation. A
+        disclosure toggle reveals the raw response (for technical review). A
+        <strong>Retry</strong> button replays your last facilitator message with a
+        fresh AI call.
+      </p>
+
+      <h4>What to do</h4>
+      <ul class="clean">
+        <li>Click <strong>Retry</strong>. This works most of the time.</li>
+        <li>If retry fails twice, rephrase your last message and send it again — sometimes the model gets stuck on an ambiguous prompt.</li>
+        <li>If all retries fail with <code>LLM_UNREACHABLE</code>, the backend or the LLM endpoint is down. Tell your IT contact; the session state is preserved, and you can resume when the service returns.</li>
+      </ul>
+
+      <aside class="note warn">
+        <span class="note-label">Session preservation</span>
+        A failed turn <em>never</em> mutates game state or history. Team resources,
+        messages prior to the error, and the round counter are all intact.
+      </aside>
+
+      <h3>Control banner</h3>
+      <p>
+        Occasionally the AI surfaces a structured request for your decision rather
+        than responding in persona — for example, flagging that a resource change
+        crosses a critical threshold. An amber banner appears above the input bar
+        with <strong>Confirm</strong> and <strong>Dismiss</strong>. Neither is
+        destructive; choose based on the table&rsquo;s intent.
+      </p>
+    </section>
+
+    <!-- 10 -->
+    <section class="chapter" id="ending">
+      <h2>Ending and exporting</h2>
+      <p class="chapter-meta">Chapter 10 &middot; Close the session properly</p>
+
+      <p>
+        When the scenario is complete — either because you have run all rounds or
+        the table has reached a conclusion — press
+        <strong>End Game &amp; Debrief</strong>. A debrief divider appears, all
+        three personas give structured closing remarks, and a
+        <strong>Download Debrief</strong> button becomes available in the action
+        toolbar.
+      </p>
+
+      <p>
+        Clicking <strong>Download Debrief</strong> saves a Markdown file named
+        <code>debrief-&lt;game-name&gt;-&lt;date&gt;.md</code> to your downloads
+        folder. It contains:
+      </p>
+
+      <ul class="clean">
+        <li>Game metadata (name, domain, scenario, date, rounds played).</li>
+        <li>Per-round sections with the state snapshot at round start and the full transcript, persona-attributed.</li>
+        <li>The debrief transcript.</li>
+        <li>A final-state team table.</li>
+        <li>An appendix with the raw JSON config used for the session.</li>
+      </ul>
+
+      <aside class="note warn">
+        <span class="note-label">Ephemeral by design</span>
+        Closing the browser tab ends the session completely. There is no history,
+        no autosave, no cloud backup — this is intentional for the sensitivity of
+        the content. <strong>Download the debrief before you leave.</strong>
+      </aside>
+    </section>
+
+    <!-- 11 -->
+    <section class="chapter" id="security">
+      <h2>Security posture</h2>
+      <p class="chapter-meta">Chapter 11 &middot; A summary for your IT contact</p>
+
+      <p>
+        The tool runs on a server inside your corporate network. Your browser calls
+        only that server; it never talks to an external LLM vendor directly. All
+        LLM credentials — API keys, endpoint URLs, extra headers — live in a
+        server-side environment file that is readable only by the service account
+        running the app.
+      </p>
+
+      <p>
+        Every in-session AI call is proxied through the internal server, which
+        injects credentials in the outbound request. Your browser network tab
+        contains no <code>Authorization</code> header, no API key, no upstream
+        URL. A Phase 8 credential audit (HAR capture) confirms this.
+      </p>
+
+      <p>
+        The tool stores nothing between sessions. There is no database, no cookie,
+        no localStorage for game content. The exported debrief Markdown file is
+        the only persistent artifact, and it lives wherever you save it.
+      </p>
+    </section>
+
+    <!-- 12 -->
+    <section class="chapter" id="shortcuts">
+      <h2>Quick reference</h2>
+      <p class="chapter-meta">Chapter 12 &middot; Shortcuts and values</p>
+
+      <h3>Keyboard</h3>
+      <table class="shortcuts">
+        <tr><td><kbd>Enter</kbd></td><td>Send the current facilitator message</td></tr>
+        <tr><td><kbd>Shift</kbd> + <kbd>Enter</kbd></td><td>New line within the message</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>No-op in v1. Does not clear the input.</td></tr>
+      </table>
+
+      <h3>Persona colours</h3>
+      <table class="shortcuts">
+        <tr><td><span class="persona-chip kent"><span class="persona-dot"></span>Kent Valentina</span></td><td>Blue &middot; #5B9BD5 &middot; framing, legitimacy, disputes</td></tr>
+        <tr><td><span class="persona-chip finch"><span class="persona-dot"></span>Alistair Finch</span></td><td>Amber &middot; #DFA02A &middot; evidence, consequence, injects</td></tr>
+        <tr><td><span class="persona-chip chen"><span class="persona-dot"></span>Michael Chen</span></td><td>Green &middot; #2BC48A &middot; operations, readiness, process</td></tr>
+      </table>
+
+      <h3>Resource bounds</h3>
+      <dl class="defs">
+        <dt>Crisis severity</dt><dd>0 to 5</dd>
+        <dt>EDIP legitimacy</dt><dd>&minus;2 to +2</dd>
+        <dt>Political capital</dt><dd>0 to 6 (STRAINED at 1, CRISIS at 0)</dd>
+        <dt>Political outlook</dt><dd>&minus;2 to +2</dd>
+        <dt>Readiness</dt><dd>0 to 5</dd>
+        <dt>Stock, CRM, IC</dt><dd>0 to 99 each</dd>
+      </dl>
+
+      <h3>Voting rule</h3>
+      <p>
+        A motion passes when <strong>Support &ge; 3</strong> and
+        <strong>Objections &le; 1</strong>. Anything else fails.
+      </p>
+    </section>
+
+    <footer>
+      <span>KV WarGame &middot; User Guide v1</span>
+      <span><a href="quick-start.html">Quick Start</a></span>
+    </footer>
+
+  </main>
+
+</div>
+
+</body>
+</html>
