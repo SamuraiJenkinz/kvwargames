@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDIP Security of Supply Wargame — Leadership Overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #17212B;
+    --ink-soft: #2B3A4A;
+    --slate: #5A6773;
+    --pewter: #8995A0;
+    --mist: #B8C2CC;
+    --fog: #D9DFE4;
+    --linen: #EFF2F5;
+    --surface: #FAFBFC;
+    --navy: #203548;
+    --accent: #3F5C78;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--linen);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body { padding: 72px 24px 96px; }
+
+  .container { max-width: 720px; margin: 0 auto; }
+
+  /* Wordmark */
+  .wordmark {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--slate);
+    margin-bottom: 96px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .wordmark .divider {
+    flex: 1;
+    height: 1px;
+    background: var(--fog);
+    margin: 0 32px;
+  }
+
+  /* Hero */
+  .hero { margin-bottom: 96px; }
+
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 32px;
+  }
+
+  h1 {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 52px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 32px;
+  }
+
+  .hero-body {
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--slate);
+    max-width: 560px;
+    font-weight: 300;
+  }
+
+  /* Sections */
+  .section { margin-bottom: 80px; }
+
+  h2 {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    margin-bottom: 24px;
+    padding-top: 40px;
+    border-top: 1px solid var(--fog);
+  }
+
+  p {
+    margin-bottom: 20px;
+    color: var(--ink-soft);
+    font-size: 16px;
+  }
+
+  p + p { margin-top: 0; }
+
+  /* Personas */
+  .personas {
+    margin-top: 40px;
+    display: grid;
+    gap: 40px;
+  }
+
+  .persona {
+    border-left: 1px solid var(--fog);
+    padding-left: 32px;
+  }
+
+  .persona-role {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .persona-name {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 10px;
+    letter-spacing: -0.005em;
+  }
+
+  .persona-voice {
+    font-size: 15px;
+    color: var(--slate);
+    font-style: italic;
+    font-family: 'EB Garamond', Georgia, serif;
+    line-height: 1.6;
+  }
+
+  /* Pull-quote */
+  .pull {
+    border-top: 1px solid var(--fog);
+    border-bottom: 1px solid var(--fog);
+    padding: 56px 0;
+    margin: 56px 0;
+    text-align: center;
+  }
+
+  .pull-text {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 26px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.45;
+    color: var(--ink);
+    max-width: 540px;
+    margin: 0 auto;
+    letter-spacing: -0.005em;
+  }
+
+  /* Facts grid */
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--fog);
+  }
+
+  .fact-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--pewter);
+    margin-bottom: 14px;
+  }
+
+  .fact-value {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 42px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .fact-unit {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--slate);
+    margin-top: 10px;
+    font-weight: 400;
+  }
+
+  /* Use cases */
+  ul.use-cases {
+    list-style: none;
+    margin-top: 32px;
+  }
+
+  ul.use-cases li {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--fog);
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 32px;
+  }
+
+  ul.use-cases li:first-child { border-top: 1px solid var(--fog); }
+
+  .case-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    padding-top: 6px;
+  }
+
+  .case-text {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 96px;
+    padding-top: 40px;
+    border-top: 1px solid var(--fog);
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--pewter);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  @media (max-width: 680px) {
+    body { padding: 48px 24px 72px; }
+    h1 { font-size: 36px; }
+    h2 { font-size: 26px; }
+    .hero-body { font-size: 17px; }
+    .facts { grid-template-columns: 1fr; gap: 32px; }
+    ul.use-cases li { grid-template-columns: 1fr; gap: 8px; }
+    .pull-text { font-size: 22px; }
+    .wordmark { margin-bottom: 64px; font-size: 9px; }
+    .wordmark .divider { margin: 0 16px; }
+    footer { flex-direction: column; gap: 16px; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="wordmark">
+  <span>EDIP Council</span>
+  <div class="divider"></div>
+  <span>Supply Wargame · v1.0</span>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">For Executive Review</div>
+  <h1>A facilitation console for policy wargames that actually remembers the conversation.</h1>
+  <p class="hero-body">Three AI advisors respond in character, live game state updates as decisions are made, and every session ends with a downloadable record. Built for the EDIP Council, validated against the production corporate language model under a full five-round scenario.</p>
+</section>
+
+<section class="section">
+  <h2>The premise</h2>
+  <p>Tabletop exercises are the clearest way to pressure-test policy. They are also the hardest to run at pace. A single skilled facilitator has to remember every inject, every card played, every resource the four teams have spent, and deliver consistent voices for each advisory role across a two-hour session.</p>
+  <p>The Supply Wargame Console does the memory work. The facilitator types what happened; three AI personas respond in character; the crisis tracker, legitimacy score, and per-team resources update in the margin. At the end of the session, a single markdown file captures everything that was said and every state change it caused.</p>
+</section>
+
+<section class="section">
+  <h2>Three personas, one council</h2>
+  <p>Each advisor holds a distinctive register. They are addressed by name. They do not blur into each other.</p>
+  <div class="personas">
+    <div class="persona">
+      <div class="persona-role">Institutional</div>
+      <div class="persona-name">Kent Voss</div>
+      <div class="persona-voice">Frames the round. Weighs procedural legitimacy against speed. Invites dissent before calling a position.</div>
+    </div>
+    <div class="persona">
+      <div class="persona-role">Evidential</div>
+      <div class="persona-name">Anna Finch</div>
+      <div class="persona-voice">Delivers the inject. Tracks crisis severity. Names what the evidence actually supports.</div>
+    </div>
+    <div class="persona">
+      <div class="persona-role">Operational</div>
+      <div class="persona-name">Mei Chen</div>
+      <div class="persona-voice">Reads readiness, industrial capacity, and stockpile posture. Speaks when frontline resources are at stake.</div>
+    </div>
+  </div>
+</section>
+
+<div class="pull">
+  <p class="pull-text">The facilitator decides. The console remembers. The record writes itself.</p>
+</div>
+
+<section class="section">
+  <h2>What leadership receives</h2>
+  <p>Every session produces a single downloadable markdown artifact containing session metadata, per-round transcripts with starting-state tables, a debrief section with each advisor's closing reflection, and the final state of play. No screen captures, no manual transcription.</p>
+  <p>The facilitator remains in control at every step. When an advisor suggests advancing the round or calling the debrief, the console surfaces an explicit confirmation. Nothing is auto-applied. The state tracker shows what changed; the chat feed shows why; the debrief export makes both permanent.</p>
+</section>
+
+<section class="section">
+  <h2>Trust architecture</h2>
+  <p>Corporate language-model credentials never reach the facilitator's browser. Every request passes through an internal proxy that injects the key server-side; the client sees only application payloads. This is verified by network-trace audit on each release.</p>
+  <p>Malformed responses are caught before they touch game state. A four-layer defensive parser rejects anything that does not conform to the advisor response schema, rendering a clear retry affordance to the facilitator. The session continues without restart, and the incident is captured in the debrief record.</p>
+</section>
+
+<section class="section">
+  <h2>Where it fits</h2>
+  <ul class="use-cases">
+    <li>
+      <div class="case-label">Policy Rehearsal</div>
+      <div class="case-text">Stress-test a draft instrument or procedure against a simulated crisis before committing to the real thing.</div>
+    </li>
+    <li>
+      <div class="case-label">Leadership Induction</div>
+      <div class="case-text">Walk new principals through the pressure points of the instrument portfolio in a single session with a written record.</div>
+    </li>
+    <li>
+      <div class="case-label">Cross-agency Exercise</div>
+      <div class="case-text">Coordinate four member-state teams through a shared scenario with consistent advisory voices and transparent state.</div>
+    </li>
+    <li>
+      <div class="case-label">After-action Review</div>
+      <div class="case-text">Revisit past decisions using the debrief record — replay the reasoning, not just the outcome.</div>
+    </li>
+  </ul>
+</section>
+
+<section class="section">
+  <h2>Readiness</h2>
+  <p>Delivered across eight phases and validated under a full five-round Scenario 2 live run against the production language model on 15 April 2026. Persona voices held across all five rounds. Credential isolation was confirmed on every browser-originated request. A malformed-response failure was caught and recovered organically during the run, providing stronger evidence than a synthetic test could have produced. The release passes 515 frontend tests and 12 backend tests, with evidence captured and stored alongside the code.</p>
+  <div class="facts">
+    <div>
+      <div class="fact-label">Phases Delivered</div>
+      <div class="fact-value">8</div>
+      <div class="fact-unit">all verified</div>
+    </div>
+    <div>
+      <div class="fact-label">Live Rounds Run</div>
+      <div class="fact-value">5</div>
+      <div class="fact-unit">Scenario 2, full depth</div>
+    </div>
+    <div>
+      <div class="fact-label">Credentials Observed</div>
+      <div class="fact-value">0</div>
+      <div class="fact-unit">on browser requests</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>EDIP Security of Supply Wargame</span>
+  <span>v1.0 · 15 April 2026</span>
+</footer>
+
+</div>
+</body>
+</html>
