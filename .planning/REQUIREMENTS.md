@@ -62,34 +62,32 @@
 
 ## Traceability
 
-Filled during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HEALTH-01 | — | Pending |
-| HEALTH-02 | — | Pending |
-| HEALTH-03 | — | Pending |
-| HEALTH-04 | — | Pending |
-| HEALTH-05 | — | Pending |
-| HEALTH-06 | — | Pending |
-| HEALTH-07 | — | Pending |
-| HEALTH-08 | — | Pending |
-| HEALTH-09 | — | Pending |
-| HEALTH-10 | — | Pending |
-| HEALTH-11 | — | Pending |
-| HEALTH-12 | — | Pending |
-| ROUTE-01 | — | Pending |
-| ROUTE-02 | — | Pending |
-| DEBRIEF-01 | — | Pending |
-| PROMPT-01 | — | Pending |
-| PROMPT-02 | — | Pending |
-| PROMPT-03 | — | Pending |
+| HEALTH-01 | Phase 9 | Pending |
+| HEALTH-02 | Phase 9 | Pending |
+| HEALTH-03 | Phase 9 | Pending |
+| HEALTH-04 | Phase 9 | Pending |
+| HEALTH-05 | Phase 9 | Pending |
+| HEALTH-06 | Phase 9 | Pending |
+| HEALTH-07 | Phase 10 | Pending |
+| HEALTH-08 | Phase 10 | Pending |
+| HEALTH-09 | Phase 10 | Pending |
+| HEALTH-10 | Phase 10 | Pending |
+| HEALTH-11 | Phase 10 | Pending |
+| HEALTH-12 | Phase 10 | Pending |
+| ROUTE-01 | Phase 11 | Pending |
+| ROUTE-02 | Phase 11 | Pending |
+| DEBRIEF-01 | Phase 11 | Pending |
+| PROMPT-01 | Phase 12 | Pending |
+| PROMPT-02 | Phase 12 | Pending |
+| PROMPT-03 | Phase 12 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 18 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 18 ⚠️
+- Mapped to phases: 18 (Phase 9: 6, Phase 10: 6, Phase 11: 3, Phase 12: 3)
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-15*
-*Last updated: 2026-04-15 after v1.1 definition*
+*Last updated: 2026-04-15 after v1.1 roadmap creation*
