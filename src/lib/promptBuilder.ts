@@ -219,6 +219,8 @@ function buildBlock9(): string {
     '}',
     '',
     'NEVER write the literal word `undefined` anywhere in your JSON — it is not valid JSON and will be rejected by the parser. When a value does not apply, use `null` OR omit the key.',
+    '',
+    'Every persona response MUST include all four fields (`speaker`, `message`, `stateUpdate`, `flag`) explicitly. Use `null` for `stateUpdate` when nothing changed and `null` for `flag` when there is no facilitator note. Do not omit these keys — they are required to be present on every persona object.',
     '```',
     '',
     'stateUpdate values are the NEW ABSOLUTE value after the change, NOT a numeric difference. Only include fields that actually changed this turn — omit unchanged fields entirely (STATE-03). Example: if team.pc is currently 5 and they spend 1, send pc: 4 (the new value), NOT pc: -1.',

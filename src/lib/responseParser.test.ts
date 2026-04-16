@@ -184,6 +184,47 @@ describe('parsePersonaResponse — Layer 1 cleanup', () => {
       expect(result.value.responses[0].message).toContain('"undefined"')
     }
   })
+
+  // Regression: LLMs frequently omit optional fields (`flag`, `stateUpdate`)
+  // rather than writing them explicitly as null. The validator must treat
+  // absence as equivalent to null so a well-formed response with a correct
+  // stateUpdate is not discarded because the facilitator-note `flag` is
+  // missing.
+  it('accepts a persona response missing the flag field entirely', () => {
+    const raw = JSON.stringify({
+      responses: [
+        {
+          speaker: 'chen',
+          message: 'Team B PC dropped to 3.',
+          stateUpdate: { teamUpdates: [{ id: 'teamB', pc: 3 }] },
+          // no flag key
+        },
+      ],
+      control: null,
+    })
+    const result = parsePersonaResponse(raw)
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.value.responses[0].stateUpdate).toEqual({
+        teamUpdates: [{ id: 'teamB', pc: 3 }],
+      })
+    }
+  })
+
+  it('accepts a persona response missing the stateUpdate field entirely', () => {
+    const raw = JSON.stringify({
+      responses: [
+        {
+          speaker: 'kent',
+          message: 'A framing comment with no state change.',
+          flag: null,
+          // no stateUpdate key
+        },
+      ],
+    })
+    const result = parsePersonaResponse(raw)
+    expect(result.ok).toBe(true)
+  })
 })
 
 // ─── Layer 2: JSON.parse failures ─────────────────────────────────────────────
@@ -290,17 +331,13 @@ describe('parsePersonaResponse — Layer 3 (validation failures)', () => {
     }
   })
 
-  it('rejects missing stateUpdate (undefined, not null)', () => {
-    // stateUpdate must be null or an object, NOT undefined
-    const raw = JSON.stringify({
-      responses: [{ speaker: 'kent', message: 'hi', flag: null }],
-    })
-    const result = parsePersonaResponse(raw)
-    expect(result.ok).toBe(false)
-    if (!result.ok) {
-      expect(result.errorKind).toBe('VALIDATION_FAILURE')
-    }
-  })
+  // NOTE: Missing stateUpdate and missing flag are now ACCEPTED as
+  // equivalent to null (see Layer 1 cleanup tests above). The prior strict
+  // contract rejected them, but LLMs commonly omit optional keys and a
+  // correct stateUpdate was being discarded solely because the flag key
+  // was missing. The lenient behavior is covered by the "accepts a persona
+  // response missing the flag field entirely" and "accepts a persona
+  // response missing the stateUpdate field entirely" tests above.
 
   it('accepts null stateUpdate', () => {
     const raw = JSON.stringify({

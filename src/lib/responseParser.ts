@@ -51,15 +51,19 @@ function isPersonaResponse(x: unknown): x is PersonaResponse {
   // message must be a string
   if (typeof r.message !== 'string') return false
 
-  // stateUpdate must be either null or a non-null object (not undefined, not a primitive)
-  if (r.stateUpdate !== null) {
-    if (typeof r.stateUpdate !== 'object' || r.stateUpdate === null) {
-      return false
-    }
+  // stateUpdate: absent (undefined) or null is treated as "no update". Any
+  // other value must be a non-null object. LLMs often omit the key instead
+  // of writing it explicitly as null, so we accept both.
+  if (r.stateUpdate !== undefined && r.stateUpdate !== null) {
+    if (typeof r.stateUpdate !== 'object') return false
   }
 
-  // flag must be either null or a string
-  if (r.flag !== null && typeof r.flag !== 'string') return false
+  // flag: absent (undefined), null, or a string are all acceptable. Same
+  // reasoning as stateUpdate — LLMs commonly omit optional keys when they
+  // would be null. Reject only if present and not a string.
+  if (r.flag !== undefined && r.flag !== null && typeof r.flag !== 'string') {
+    return false
+  }
 
   return true
 }
