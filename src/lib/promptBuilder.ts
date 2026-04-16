@@ -219,7 +219,7 @@ function buildBlock9(): string {
     '}',
     '```',
     '',
-    'stateUpdate is a DELTA — only include fields that actually changed this turn. Omit unchanged fields entirely (STATE-03).',
+    'stateUpdate values are the NEW ABSOLUTE value after the change, NOT a numeric difference. Only include fields that actually changed this turn — omit unchanged fields entirely (STATE-03). Example: if team.pc is currently 5 and they spend 1, send pc: 4 (the new value), NOT pc: -1.',
     '',
     'Crisis State Transition Rules (Finch MUST emit these in stateUpdate):',
     '- When crisisSeverity reaches 2 AND crisisState is "No Crisis":',

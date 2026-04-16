@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDIP Wargame &mdash; Cards &amp; National Actions Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #8B7355;
+    --primary-dark: #6D5A42;
+    --secondary: #C4B5A0;
+    --tertiary: #D4C5B0;
+    --bg: #F5F0EB;
+    --surface: #FFFFFF;
+    --border: #E8E0D8;
+    --border-light: #EDE6DD;
+    --text: #2C2420;
+    --text-secondary: #6B5E52;
+    --text-muted: #B8A88A;
+    --text-label: #8A7A6B;
+    --shadow-soft: 0 1px 2px rgba(139, 115, 85, 0.06);
+    --shadow-warm: 0 4px 12px rgba(139, 115, 85, 0.08);
+    --shadow-lifted: 0 8px 24px rgba(139, 115, 85, 0.10);
+    --sage: #8A9A7D;
+    --terracotta: #B07D62;
+    --terracotta-light: #C4956E;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ── */
+  .page-wrapper {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 64px 32px 96px;
+  }
+
+  /* ── Typography ── */
+  h1, h2, h3, h4 {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    color: var(--text);
+  }
+
+  h1 {
+    font-size: 2.75rem;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-size: 1.85rem;
+    line-height: 1.25;
+    margin-top: 64px;
+    margin-bottom: 24px;
+  }
+
+  h3 {
+    font-size: 1.35rem;
+    line-height: 1.3;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    max-width: 680px;
+  }
+
+  .subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .tagline {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-secondary);
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  .label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-label);
+  }
+
+  .label-primary {
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--primary);
+  }
+
+  /* ── Divider ── */
+  .divider {
+    display: flex;
+    justify-content: center;
+    margin: 48px 0;
+  }
+  .divider span {
+    width: 60px;
+    height: 1px;
+    background: var(--tertiary);
+  }
+
+  .divider-wide {
+    margin: 64px 0;
+  }
+  .divider-wide span {
+    width: 100px;
+  }
+
+  /* ── Card Surface ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 32px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow 0.25s ease;
+  }
+  .card:hover {
+    box-shadow: var(--shadow-warm);
+  }
+
+  .card-compact {
+    padding: 24px 28px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .card-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--primary);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .card-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .card-body p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+  }
+
+  .card-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .meta-value {
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  /* ── Category Badges ── */
+  .category-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .cat-crisis       { background: var(--terracotta); }
+  .cat-monitoring   { background: var(--primary); }
+  .cat-soft         { background: var(--sage); }
+  .cat-hard         { background: #9A6B55; }
+  .cat-coordination { background: var(--secondary); }
+  .cat-production   { background: var(--tertiary); }
+  .cat-transfer     { background: var(--text-label); }
+  .cat-national     { background: var(--text-muted); }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+  }
+
+  thead tr {
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 0.6rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-label);
+  }
+
+  td {
+    padding: 14px 16px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  td:first-child {
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+  }
+
+  /* ── Scenario Block ── */
+  .scenario {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 32px 0;
+    box-shadow: var(--shadow-warm);
+  }
+
+  .scenario-header {
+    background: var(--bg);
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .scenario-round {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+
+  .scenario-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .scenario-body {
+    padding: 0;
+  }
+
+  .scenario-step {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    gap: 16px;
+  }
+
+  .scenario-step:last-child {
+    border-bottom: none;
+  }
+
+  .step-num {
+    font-family: 'EB Garamond', serif;
+    font-size: 1.1rem;
+    color: var(--tertiary);
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+    padding-top: 1px;
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-actor {
+    font-size: 0.6rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+
+  .step-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .step-text em {
+    font-style: italic;
+    color: var(--text);
+  }
+
+  .step-effect {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--bg);
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* ── Comparison Grid ── */
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 32px 0;
+  }
+
+  .comparison .card {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 680px) {
+    .comparison { grid-template-columns: 1fr; }
+    h1 { font-size: 2rem; }
+    .page-wrapper { padding: 40px 20px 64px; }
+    .scenario-step { flex-direction: column; gap: 4px; }
+    .step-num { width: auto; text-align: left; }
+  }
+
+  /* ── Collapsible ── */
+  details {
+    margin: 12px 0;
+  }
+
+  details summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-label);
+    transition: color 0.25s ease;
+  }
+
+  details summary:hover {
+    color: var(--text);
+  }
+
+  details summary::after {
+    content: "+";
+    font-family: 'EB Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: var(--tertiary);
+    transition: transform 0.25s ease;
+  }
+
+  details[open] summary::after {
+    content: "\2212";
+  }
+
+  details summary::-webkit-details-marker { display: none; }
+
+  details .detail-content {
+    padding: 20px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* ── Inline Code ── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8em;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--primary-dark);
+  }
+
+  /* ── Resource Delta ── */
+  .delta-pos { color: var(--sage); }
+  .delta-neg { color: var(--terracotta); }
+
+  /* ── Section Numbers ── */
+  .section-num {
+    font-family: 'EB Garamond', serif;
+    font-size: 3rem;
+    font-weight: 300;
+    color: var(--border);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  /* ── Footer ── */
+  footer {
+    margin-top: 96px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+
+  footer p {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    max-width: none;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- ════ Header ════ -->
+  <div class="subtitle">EDIP Security of Supply Wargame</div>
+  <h1>Cards &amp; National Actions.</h1>
+  <p class="tagline">
+    A facilitator&rsquo;s reference to the eleven EDIP policy instruments
+    and four sovereign actions that shape every round of play.
+  </p>
+
+  <div class="divider divider-wide"><span></span></div>
+
+  <!-- ════ Introduction ════ -->
+  <p>
+    The EDIP Wargame models EU crisis response through two distinct mechanisms.
+    <strong>EDIP Cards</strong> are collective policy instruments &mdash; proposed at the EU level
+    and subject to a vote among all four member-state teams. <strong>National Actions</strong>
+    are sovereign decisions taken unilaterally by a single team, with domestic consequences
+    that ripple outward through trade, diplomacy, and public opinion.
+  </p>
+  <p>
+    Understanding when to deploy each &mdash; and how they interact &mdash;
+    is the core strategic tension of every session.
+  </p>
+
+  <div class="divider"><span></span></div>
+
+  <!-- ════ Comparison ════ -->
+  <div class="comparison">
+    <div class="card">
+      <div class="label-primary" style="margin-bottom: 12px;">EDIP Cards</div>
+      <h4>Collective Measures</h4>
+      <div class="card-body">
+        <p>Proposed at EU level. Require a vote: Support from at least three teams, with no more than one objection. Affect multiple teams. Unlock progressively stronger tools as the crisis state escalates.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label-primary" style="margin-bottom: 12px;">National Actions</div>
+      <h4>Sovereign Decisions</h4>
+      <div class="card-body">
+        <p>Declared unilaterally by a single team. No vote required. Cost is borne by the declaring team alone &mdash; typically in Political Capital. May trigger diplomatic consequences or legitimacy shifts.</p>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>EDIP Cards</th>
+        <th>National Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Approval</td>
+        <td>Vote: Support &ge; 3, Objections &le; 1</td>
+        <td>Declared unilaterally</td>
+      </tr>
+      <tr>
+        <td>Scope</td>
+        <td>Multi-team, EU-level</td>
+        <td>Single team, domestic</td>
+      </tr>
+      <tr>
+        <td>Precondition</td>
+        <td>Crisis severity thresholds</td>
+        <td>Political Capital availability</td>
+      </tr>
+      <tr>
+        <td>Enforcement</td>
+        <td>Economic Operator response mechanic</td>
+        <td>Facilitator narrates consequences</td>
+      </tr>
+      <tr>
+        <td>Legitimacy Effect</td>
+        <td>Affects EDIP Legitimacy directly</td>
+        <td>May affect Legitimacy indirectly</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ════ Section 1: National Actions ════ -->
+  <div class="divider divider-wide"><span></span></div>
+
+  <div class="section-num">I</div>
+  <h2 style="margin-top: 0;">National Actions</h2>
+  <p>
+    Each team may declare one national action per round. These represent
+    domestic policy choices &mdash; stockpile management, emergency measures,
+    bilateral diplomacy, and public narrative framing. They cost Political Capital
+    and shape the political landscape within which EDIP cards operate.
+  </p>
+
+  <!-- NA-1 -->
+  <div class="card" style="margin-top: 32px;">
+    <div class="card-header">
+      <span class="card-id">NA-1</span>
+      <span class="card-title">Adjust National Stockpiles</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Move stock or CRM tokens into the &ldquo;Committed this round&rdquo; area.
+        Only committed tokens can raise Readiness or be offered in transfers and EDIP measures.
+        Mandatory EDIP measures, however, can still target uncommitted stock.
+      </p>
+      <p>
+        Over-committing exposes stock to requests from other teams.
+        Under-committing limits readiness gains and may undermine a team&rsquo;s credibility
+        at the negotiating table.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Direct Cost</span>
+        <span class="meta-value">None</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Strategic Risk</span>
+        <span class="meta-value">Exposure vs. credibility trade-off</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NA-2 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">NA-2</span>
+      <span class="card-title">National Emergency Measure</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Declare national control on one stock type for this round. The team cannot
+        voluntarily transfer or commit that stock &mdash; except when compelled by
+        mandatory EDIP tools. In exchange, Readiness and Resilience will not drop
+        purely due to shortages in that stock type.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Cost</span>
+        <span class="meta-value"><span class="delta-neg">PC &minus;1</span></span>
+      </div>
+      <div class="meta-item">
+        <span class="label">If Objected</span>
+        <span class="meta-value"><span class="delta-neg">EDIP Legitimacy &minus;1</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NA-3 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">NA-3</span>
+      <span class="card-title">Bilateral / Minilateral Deal</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Negotiate a deal with one or more other teams &mdash; all parties must consent.
+        Tradeable assets include stock and CRM tokens, IC tokens, up to &plusmn;1 Political Capital
+        per party, and explicit future EDIP support commitments. Token transfers follow
+        the agreed timing.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Cost</span>
+        <span class="meta-value">Uses one action slot + traded assets</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Hidden Penalties</span>
+        <span class="meta-value">None</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NA-4 -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">NA-4</span>
+      <span class="card-title">Public Narrative Management</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Two options with very different political trajectories:
+      </p>
+      <p>
+        <strong>Option A &mdash; &ldquo;Sell EDIP at home.&rdquo;</strong>&ensp;
+        <span class="delta-pos">PO +1</span>,
+        <span class="delta-pos">EDIP Legitimacy +1</span> if the team backed a strong EDIP card
+        (CS-01, CS-02, SP-02, PA-01, PA-02, or TR-01) this round.
+        Cost: <span class="delta-neg">PC &minus;1</span>.
+      </p>
+      <p>
+        <strong>Option B &mdash; &ldquo;Blame Brussels.&rdquo;</strong>&ensp;
+        <span class="delta-pos">PO +1</span>,
+        <span class="delta-neg">EDIP Legitimacy &minus;1</span>.
+        No PC cost, but the team cannot request a strong EDIP card next round.
+      </p>
+    </div>
+  </div>
+
+  <!-- ════ Section 2: EDIP Cards ════ -->
+  <div class="divider divider-wide"><span></span></div>
+
+  <div class="section-num">II</div>
+  <h2 style="margin-top: 0;">The Eleven EDIP Cards</h2>
+  <p>
+    Organised into seven categories, these cards represent the escalating
+    toolkit of EU crisis response &mdash; from monitoring and information-gathering
+    through voluntary and mandatory prioritisation, to production acceleration
+    and transfer controls. Stronger cards require higher crisis-state preconditions.
+  </p>
+
+  <!-- Crisis State -->
+  <h3><span class="category-dot cat-crisis"></span>Crisis State</h3>
+  <p>These two cards control the game&rsquo;s escalation ladder. Each unlocks progressively stronger EDIP instruments.</p>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">CS-01</span>
+      <span class="card-title">Activate Supply Crisis</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Moves the EDIP crisis state to &ldquo;Supply Crisis.&rdquo; Unlocks information requests,
+        voluntary and mandatory prioritisation, and coordinated procurement.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Requires</span>
+        <span class="meta-value">Crisis Severity &ge; 2</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Timing</span>
+        <span class="meta-value">This round</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Effect</span>
+        <span class="meta-value"><span class="delta-neg">All teams PC &minus;1</span> &ensp; EDIP Legitimacy &plusmn;1</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">CS-02</span>
+      <span class="card-title">Activate Security-Related Supply Crisis</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Escalates to &ldquo;Security-Related Supply Crisis.&rdquo; Unlocks the strongest EDIP tools:
+        intra-EU fast-track transfers, permit acceleration, mutual recognition, and
+        working-time flexibility. Crisis severity cannot fall below 2 while active.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Requires</span>
+        <span class="meta-value">Crisis Severity &ge; 3</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Timing</span>
+        <span class="meta-value">This round</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Effect</span>
+        <span class="meta-value"><span class="delta-neg">All teams PC &minus;1</span> &ensp; EDIP Legitimacy &plusmn;1</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monitoring -->
+  <h3><span class="category-dot cat-monitoring"></span>Monitoring</h3>
+  <p>Intelligence-gathering instruments. Lower threshold, lower risk, but they set the stage for harder measures.</p>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">MP-01</span>
+      <span class="card-title">Targeted Information Requests</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Reveals hidden stock and capacity information for one or two targeted teams.
+        Draws an Economic Operator Response Card to determine the quality of intelligence received.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Requires</span>
+        <span class="meta-value">Crisis Severity &ge; 2</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Targeted Teams</span>
+        <span class="meta-value"><span class="delta-neg">PO &minus;1</span>, Sovereignty +1</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">MP-02</span>
+      <span class="card-title">General Information Mapping Initiative</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Presents a dependency map of the entire supply chain.
+        All teams receive one Insight token. Next round: maximum two EDIP measures on the agenda.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Requires</span>
+        <span class="meta-value">Crisis Severity &ge; 2</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Effect</span>
+        <span class="meta-value"><span class="delta-pos">EDIP Legitimacy +1</span> &ensp; All teams +1 Insight</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prioritisation (Soft) -->
+  <h3><span class="category-dot cat-soft"></span>Prioritisation &mdash; Voluntary</h3>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">SP-01</span>
+      <span class="card-title">Voluntary Prioritisation Request</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Provider voluntarily shifts one IC token to a beneficiary team.
+        Beneficiary gains Defence Stock or Resilience. Provider chooses their cost:
+        <span class="delta-neg">PC &minus;1</span> or <span class="delta-neg">PO &minus;1</span>.
+      </p>
+      <p>
+        If the provider refuses, the refusal becomes narrative justification for
+        the stronger SP-02 Mandatory Prioritisation Order.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Requires</span>
+        <span class="meta-value">Supply Crisis active</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Timing</span>
+        <span class="meta-value">This round</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prioritisation (Hard) -->
+  <h3><span class="category-dot cat-hard"></span>Prioritisation &mdash; Mandatory</h3>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">SP-02</span>
+      <span class="card-title">Mandatory Prioritisation Order</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Provider <em>must</em> shift two IC tokens to the beneficiary.
+        The provider may invoke security interests <strong>once per scenario</strong> to halve the transfer to one IC.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Requires</span>
+        <span class="meta-value">Supply or Security crisis; voluntary measures insufficient</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Provider Cost</span>
+        <span class="meta-value"><span class="delta-neg">PC &minus;2, PO &minus;1</span></span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Legitimacy</span>
+        <span class="meta-value"><span class="delta-neg">&minus;1</span> if strong objections; <span class="delta-pos">+1</span> from beneficiary if prevents collapse</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demand Coordination -->
+  <h3><span class="category-dot cat-coordination"></span>Demand Coordination</h3>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">CP-01</span>
+      <span class="card-title">Coordinated Procurement / Add-On Orders</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Two or more teams pool demand for similar products. The industrial team benefits
+        from predictable contracts with a possible +1 efficiency bonus (3 IC &rarr; 4 Defence Stock).
+        Participants accept EU-level delivery sequencing influence.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Requires</span>
+        <span class="meta-value">Supply or Security crisis; 2+ teams seeking similar products</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Timing</span>
+        <span class="meta-value">Takes effect next round</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Production Acceleration -->
+  <h3><span class="category-dot cat-production"></span>Production Acceleration</h3>
+  <p>Three instruments for increasing industrial output. Each carries sovereignty and opinion costs.</p>
+
+  <div class="card card-compact">
+    <div class="card-header">
+      <span class="card-id">PA-01</span>
+      <span class="card-title">Permit Fast-Track &amp; Continuity of Production</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Selected team gains <span class="delta-pos">+1 IC per round</span> from next round onward.
+        <span class="delta-neg">PO &minus;1</span>, Sovereignty +1.
+        Repeated use may trigger a &ldquo;legal challenge&rdquo; narrative event.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Requires</span>
+        <span class="meta-value">Security crisis or high-severity Supply crisis</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Timing</span>
+        <span class="meta-value">Ongoing from next round</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-compact">
+    <div class="card-header">
+      <span class="card-id">PA-02</span>
+      <span class="card-title">Mutual Recognition &amp; Fast-Track Certification</span>
+    </div>
+    <div class="card-body">
+      <p>
+        One product line&rsquo;s time-to-field reduced by one round.
+        <span class="delta-pos">EDIP Legitimacy +1</span> if pragmatic and well-targeted.
+        Overuse risk: facilitator introduces a &ldquo;quality concern&rdquo; narrative.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Requires</span>
+        <span class="meta-value">Security-Related Supply Crisis active</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Timing</span>
+        <span class="meta-value">This round</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-compact">
+    <div class="card-header">
+      <span class="card-id">PA-03</span>
+      <span class="card-title">Working-Time Flexibility &amp; Innovation Support</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Target team gains <span class="delta-pos">+1 temporary IC</span> this round only.
+        <span class="delta-neg">PO &minus;1</span>. Facilitator discretion on inclusion.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Requires</span>
+        <span class="meta-value">Security-Related Supply Crisis active</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Timing</span>
+        <span class="meta-value">This round (optional)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transfers -->
+  <h3><span class="category-dot cat-transfer"></span>Transfers</h3>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-id">TR-01</span>
+      <span class="card-title">Intra-EU Transfer Fast-Track &amp; Export Ban Constraint</span>
+    </div>
+    <div class="card-body">
+      <p>
+        Intra-EU transfers are fast-tracked to same-round delivery. Members cannot impose
+        effective export bans on security products without incurring significant political costs.
+        All teams Sovereignty +1.
+      </p>
+      <p>
+        Any attempt to reimpose a ban costs <span class="delta-neg">PC &minus;2</span>
+        and triggers an EDIP Legitimacy penalty.
+      </p>
+    </div>
+    <div class="card-meta">
+      <div class="meta-item">
+        <span class="label">Requires</span>
+        <span class="meta-value">Security crisis; transfer bottlenecks or export ban threats</span>
+      </div>
+      <div class="meta-item">
+        <span class="label">Timing</span>
+        <span class="meta-value">This round (ongoing effect)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ Section 3: Sample Gameplay ════ -->
+  <div class="divider divider-wide"><span></span></div>
+
+  <div class="section-num">III</div>
+  <h2 style="margin-top: 0;">Sample Gameplay</h2>
+  <p>
+    Two scenarios illustrating how cards and national actions unfold
+    in practice. Each shows the facilitator&rsquo;s input, persona responses,
+    and resulting state changes.
+  </p>
+
+  <!-- Scenario A -->
+  <div class="scenario">
+    <div class="scenario-header">
+      <div class="scenario-round">Scenario A &mdash; Round 2</div>
+      <div class="scenario-title">Activating Supply Crisis After an Intelligence Report</div>
+    </div>
+    <div class="scenario-body">
+      <div class="scenario-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-actor">Facilitator</div>
+          <div class="step-text">
+            Types into the chat input bar: <em>&ldquo;Team A proposes CS-01 Activate Supply Crisis
+            following the Round 1 intelligence report showing critical semiconductor shortages
+            across three member states. Teams vote.&rdquo;</em>
+          </div>
+        </div>
+      </div>
+      <div class="scenario-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-actor">Kent Valentina &mdash; Institutional Analyst</div>
+          <div class="step-text">
+            Responds in character, framing the political dynamics of the vote. Notes which teams
+            are likely to support, which may object, and the precedent this sets for the session.
+          </div>
+          <div class="step-effect">
+            stateUpdate: { crisisState: "Supply Crisis", teamUpdates: [<br>
+            &ensp;&ensp;{ id: "teamA", pc: 4 }, { id: "teamB", pc: 3 },<br>
+            &ensp;&ensp;{ id: "teamC", pc: 2 }, { id: "teamD", pc: 4 }<br>
+            ] }
+          </div>
+        </div>
+      </div>
+      <div class="scenario-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-actor">State Dashboard</div>
+          <div class="step-text">
+            Crisis State badge transitions from &ldquo;No Crisis&rdquo; to &ldquo;Supply Crisis.&rdquo;
+            All team PC values decrease by 1. Delta ghosts pulse on the affected cells.
+          </div>
+        </div>
+      </div>
+      <div class="scenario-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-actor">Facilitator &mdash; Follow-Up</div>
+          <div class="step-text">
+            Now that Supply Crisis is active, the facilitator can propose monitoring cards
+            (MP-01, MP-02) and voluntary prioritisation (SP-01). The escalation ladder is open.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scenario B -->
+  <div class="scenario">
+    <div class="scenario-header">
+      <div class="scenario-round">Scenario B &mdash; Round 3</div>
+      <div class="scenario-title">National Emergency Measure Followed by Mandatory Prioritisation</div>
+    </div>
+    <div class="scenario-body">
+      <div class="scenario-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-actor">Facilitator</div>
+          <div class="step-text">
+            <em>&ldquo;Team C declares NA-2 National Emergency Measure on rare earth reserves,
+            citing domestic security concerns.&rdquo;</em>
+          </div>
+        </div>
+      </div>
+      <div class="scenario-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-actor">Dr. Alistair Finch &mdash; Strategic Adversary</div>
+          <div class="step-text">
+            Analyses the signalling implications. Notes that Team C is protecting its rare-earth
+            reserves while other teams face shortages &mdash; this will provoke a response.
+          </div>
+          <div class="step-effect">
+            stateUpdate: { edipLegitimacy: -1, teamUpdates: [<br>
+            &ensp;&ensp;{ id: "teamC", pc: 2 }<br>
+            ] }
+          </div>
+        </div>
+      </div>
+      <div class="scenario-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-actor">Facilitator</div>
+          <div class="step-text">
+            <em>&ldquo;In response, Team A proposes SP-02 Mandatory Prioritisation Order targeting
+            Team C&rsquo;s rare earth reserves. Teams vote &mdash; A, B, and D support; C objects.
+            Motion passes (3 support, 1 objection).&rdquo;</em>
+          </div>
+        </div>
+      </div>
+      <div class="scenario-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-actor">Dr. Michael Chen &mdash; Technical Adviser</div>
+          <div class="step-text">
+            Evaluates the technical feasibility of the mandatory transfer. Two IC tokens
+            must move from Team C to Team A. Team C may invoke its one-time security-interest
+            override to halve the transfer.
+          </div>
+          <div class="step-effect">
+            stateUpdate: { teamUpdates: [<br>
+            &ensp;&ensp;{ id: "teamC", ic: 3, pc: 1, po: -1 },<br>
+            &ensp;&ensp;{ id: "teamA", ic: 5 }<br>
+            ] }
+          </div>
+        </div>
+      </div>
+      <div class="scenario-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-actor">State Dashboard</div>
+          <div class="step-text">
+            Team C&rsquo;s IC drops by 2 and PC drops by 2. Team A&rsquo;s IC rises by 2.
+            EDIP Legitimacy adjusts based on the political dynamics of the forced transfer.
+            The tension between sovereignty and collective security is now the central narrative thread.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ Section 4: Quick Reference ════ -->
+  <div class="divider divider-wide"><span></span></div>
+
+  <div class="section-num">IV</div>
+  <h2 style="margin-top: 0;">Quick Reference</h2>
+
+  <details>
+    <summary>Crisis Escalation Ladder</summary>
+    <div class="detail-content">
+      <table>
+        <thead>
+          <tr>
+            <th>State</th>
+            <th>Severity Threshold</th>
+            <th>Instruments Unlocked</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>No Crisis</td>
+            <td>&mdash;</td>
+            <td>National Actions only</td>
+          </tr>
+          <tr>
+            <td>Supply Crisis</td>
+            <td>&ge; 2</td>
+            <td>Monitoring (MP-01, MP-02), Voluntary Prioritisation (SP-01), Mandatory Prioritisation (SP-02), Coordinated Procurement (CP-01)</td>
+          </tr>
+          <tr>
+            <td>Security-Related Supply Crisis</td>
+            <td>&ge; 3</td>
+            <td>All above + Production Acceleration (PA-01, PA-02, PA-03), Transfer Fast-Track (TR-01)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>Resource Tracks</summary>
+    <div class="detail-content">
+      <table>
+        <thead>
+          <tr>
+            <th>Track</th>
+            <th>Abbrev</th>
+            <th>Range</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Political Capital</td>
+            <td class="mono">PC</td>
+            <td>0 &ndash; 6</td>
+            <td>Spent on national actions, lost when EDIP cards pass over objections</td>
+          </tr>
+          <tr>
+            <td>Public Opinion</td>
+            <td class="mono">PO</td>
+            <td>&minus;2 &ndash; +2</td>
+            <td>Domestic sentiment; swayed by narrative management and intrusive measures</td>
+          </tr>
+          <tr>
+            <td>Readiness</td>
+            <td class="mono">Readiness</td>
+            <td>0 &ndash; 5</td>
+            <td>Military preparedness; raised by committing stock</td>
+          </tr>
+          <tr>
+            <td>Defence Stock</td>
+            <td class="mono">Stock</td>
+            <td>0 &ndash; 99</td>
+            <td>Available materiel; moved via stockpile adjustments and transfers</td>
+          </tr>
+          <tr>
+            <td>Critical Raw Materials</td>
+            <td class="mono">CRM</td>
+            <td>0 &ndash; 99</td>
+            <td>Rare earths and strategic materials; subject to emergency measures</td>
+          </tr>
+          <tr>
+            <td>Industrial Capacity</td>
+            <td class="mono">IC</td>
+            <td>0 &ndash; 99</td>
+            <td>Production capability; shifted by prioritisation orders and production cards</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>Voting Rule</summary>
+    <div class="detail-content">
+      <p>
+        All four teams vote on each proposed EDIP card. A measure passes when it receives
+        <strong>Support from at least three teams</strong> and
+        <strong>no more than one Objection</strong>.
+        Teams may abstain, which counts as neither support nor objection.
+      </p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Persona Routing</summary>
+    <div class="detail-content">
+      <table>
+        <thead>
+          <tr>
+            <th>Persona</th>
+            <th>Card/Action Domain</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Kent Valentina</td>
+            <td>Institutional dynamics, voting, legitimacy, narrative framing</td>
+          </tr>
+          <tr>
+            <td>Dr. Alistair Finch</td>
+            <td>Strategic signalling, adversarial analysis, crisis escalation, sovereignty tensions</td>
+          </tr>
+          <tr>
+            <td>Dr. Michael Chen</td>
+            <td>Technical feasibility, resource flows, readiness calculations, production acceleration</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <!-- ════ Footer ════ -->
+  <footer>
+    <p>EDIP SECURITY OF SUPPLY WARGAME &ensp;&middot;&ensp; CARDS &amp; NATIONAL ACTIONS REFERENCE &ensp;&middot;&ensp; V1.1</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
