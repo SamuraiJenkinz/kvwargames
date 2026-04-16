@@ -103,8 +103,15 @@ $uvicornArgs = @(
 
 Write-Log ("Launching: {0} {1}" -f $venvPython, ($uvicornArgs -join ' '))
 
-# Stream process output directly into the log file. Blocks until the process exits.
-& $venvPython @uvicornArgs *>> $logFile
+# Stream process output into the log file line-by-line.
+# `*>>` can lose output when a native process exits before PowerShell flushes
+# buffered streams (e.g. pydantic ValidationError on startup). Piping through
+# 2>&1 merges stderr into the success stream, and ForEach-Object+Add-Content
+# writes each line as it arrives, so a fatal traceback lands in the log even
+# if uvicorn exits milliseconds later.
+& $venvPython @uvicornArgs 2>&1 | ForEach-Object {
+    Add-Content -Path $logFile -Value $_ -Encoding UTF8
+}
 $code = $LASTEXITCODE
 
 Write-Log "uvicorn exited with code $code"
