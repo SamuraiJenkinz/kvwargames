@@ -254,12 +254,13 @@ function buildBlock10(): string {
     '5. `flag` is null unless you need to surface a facilitation-specific note.',
     '6. `control.advanceRound` / `control.triggerDebrief` are suggestions — facilitator confirms.',
     '7. When the facilitator describes a resource movement — a national action being played (see Block 4 for costs), a card being played (see Block 5 for effects), or an explicit spend/gain ("Team B spends 1 PC", "Team A gains 2 IC") — the responding persona MUST emit stateUpdate.teamUpdates with the NEW ABSOLUTE value for each changed field. Never leave stateUpdate null when resources have moved.',
-    '8. Resource-movement worked examples (assume current state from Block 3):',
-    '   - Facilitator: "Team B spends 1 PC" and team B currently has pc=4 → stateUpdate: { teamUpdates: [{ id: "teamB", pc: 3 }] }',
-    '   - Facilitator: "Team C plays NA-2" (cost: PC -1) and team C currently has pc=3 → stateUpdate: { teamUpdates: [{ id: "teamC", pc: 2 }] }',
-    '   - Facilitator: "Team A gains 2 IC from CP-01" and team A currently has ic=5 → stateUpdate: { teamUpdates: [{ id: "teamA", ic: 7 }] }',
-    '   - Facilitator: "SP-02 passes — Team A transfers 2 IC to Team B" and A has ic=5, B has ic=3 → stateUpdate: { teamUpdates: [{ id: "teamA", ic: 3 }, { id: "teamB", ic: 5 }] }',
-    '   In each example, the value is the NEW value after the change, not the delta.',
+    '8. Team IDs are the literal single-letter ids shown in Block 3 (e.g. "A", "B", "C", "D") — NEVER prefix them with "team" or any other string. An unrecognised id causes the update to be silently dropped.',
+    '9. Resource-movement worked examples (assume current state from Block 3):',
+    '   - Facilitator: "Team B spends 1 PC" and team B currently has pc=4 → stateUpdate: { teamUpdates: [{ id: "B", pc: 3 }] }',
+    '   - Facilitator: "Team C plays NA-2" (cost: PC -1) and team C currently has pc=3 → stateUpdate: { teamUpdates: [{ id: "C", pc: 2 }] }',
+    '   - Facilitator: "Team A gains 2 IC from CP-01" and team A currently has ic=5 → stateUpdate: { teamUpdates: [{ id: "A", ic: 7 }] }',
+    '   - Facilitator: "SP-02 passes — Team A transfers 2 IC to Team B" and A has ic=5, B has ic=3 → stateUpdate: { teamUpdates: [{ id: "A", ic: 3 }, { id: "B", ic: 5 }] }',
+    '   In each example, the value is the NEW value after the change, not the delta. The `id` matches the literal team id exactly.',
   ].join('\n')
 }
 
