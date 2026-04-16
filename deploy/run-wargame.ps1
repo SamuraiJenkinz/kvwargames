@@ -103,15 +103,23 @@ $uvicornArgs = @(
 
 Write-Log ("Launching: {0} {1}" -f $venvPython, ($uvicornArgs -join ' '))
 
-# Stream process output into the log file line-by-line.
-# `*>>` can lose output when a native process exits before PowerShell flushes
-# buffered streams (e.g. pydantic ValidationError on startup). Piping through
-# 2>&1 merges stderr into the success stream, and ForEach-Object+Add-Content
-# writes each line as it arrives, so a fatal traceback lands in the log even
-# if uvicorn exits milliseconds later.
-& $venvPython @uvicornArgs 2>&1 | ForEach-Object {
-    Add-Content -Path $logFile -Value $_ -Encoding UTF8
-}
+# Run Python via cmd.exe shell redirection rather than PowerShell pipeline.
+#
+# Why: under Task Scheduler + SYSTEM there is no attached console, and
+# PowerShell's pipeline redirection (`*>>` or `2>&1 | ForEach-Object`) can
+# leave Python with sys.stdout / sys.stderr = None on Windows. Uvicorn's
+# first log write then raises AttributeError and the process dies silently
+# before any output reaches the log. cmd.exe's `>>` opens real file handles
+# for Python to inherit, which avoids the None-stream trap.
+#
+# `-u` forces unbuffered stdio so a startup traceback lands in the log
+# immediately instead of being held in a block-buffer until crash+flush.
+$env:PYTHONUNBUFFERED = '1'
+$argString = ($uvicornArgs -join ' ')
+$cmdLine = "`"$venvPython`" -u $argString >> `"$logFile`" 2>&1"
+Write-Log "cmd line  = $cmdLine"
+
+& cmd.exe /c $cmdLine
 $code = $LASTEXITCODE
 
 Write-Log "uvicorn exited with code $code"
