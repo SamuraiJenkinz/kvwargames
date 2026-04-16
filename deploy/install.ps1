@@ -105,8 +105,8 @@ function Ensure-EnvFile {
         $acl.SetAccessRuleProtection($true, $false)
         $acl.Access | ForEach-Object { $acl.RemoveAccessRule($_) | Out-Null }
         $rules = @(
-            New-Object System.Security.AccessControl.FileSystemAccessRule('NT AUTHORITY\SYSTEM','FullControl','Allow'),
-            New-Object System.Security.AccessControl.FileSystemAccessRule('BUILTIN\Administrators','FullControl','Allow')
+            New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList 'NT AUTHORITY\SYSTEM','FullControl','Allow'
+            New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList 'BUILTIN\Administrators','FullControl','Allow'
         )
         foreach ($r in $rules) { $acl.AddAccessRule($r) }
         Set-Acl $envFile $acl
