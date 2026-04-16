@@ -69,6 +69,7 @@ None. No requirements scoped for the next milestone yet — run `/gsd:new-milest
 - Session analytics dashboard (response times, token usage, persona distribution)
 - Visual config editor (form-based, not raw JSON)
 - HTTPS deployment on target server (infrastructure, not app code — handled outside GSD cycle)
+- **Multi-tenancy / session isolation.** Current architecture: each browser's Zustand store is in-memory-only, so two users on separate browsers run independent games by accident rather than by design. What's missing for a real multi-user deployment: (a) server-side session IDs so the backend can attribute LLM calls to a specific game session, (b) optional session persistence so a mid-game refresh doesn't lose state, (c) access control (corporate SSO or a shared-secret token) so the LAN URL isn't openly addressable, (d) proxy-level rate limiting if concurrent sessions grow beyond ~10. For the parallel-facilitation use case (two tables at one workshop) the current model is sufficient; this item is only needed if the tool moves toward broader deployment or senior-facilitator review workflows.
 
 ### Out of Scope
 
