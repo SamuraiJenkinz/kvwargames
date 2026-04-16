@@ -142,6 +142,48 @@ describe('parsePersonaResponse — Layer 1 cleanup', () => {
     const result = parsePersonaResponse(raw)
     expect(result.ok).toBe(true)
   })
+
+  // Regression: LLMs sometimes emit `"control": undefined` verbatim from
+  // reading "| undefined" in the schema. The sanitizer rewrites the literal
+  // `undefined` to `null` before JSON.parse so the rest of the response
+  // (including stateUpdate) is preserved instead of being discarded as
+  // PARSE_FAILURE.
+  it('rewrites literal `undefined` to null so the response parses', () => {
+    const raw = `{
+      "responses": [
+        { "speaker": "chen",
+          "message": "Team B spends 1 PC.",
+          "stateUpdate": { "teamUpdates": [{ "id": "teamB", "pc": 2 }] },
+          "flag": null }
+      ],
+      "control": undefined
+    }`
+    const result = parsePersonaResponse(raw)
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.value.responses[0].stateUpdate).toEqual({
+        teamUpdates: [{ id: 'teamB', pc: 2 }],
+      })
+    }
+  })
+
+  it('does not rewrite the quoted string "undefined" inside a message', () => {
+    const inner = JSON.stringify({
+      responses: [
+        {
+          speaker: 'kent',
+          message: 'The value was "undefined" in the source data.',
+          stateUpdate: null,
+          flag: null,
+        },
+      ],
+    })
+    const result = parsePersonaResponse(inner)
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.value.responses[0].message).toContain('"undefined"')
+    }
+  })
 })
 
 // ─── Layer 2: JSON.parse failures ─────────────────────────────────────────────

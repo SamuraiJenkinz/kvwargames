@@ -27,6 +27,16 @@ const PERSONA_ORDER: ReadonlyArray<PersonaResponse['speaker']> = [
  */
 const FENCE_PATTERN = /^```(?:json)?\s*\n?|\n?\s*```$/gm
 
+/**
+ * Matches the literal word `undefined` used as a JSON value: after `:` or `,`
+ * or `[`, surrounded by optional whitespace, and followed by `,` / `}` / `]`
+ * / end-of-string. LLMs sometimes emit `"control": undefined` verbatim despite
+ * prompt guidance — `undefined` is not valid JSON and crashes JSON.parse, so
+ * we rewrite it to `null` before parsing. Intentionally conservative: will not
+ * touch the string `"undefined"` (quoted) or `undefined` inside a string value.
+ */
+const UNDEFINED_VALUE_PATTERN = /([:,\[]\s*)undefined(\s*[,}\]]|\s*$)/g
+
 // ─── Type Guards (Layer 3) ────────────────────────────────────────────────────
 
 function isPersonaResponse(x: unknown): x is PersonaResponse {
@@ -62,9 +72,12 @@ function isLLMStructuredResponse(x: unknown): x is LLMStructuredResponse {
   if (r.responses.length < 1 || r.responses.length > 3) return false
   if (!r.responses.every(isPersonaResponse)) return false
 
-  // control is optional; if present, must be an object whose optional flags are booleans
-  if (r.control !== undefined) {
-    if (!r.control || typeof r.control !== 'object') return false
+  // control is optional; null is treated the same as absent (the Layer 1
+  // sanitizer rewrites the literal `undefined` to `null`, and some LLMs emit
+  // `"control": null` directly). If a non-null object is present, its
+  // optional flags must be booleans.
+  if (r.control !== undefined && r.control !== null) {
+    if (typeof r.control !== 'object') return false
     const c = r.control as Record<string, unknown>
     if (c.advanceRound !== undefined && typeof c.advanceRound !== 'boolean') {
       return false
@@ -109,6 +122,7 @@ export function parsePersonaResponse(raw: string): ParseResult {
   cleaned = cleaned.trim()
   cleaned = cleaned.replace(FENCE_PATTERN, '')
   cleaned = cleaned.trim()
+  cleaned = cleaned.replace(UNDEFINED_VALUE_PATTERN, '$1null$2')
 
   // Layer 2: JSON.parse -------------------------------------------------------
   let parsed: unknown
