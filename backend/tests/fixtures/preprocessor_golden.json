@@ -1,0 +1,62 @@
+[
+  {
+    "input": "NATO and EU invoke high-level responses. Crisis Severity jumps to 3\u20134; defence stocks in frontline states begin to deplete rapidly.",
+    "expected": "Nato and E U invoke high-level responses. Crisis Severity jumps to three\u2013four; defence stocks in frontline states begin to deplete rapidly.",
+    "comment": "Verbatim from src/data/edipConfig.ts scenarios[1].injects[2]. Exercises: NATO->Nato, EU->E U, plain integers 3 and 4."
+  },
+  {
+    "input": "Crisis Severity rises to 1. EDIP Crisis State remains No Crisis. KEY TENSION: whether to use EDIP monitoring tools early or rely primarily on NATO and national channels at this stage.",
+    "expected": "Crisis Severity rises to one. E D I P Crisis State remains No Crisis. KEY TENSION: whether to use E D I P monitoring tools early or rely primarily on Nato and national channels at this stage.",
+    "comment": "Verbatim from src/data/edipConfig.ts scenarios[1].injects[0]. Exercises: EDIP->E D I P (twice), NATO->Nato, plain integer 1."
+  },
+  {
+    "input": "We must keenly consider how EDIP tools can ensure collective action without rushing into actions that might harm our legitimacy or political capital.",
+    "expected": "We must keenly consider how E D I P tools can ensure collective action without rushing into actions that might harm our legitimacy or political capital.",
+    "comment": "Verbatim from .planning/phases/08-qa-credential-audit/08-02-LIVE-RUN.md Round 1 Kent persona response. Exercises: EDIP->E D I P, no numbers."
+  },
+  {
+    "input": "The current inject describes increased Russian hybrid activities: cyber attacks, disinformation campaigns, airspace violations, small border incidents. Raises Crisis Severity to 1. No EDIP Crisis State activation yet.",
+    "expected": "The current inject describes increased Russian hybrid activities: cyber attacks, disinformation campaigns, airspace violations, small border incidents. Raises Crisis Severity to one. No E D I P Crisis State activation yet.",
+    "comment": "Verbatim from .planning/phases/08-qa-credential-audit/08-02-LIVE-RUN.md Round 1 Finch persona response. Exercises: EDIP->E D I P, plain integer 1."
+  },
+  {
+    "input": "Multiple EDIPs were deployed across the 3rd and 22nd rounds to address PCs shortfall in frontline states.",
+    "expected": "Multiple E D I Ps were deployed across the third and twenty-second rounds to address P Cs shortfall in frontline states.",
+    "comment": "Synthetic. Exercises: EDIPs->E D I Ps (plural preferred over singular), PCs->P Cs, ordinals 3rd->third and 22nd->twenty-second."
+  },
+  {
+    "input": "The SIEP and LEFS frameworks were activated after Crisis Severity reached 50% of the maximum threshold in 2024.",
+    "expected": "The S I E P and L E F S frameworks were activated after Crisis Severity reached fifty percent of the maximum threshold in twenty twenty-four.",
+    "comment": "Synthetic. Exercises: SIEP->S I E P, LEFS->L E F S, percentage 50%->fifty percent, year 2024->twenty twenty-four."
+  },
+  {
+    "input": "The SoS signal was transmitted by ICs and POs on the 1st day of the CRM shortage in 2026.",
+    "expected": "The S O S signal was transmitted by I Cs and P Os on the first day of the C R M shortage in twenty twenty-six.",
+    "comment": "Synthetic. Exercises: SoS->S O S, ICs->I Cs, POs->P Os, CRM->C R M, ordinal 1st->first, year 2026->twenty twenty-six."
+  },
+  {
+    "input": "IC and PO tokens were allocated; 12.5% of total IC capacity was reserved for the SIEP programme.",
+    "expected": "I C and P O tokens were allocated; twelve point five percent of total I C capacity was reserved for the S I E P programme.",
+    "comment": "Synthetic. Exercises: IC->I C, PO->P O, decimal percentage 12.5%->twelve point five percent, SIEP->S I E P."
+  },
+  {
+    "input": "**EDIP** tools must be invoked when there are 123 units of CRM remaining across all teams.",
+    "expected": "E D I P tools must be invoked when there are one hundred and twenty-three units of C R M remaining across all teams.",
+    "comment": "Synthetic. Exercises: bold markdown **EDIP** stripped then expanded to E D I P, CRM->C R M, plain integer 123->one hundred and twenty-three."
+  },
+  {
+    "input": "# Round Three\nThe _mandatory_ prioritisation order affected all PC holders and 50 ICs total.",
+    "expected": "Round Three\nThe mandatory prioritisation order affected all P C holders and fifty I Cs total.",
+    "comment": "Synthetic. Exercises: # heading stripped, _italic_ stripped, PC->P C, ICs->I Cs, plain integer 50->fifty."
+  },
+  {
+    "input": "Use `SP-02` to mandate transfers.<br>Teams with PO below 2 cannot invoke SoS protocol.",
+    "expected": "Use SP-02 to mandate transfers.Teams with P O below two cannot invoke S O S protocol.",
+    "comment": "Synthetic. Exercises: backtick removal, HTML <br> tag stripped, PO->P O, SoS->S O S, plain integer 2->two."
+  },
+  {
+    "input": "- Activate CS-01 when EU defence stocks fall below critical levels.\n* Review EDIP Legitimacy after the 2nd mandatory order.",
+    "expected": "Activate CS-01 when E U defence stocks fall below critical levels.\nReview E D I P Legitimacy after the second mandatory order.",
+    "comment": "Synthetic. Exercises: line-start bullet (- and *) stripped, EU->E U, EDIP->E D I P, ordinal 2nd->second."
+  }
+]
