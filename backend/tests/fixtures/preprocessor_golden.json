@@ -51,12 +51,12 @@
   },
   {
     "input": "Use `SP-02` to mandate transfers.<br>Teams with PO below 2 cannot invoke SoS protocol.",
-    "expected": "Use SP-02 to mandate transfers.Teams with P O below two cannot invoke S O S protocol.",
-    "comment": "Synthetic. Exercises: backtick removal, HTML <br> tag stripped, PO->P O, SoS->S O S, plain integer 2->two."
+    "expected": "Use SP-two to mandate transfers.Teams with P O below two cannot invoke S O S protocol.",
+    "comment": "Synthetic. Exercises: backtick removal, HTML <br> tag stripped, PO->P O, SoS->S O S, plain integers 02->two and 2->two."
   },
   {
     "input": "- Activate CS-01 when EU defence stocks fall below critical levels.\n* Review EDIP Legitimacy after the 2nd mandatory order.",
-    "expected": "Activate CS-01 when E U defence stocks fall below critical levels.\nReview E D I P Legitimacy after the second mandatory order.",
-    "comment": "Synthetic. Exercises: line-start bullet (- and *) stripped, EU->E U, EDIP->E D I P, ordinal 2nd->second."
+    "expected": "Activate CS-one when E U defence stocks fall below critical levels.\nReview E D I P Legitimacy after the second mandatory order.",
+    "comment": "Synthetic. Exercises: line-start bullet (- and *) stripped, EU->E U, EDIP->E D I P, ordinal 2nd->second, plain integer 01->one."
   }
 ]
