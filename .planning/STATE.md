@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-15 after v1.1 milestone completion)
+See: .planning/PROJECT.md (updated 2026-04-17 after v1.2 milestone kickoff)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** No active milestone — v1.1 shipped 2026-04-15; ready to scope the next milestone
+**Current focus:** v1.2 Debrief Podcast — defining requirements
 
 ## Current Position
 
-Phase: None active (v1.1 complete — Phases 9–12 all shipped)
-Plan: Not started
-Status: Ready to plan next milestone
-Last activity: 2026-04-15 — v1.1 Pre-live-run hardening milestone complete; tagged; archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-17 — Milestone v1.2 Debrief Podcast started; research pass queued
 
-Progress: [████████████] 46/46 plans complete across v1.0 (39) + v1.1 (7)
+Progress: [████████████] 46/46 plans complete across v1.0 (39) + v1.1 (7) — v1.2 starts at Phase 13
 
 ## Performance Metrics
 
@@ -65,6 +65,6 @@ From v1.1 (see `.planning/milestones/v1.1-MILESTONE-AUDIT.md`):
 
 ## Session Continuity
 
-Last session: 2026-04-15 (v1.1 milestone complete)
-Stopped at: v1.1 archived, tagged, and committed. PROJECT.md evolved with Validated migration and v1.1 decisions. ROADMAP.md collapsed to milestone index. REQUIREMENTS.md removed pending next-milestone definition.
-Resume file: None — ready for `/gsd:new-milestone`.
+Last session: 2026-04-17 (v1.2 milestone kickoff)
+Stopped at: PROJECT.md updated with v1.2 Debrief Podcast milestone goals. Next step: spawn 4-way research (STACK/FEATURES/ARCHITECTURE/PITFALLS, milestone-aware for ElevenLabs + MP3-concat + audio UX) → synthesize → requirements → roadmap.
+Resume file: None — in-flight `/gsd:new-milestone` run.

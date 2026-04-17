@@ -17,19 +17,23 @@ Three AI personas respond in-character to facilitator input with accurate, live 
 - **Audit status:** v1.1 audit `tech_debt` (non-blocking; sole item was a ROADMAP.md doc-drift line, resolved during milestone completion). Full audit report at `.planning/milestones/v1.1-MILESTONE-AUDIT.md`
 - **Pipeline ready for next live exercise:** health-gate + crisisState rule + clean routing all verified end-to-end
 
-## Next Milestone Goals
+## Current Milestone: v1.2 Debrief Podcast
 
-Not yet scoped. Run `/gsd:new-milestone` to move into questioning → research → requirements → roadmap.
+**Goal:** Convert the end-of-session debrief into a three-voice MP3 podcast — Kent, Finch, and Chen each read their own debrief messages through distinct ElevenLabs voices, stitched into a single MP3 facilitators can play in-app and download.
 
-Candidate focus areas surfaced during v1.1 (all deferred as out-of-scope then):
+**Target features:**
 
-- **Streaming LLM responses** token-by-token if the corporate endpoint supports SSE — would reduce perceived latency during Finch's longer responses
-- **Session analytics dashboard** — response times, token usage, persona distribution, crisis-state transitions over a game
-- **Visual config editor** (form-based, not raw JSON) — lowers the config-authoring barrier for facilitators who did not write the EDIP canonical config
-- **Observability hardening** — structured logging of the 8-code health taxonomy over time, stale-localStorage detection on setup
-- **HTTPS / TLS** — deferred as infrastructure (reverse-proxy) rather than app-code concern, but may warrant documentation pass
+- ElevenLabs TTS integration via server-side proxy (zero browser-side credentials, same pattern as `/api/llm`)
+- Three persona voices — one ElevenLabs stock voice per persona (Kent, Finch, Chen). Voice IDs configured via `.env`; selection deferred to runtime config, not auditioned in this milestone
+- Script source: existing `isDebrief: true` persona messages (no new LLM call — the in-character scripts already exist at end-of-game)
+- TTS preprocessing for wargame vocabulary (EDIP, PC, PO, CRM, IC, LEFS, SIEP → phonetic expansion; numbers → num2words)
+- Audio segment stitching — three per-persona MP3 segments joined with brief silence pads into a single session MP3
+- Backend endpoint `POST /api/debrief/podcast` returning the stitched MP3 (streaming or 202-then-poll pattern, TBD during planning)
+- Frontend `PodcastPlayer` component in the debrief panel — inline `<audio>` player + Download MP3 button, side by side; appears alongside the existing markdown debrief download
+- Health-check parity — ElevenLabs availability surfaced through the existing `/api/health/llm` pattern (same 8-code taxonomy reused, or a parallel `/api/health/tts` — decision during research)
+- Graceful degradation — ElevenLabs down must not block the markdown debrief; UI shows "audio unavailable" and keeps the existing export path working
 
-None of these are committed. The next milestone should start from a fresh questioning pass, not a pre-selected backlog.
+**Reference implementation:** MDInsights (`SamuraiJenkinz/daily-intelligence-brief`) — the `TTSProvider` abstract base, `ElevenLabsTTSProvider`, atomic file writes, structured logging, and `api_events` audit pattern are known-good shapes that transplant directly into this stack.
 
 ## Requirements
 
@@ -61,7 +65,7 @@ None of these are committed. The next milestone should start from a fresh questi
 
 ### Active
 
-None. No requirements scoped for the next milestone yet — run `/gsd:new-milestone` to define.
+Requirements being refined during v1.2 research + requirements phase. Scope committed at the milestone level (see Current Milestone above); per-requirement REQ-IDs land in `.planning/REQUIREMENTS.md` after research.
 
 ### Deferred (v2+ candidates)
 
@@ -69,6 +73,9 @@ None. No requirements scoped for the next milestone yet — run `/gsd:new-milest
 - Session analytics dashboard (response times, token usage, persona distribution)
 - Visual config editor (form-based, not raw JSON)
 - HTTPS deployment on target server (infrastructure, not app code — handled outside GSD cycle)
+- Observability hardening (structured logging of 8-code health taxonomy over time, stale-localStorage detection)
+- Voice-audition phase for ElevenLabs (pick persona-matched voices instead of stock defaults — explicitly deferred from v1.2 per user direction)
+- Multi-language debrief audio (ElevenLabs `eleven_multilingual_v2` supports it; scope this only when a non-English EDIP exercise is planned)
 - **Multi-tenancy / session isolation.** Current architecture: each browser's Zustand store is in-memory-only, so two users on separate browsers run independent games by accident rather than by design. What's missing for a real multi-user deployment: (a) server-side session IDs so the backend can attribute LLM calls to a specific game session, (b) optional session persistence so a mid-game refresh doesn't lose state, (c) access control (corporate SSO or a shared-secret token) so the LAN URL isn't openly addressable, (d) proxy-level rate limiting if concurrent sessions grow beyond ~10. For the parallel-facilitation use case (two tables at one workshop) the current model is sufficient; this item is only needed if the tool moves toward broader deployment or senior-facilitator review workflows.
 
 ### Out of Scope
@@ -130,4 +137,4 @@ None. No requirements scoped for the next milestone yet — run `/gsd:new-milest
 | Tier B replay path (a) full R1→R2→R3, not localStorage seed (v1.1) | Most-faithful replay against real endpoint; raw JSON is the PASS artifact | ✓ Good — first-call PASS, no retries; Tier B pattern now reusable |
 
 ---
-*Last updated: 2026-04-15 after v1.1 milestone completion*
+*Last updated: 2026-04-17 after v1.2 milestone kickoff*
