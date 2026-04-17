@@ -78,37 +78,43 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Filled by roadmap creation — each requirement maps to exactly one phase.
+Every v1.2 requirement maps to exactly one phase. Phase 16 is a verification phase and carries no new requirement IDs — it re-exercises PODGEN-* and PODPLAY-* against a real ElevenLabs key following the v1.1 Tier-B pattern.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PODGEN-01 | — | Pending |
-| PODGEN-02 | — | Pending |
-| PODGEN-03 | — | Pending |
-| PODGEN-04 | — | Pending |
-| PODGEN-05 | — | Pending |
-| PODGEN-06 | — | Pending |
-| PODGEN-07 | — | Pending |
-| PODGEN-08 | — | Pending |
-| PODPLAY-01 | — | Pending |
-| PODPLAY-02 | — | Pending |
-| PODPLAY-03 | — | Pending |
-| PODPLAY-04 | — | Pending |
-| PODPLAY-05 | — | Pending |
-| PODUX-01 | — | Pending |
-| PODUX-02 | — | Pending |
-| PODUX-03 | — | Pending |
-| PODRES-01 | — | Pending |
-| PODRES-02 | — | Pending |
-| PODRES-03 | — | Pending |
-| PODDEP-01 | — | Pending |
-| PODDEP-02 | — | Pending |
+| PODGEN-01 | Phase 14 | Pending |
+| PODGEN-02 | Phase 14 | Pending |
+| PODGEN-03 | Phase 14 | Pending |
+| PODGEN-04 | Phase 14 | Pending |
+| PODGEN-05 | Phase 13 | Pending |
+| PODGEN-06 | Phase 14 | Pending |
+| PODGEN-07 | Phase 14 | Pending |
+| PODGEN-08 | Phase 14 | Pending |
+| PODPLAY-01 | Phase 14 | Pending |
+| PODPLAY-02 | Phase 14 | Pending |
+| PODPLAY-03 | Phase 14 | Pending |
+| PODPLAY-04 | Phase 14 | Pending |
+| PODPLAY-05 | Phase 14 | Pending |
+| PODUX-01 | Phase 14 | Pending |
+| PODUX-02 | Phase 14 | Pending |
+| PODUX-03 | Phase 14 | Pending |
+| PODRES-01 | Phase 15 | Pending |
+| PODRES-02 | Phase 15 | Pending |
+| PODRES-03 | Phase 15 | Pending |
+| PODDEP-01 | Phase 13 | Pending |
+| PODDEP-02 | Phase 13 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 21 total
-- Mapped to phases: 0 (populated by roadmap creation)
-- Unmapped: 21 ⚠️ — roadmap creation will fill
+- Mapped to phases: 21 ✓
+- Unmapped: 0
+
+**By phase:**
+- Phase 13 (Firewall Spike + Mockable Backend Foundation): 3 requirements — PODDEP-01, PODDEP-02, PODGEN-05
+- Phase 14 (Podcast Endpoint + Player): 15 requirements — PODGEN-01/02/03/04/06/07/08, PODPLAY-01/02/03/04/05, PODUX-01/02/03
+- Phase 15 (TTS Health + Graceful Degradation): 3 requirements — PODRES-01, PODRES-02, PODRES-03
+- Phase 16 (Live Verification + Audit): 0 new requirements (verification phase)
 
 ---
 *Requirements defined: 2026-04-17*
-*Last updated: 2026-04-17 after research synthesis*
+*Last updated: 2026-04-17 after roadmap creation — 21/21 mapped to Phases 13–16*
