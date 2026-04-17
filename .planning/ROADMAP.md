@@ -36,7 +36,7 @@
   2. Setting `TTS_PROVIDER=fake` in `.env` (the dev default) causes `POST /api/debrief/podcast` invocations in a local `pytest` run to return deterministic stitched MP3 bytes with no network traffic to `api.elevenlabs.io` whatsoever (verified via `httpx` mock-transport spy or equivalent).
   3. Running the preprocessor on the v1.0 Scenario-2 `isDebrief: true` message corpus yields output where `EDIP`, `PC`, `PO`, `CRM`, `IC`, `LEFS`, `SIEP`, and `SoS` are expanded to the correct letter-spelled or word forms, numbers are normalised to words, and markdown emphasis characters (`**`, `*`, `_`) are stripped — verified by a golden-file test.
   4. A local `pytest` run ends with the `/api/debrief/podcast` endpoint returning a valid MP3 `Content-Type: audio/mpeg` response whose bytes, when written to disk, open and play in VLC (or equivalent) at the expected ~3-segments × fake-duration length.
-**Plans**: 3 plans (TBD)
+**Plans**: 3 plans
 
 Plans:
 - [ ] 13-01: Firewall spike + ElevenLabs-reachability evidence + PROJECT.md Key Decision (PODDEP-01)
