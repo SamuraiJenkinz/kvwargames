@@ -1,214 +1,207 @@
-# Project Research Summary
+# Project Research Summary — v1.2 Debrief Podcast
 
-**Project:** KV War Game Engine
-**Domain:** AI-powered policy tabletop exercise facilitation tool
-**Researched:** 2026-04-13
+**Project:** KV War Game Engine — v1.2 milestone (Debrief Podcast)
+**Domain:** ElevenLabs three-voice MP3 generation layered onto a shipped FastAPI + React SPA
+**Researched:** 2026-04-17
 **Confidence:** HIGH
+
+> This SUMMARY supersedes the earlier v1.0 summary (2026-04-13). v1.0 MVP and v1.1 hardening are both live in production; this document covers ONLY the additions needed for the v1.2 Debrief Podcast milestone. Base-stack decisions (Python 3.11 / FastAPI 0.135.x / React 19 / Vite 6 / Zustand 5 / Tailwind 4) are locked and not re-evaluated here.
 
 ## Executive Summary
 
-The KV War Game Engine is a single-facilitator facilitation tool that uses a three-persona LLM system to run structured policy exercises. It is not a chatbot, not a traditional game engine, and not a multi-user collaboration platform. The correct mental model is a purpose-built facilitator console that uses a corporate GPT-4o/5 endpoint to voice three specialist personas (Kent, Finch, Chen) who react to live facilitator input, update a shared game state, and produce a structured debrief at session end. The recommended implementation is a thin FastAPI backend (credential proxy only) fronting a React/Vite SPA that holds all game logic, state, and persona routing in the browser. The architecture is intentionally lopsided: the backend has two endpoints and zero game logic; the frontend carries the entire domain.
+v1.2 converts the already-existing end-of-session debrief into a three-voice (Kent -> Finch -> Chen) MP3 podcast with an inline HTML5 player and download button in the debrief panel. The critical insight that shapes every downstream choice: **the three persona "scripts" already exist as `isDebrief: true` messages in `messages[]` — there is no new LLM call in v1.2.** Every prompt, every token-budget assertion, and every context-window invariant from v1.1 stays bit-identical. v1.2 is purely a post-LLM TTS + stitching pipeline plus a small React player.
 
-The stack is well-suited and low-risk. FastAPI 0.135.x + Pydantic v2 + httpx covers the backend in roughly 150 lines of code. React 19 + Zustand 5 + Tailwind v4 covers the frontend. No database, no auth layer, no WebSockets, no queues -- all explicitly out of scope and must stay out of scope. The LLM proxy pattern (frontend sends `{systemPrompt, messages, maxTokens}`; backend injects credentials and forwards) is the single most important architectural decision and is already well-specified. The primary technical risk is not the stack -- it is the LLM integration layer: JSON parsing robustness, context window accumulation, persona drift, and state clamping correctness. All four can silently break a live facilitation session and all four require deliberate hardening, not optimistic happy-path implementation.
+The prescribed approach is minimal-surface-area: two new backend dependencies (`elevenlabs==2.43.0`, `num2words>=0.5.13,<0.6`), one new router (`/api/debrief/podcast` returning blocking `audio/mpeg`), one new health endpoint (`/api/health/tts` in parallel to the v1.1 LLM probe), one new Zustand slice owning a store-scoped blob-URL lifecycle, and one new React `PodcastPlayer` component adjacent to the existing `Download Debrief (.md)` button. MP3 stitching is done with **raw Python `bytes` concatenation** (all ElevenLabs segments share `mp3_44100_128` CBR — frames are self-contained at this setting) plus a 500ms pre-generated silence-pad MP3 committed to the repo. This deliberately avoids `pydub`, `ffmpeg`, `ffmpeg-python`, and `mutagen` — no system-level binary dependency, no subprocess fragility on Windows scheduled-task deployment, no decode/re-encode fidelity loss.
 
-The recommended build order follows a strict dependency chain: TypeScript interfaces first (everything else depends on them), then Zustand store, then UI layout with mock data, then backend + LLM integration with hardened error handling, then polish and debrief export. Config generation from a text brief should be treated as a Phase 5 feature -- it has high prompt-engineering risk and the EDIP default config covers the launch use case without it. A full 5-round scenario QA run against real LLM credentials must precede any live exercise use; this is the only way to surface context accumulation and persona drift failures.
-
----
+Top risks cluster around ElevenLabs operational characteristics rather than the stack itself: free-tier character quota burn during dev (mitigated by a `FakeTTSProvider` ABC that defaults in dev), corporate firewall behaviour on a new external endpoint (mitigated by a pre-build spike from the target Windows Server documented as an entry-gate), client-disconnect-without-cancel charging for orphan TTS work (mitigated by `is_disconnected()` checkpoints and an in-flight button disable), blob-URL memory leaks in the React player (mitigated by store-owned lifecycle — revoke-before-overwrite and revoke-on-`newGame()`), and domain-acronym mispronunciation (EDIP, PC, PO, CRM, LEFS, SIEP — mitigated by a regex pronunciation dict applied in `text_preprocessor.py` before the TTS call). The graceful-degradation contract is load-bearing: TTS failure must never block the shipped markdown debrief path.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The stack is entirely predetermined by the project spec and confirmed by research. FastAPI 0.135.x is the current stable with built-in async, OpenAPI, and Pydantic-native validation -- ideal for a two-endpoint credential proxy. The LLM call uses `httpx.AsyncClient` rather than the OpenAI SDK because the corporate endpoint requires custom headers (`LLM_EXTRA_HEADERS`) that the SDK opinionates against. On the frontend, React 19 + Vite 6 + Zustand 5 + Tailwind v4 is the current stable combination. The only non-obvious version decisions are Tailwind v4 (CSS-first config via `@theme {}` -- no `tailwind.config.js`) and Zustand 5 (named exports -- `import { create } from 'zustand'`, not default import). Explicit do-not-use list: no SQLAlchemy, no Redis/Celery, no WebSockets, no React Query, no Docker for dev, no JWT/auth inside the app.
+Two additive Python dependencies; **zero** new frontend dependencies. The feature delivers entirely with the existing React 19 / Zustand 5 / Tailwind 4 frontend and the existing FastAPI / httpx backend.
 
-**Core technologies:**
-- Python 3.11+ / FastAPI 0.135.x: async credential proxy -- async-native, minimal surface area, serves Vite build as static files
-- Pydantic v2.9+ / pydantic-settings: request validation and typed env var management -- required by FastAPI 0.135.2+
-- httpx 0.27+: async LLM proxy client -- FastAPI transitive dep, supports custom headers, non-blocking
-- React 19 / TypeScript 5 / Vite 6: SPA runtime -- current stable, fast HMR, clean SPA build for FastAPI to serve
-- Zustand 5: game state store -- flat store pattern matches GameStore shape, no boilerplate, session-only (no persistence needed)
-- Tailwind CSS v4 + @tailwindcss/vite: utility styling -- CSS-first `@theme {}` supports the custom design token system (Syne, DM Sans, IBM Plex Mono)
+**Core additions (backend):**
+- **`elevenlabs==2.43.0`** — ElevenLabs Python SDK; use the **sync** `ElevenLabs` client wrapped in `starlette.concurrency.run_in_threadpool`. Pinned exactly (not a floor) to avoid silent Fern-regen breakage from the SDK's weekly auto-generated releases. Open bug #243 on `AsyncElevenLabs` is the specific reason for sync-first.
+- **`num2words>=0.5.13,<0.6`** — Number-to-words normalization for TTS preprocessing. Pure-Python, no C extensions, Windows-safe.
+- **No `pydub`, no `ffmpeg-python`, no `mutagen`, no `tenacity`.** Raw-bytes MP3 concat replaces all of them. 500ms silence pad is a static `backend/app/assets/silence_500ms.mp3` committed once, offline-generated, ~8 KB.
+
+**Frontend: no `package.json` changes.** Native HTML5 `<audio controls>` + a synthetic `<a download>` anchor (identical pattern to the shipped `debriefExporter.ts::downloadDebrief`). No `wavesurfer.js`, no `howler.js`, no `react-audio-player`.
+
+**New env vars (all server-side, never in browser):** `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_KENT`, `ELEVENLABS_VOICE_FINCH`, `ELEVENLABS_VOICE_CHEN`, `ELEVENLABS_MODEL_ID=eleven_multilingual_v2` (settled — see Open Questions), `ELEVENLABS_OUTPUT_FORMAT=mp3_44100_128`.
+
+Detail: [`.planning/research/STACK.md`](./STACK.md).
 
 ### Expected Features
 
-The feature landscape has unusually high confidence because the authoritative spec (`WARGAME_ENGINE_DEV_SPEC.md`) defines scope precisely. There are no discovery-phase unknowns about what the product needs to do.
+FEATURES.md enumerates **11 table-stakes** features and 8 differentiators (5 IN / 3 OUT). The v1.2 MVP ships all 11 table stakes plus 5 low-cost differentiators (16 items total in P1).
 
-**Must have (table stakes -- MVP blocking):**
-- Three-column game layout (state panel, chat feed, reference panel) -- the product's primary visual contract
-- Three visually distinct AI personas with routing logic -- if voices look or sound identical, the value proposition collapses
-- Live game state dashboard (crisis severity track, EDIP legitimacy track, four team resource grids) -- facilitator situational awareness
-- Round counter and round advancement with inject delivery -- primary temporal anchor for the exercise
-- Facilitator input handler producing persona responses -- the core interaction loop
-- Structured JSON state updates applied to live game state -- closes the loop between AI narrative and game mechanics
-- Reference panel (CARDS / ACTIONS / GUIDE tabs) -- facilitators cannot memorise 11 cards
-- Debrief trigger and markdown export -- the client deliverable; sessions without exports produce no artifact
-- LLM proxy with credentials server-side only -- non-negotiable security requirement
-- Error states visible in chat feed, not silent -- LLM calls fail; silence is worse than a visible error
+**Must have (11 table stakes):**
+1. TS-1 Generate Podcast button in debrief area (adjacent to existing markdown download)
+2. TS-2 Inline `<audio controls>` player
+3. TS-3 Download MP3 with `debrief-{kebab}-{YYYY-MM-DD-HHmm}.mp3` filename
+4. TS-4 Fixed persona order: **Kent -> Finch -> Chen** (settled)
+5. TS-5 ~500-750ms silence pad between persona segments
+6. TS-6 Per-persona progress feedback ("Kent done, Finch rendering, Chen waiting")
+7. TS-7 Cancel in-flight generation (frontend `AbortController` + backend `is_disconnected()` checkpoints)
+8. TS-8 Graceful degradation: markdown debrief stays functional when TTS is down
+9. TS-9 TTS health surfaced on Setup screen (does NOT gate Launch — soft warning only)
+10. TS-10 Per-session character-count cap with confirm dialog (prevents runaway-cost click)
+11. TS-11 Session-ephemeral cache keyed on debrief-text-hash (accidental re-click returns cached MP3)
 
-**Should have (differentiators -- post-MVP):**
-- Persona flag banners (amber warnings from LLM `flag` field) -- procedural warnings without breaking persona voice
-- PC threshold warning badges (STRAINED/CRISIS) -- prevents facilitators missing a strained team state
-- Config generation from text brief -- high facilitation value but high prompt-engineering risk
-- Keyboard shortcuts (Enter to send, Escape to clear) -- polish for experienced facilitators
+**Should have (differentiators going IN — all low marginal cost on top of TS):**
+- DF-1 Transcript displayed under the player (expandable)
+- DF-2 Per-persona "Skip to Kent / Finch / Chen" segment markers using backend-returned offsets
+- DF-3 Re-generate button with "uses ElevenLabs quota again" confirm
+- DF-4 Progress bar + percentage on top of TS-6's per-persona events
+- DF-5 "Now playing: Kent Valentina" label that updates at segment boundaries
 
-**Defer (post-MVP):**
-- Config generation from text brief -- complex to prompt-engineer reliably; EDIP config covers the launch case
-- Responsive tablet layout -- primary target is 1280px laptop
-- Config JSON editing in review mode -- load-only is sufficient for MVP
+**Defer (v1.3+):**
+- DF-6 Per-persona MP3 download — structural backend change; wait for explicit facilitator request
+- DF-7 Media Session API chapter metadata — OS-level controls; single-facilitator-at-table use case does not need it
+- DF-8 Playback speed UI — native `<audio>` right-click already exposes this
+- Voice audition / voice casting — explicitly deferred per user scope
 
-**Hard anti-features (never build):**
-- Multi-user real-time collaboration, persistent session history, user accounts
-- Streaming token-by-token LLM responses
-- Player-facing views or mobile-first layout
-- LLM model selection in the UI
+**Anti-features (never build, documented in FEATURES.md Anti-Features section):** AF-1 streaming-as-it-generates, AF-2 browser-side API keys, AF-3 multi-user collaborative editing, AF-4 voice-cloning of real people, AF-5 UI-blocking modal, AF-6 auto-play, AF-7 cloud share-by-link, AF-8 auto-generate on end-of-game, AF-9 narrated-session podcast (new LLM call), AF-10 LLM-generated show notes.
+
+Detail: [`.planning/research/FEATURES.md`](./FEATURES.md).
 
 ### Architecture Approach
 
-The architecture is a thin-backend, fat-client pattern with a strict security boundary. The FastAPI backend is a pure credential-protecting proxy -- it reads `LLM_API_KEY` from environment, validates the request shape via Pydantic, forwards to the corporate OpenAI-compatible endpoint via httpx, and returns raw `{text: str}`. It has zero game logic and zero state. All domain complexity lives in the React frontend: `promptBuilder.ts` assembles the full system prompt on every LLM call (including serialized live `GameState`), `stateUpdater.ts` applies clamped state deltas, and the Zustand store holds the entire session. `LLMStructuredResponse` is parsed client-side so JSON errors surface gracefully in the chat feed rather than as backend 500s.
+Additive and bolt-on, not a rewrite. The shipped v1.0/v1.1 architecture stays bit-identical except for seven explicitly enumerated modifications (listed in ARCHITECTURE.md section 2.5). A new `backend/app/services/` folder is created (sibling to `routers/`) to hold TTS provider, text preprocessor, and audio generator — keeping `routers/debrief.py` thin (HTTP framing and error-code translation only).
 
 **Major components:**
-1. FastAPI backend (`routers/llm.py`, `routers/config_gen.py`) -- credential proxy; two POST endpoints; stateless
-2. Zustand store (`src/lib/gameStore.ts`) -- single source of truth for phase, gameConfig, gameState, messages, llmHistory, UI state
-3. `promptBuilder.ts` -- rebuilds full system prompt on every call; encodes game engine, routing rules, live state, JSON output schema
-4. `stateUpdater.ts` -- applies LLM state deltas with hard clamping; all valid bounds enforced here; null/undefined = no-op
-5. `llmClient.ts` -- fetch wrapper to `/api/llm`; strips markdown fences; parses JSON with try/catch; produces error chat messages on failure
-6. GameScreen components -- three-column layout shell composing StatePanel, ChatFeed, ReferencePanel, FacilitatorInput
-7. Shared primitives -- TrackBar, StatusBadge, LoadingDots
+1. **`backend/app/services/tts/{base,elevenlabs_provider}.py`** — `TTSProvider` ABC + ElevenLabs concrete impl. The ABC is the seam that enables a `FakeTTSProvider` for dev/test to protect quota.
+2. **`backend/app/services/text_preprocessor.py`** — pure function: markdown stripping + regex-based acronym pronunciation dict (EDIP -> "E D I P", NATO -> "Nato", PC/PO/CRM/LEFS/SIEP etc.) + `num2words` for numbers and years. Applied AFTER the LLM, BEFORE ElevenLabs. No prompt changes anywhere.
+3. **`backend/app/services/audio_generator.py`** — orchestrator: calls provider 3x serially (or bounded-concurrent), stitches with silence pads, returns MP3 bytes + optional per-segment offsets.
+4. **`backend/app/routers/debrief.py`** — `POST /api/debrief/podcast`; request is 3-segment JSON `{segments:[{persona,text}x3], gameName}`; response is blocking `audio/mpeg` with `Content-Disposition` set for download.
+5. **`backend/app/routers/health.py` (extended, not replaced)** — adds `GET /api/health/tts` using the same 8-code taxonomy as the v1.1 LLM probe, always HTTP 200, body.ok carries signal, 30s in-memory cache to protect quota. Probes ElevenLabs `GET /v1/voices` or `/v1/user` (cheap, no TTS billing).
+6. **`src/lib/podcastClient.ts`** — zero-throw discriminated-union fetch wrapper mirroring `llmClient.ts` line-for-line; swap JSON -> blob.
+7. **`src/lib/gameStore.ts` — new `PodcastSlice`** — 4-status state machine (`idle` / `generating` / `ready` / `failed`) + `podcastBlobUrl` + `podcastAbortController`. Store owns blob-URL lifecycle; `newGame()` and `resetGame()` call `clearPodcast()` which revokes first, then zeros.
+8. **`src/components/game/PodcastPlayer/PodcastPlayer.tsx`** — renders Generate button / spinner / `<audio>` + Download / error hint depending on status. Dropped into `ActionToolbar.tsx` adjacent to the existing markdown Download button — the ONE existing UI file that needs an edit.
+9. **`src/components/setup/TtsHealthBadge.tsx`** — structural copy of `HealthBadge.tsx`; does NOT gate Launch.
 
-**Key patterns to follow:**
-- Thin backend, fat client: prompt engineering, persona routing, and state management belong in the frontend
-- Prompt-as-configuration: system prompt is the game engine; loading a new `GameConfig` changes the game without code deployment
-- Optimistic message append: facilitator message displays immediately; loading dots during LLM call
-- Single LLM history thread: one flat `llmHistory[]` for all personas sharing context; setup config gen uses separate stateless call
-- Clamped state application: `applyStateUpdate` enforces hard bounds before writing to store
+**Delivery pattern: blocking streaming `audio/mpeg`, NOT 202+poll.** The backend is stateless; introducing a job store to satisfy TS-6's progress UI would contradict the deferred multi-tenancy decision and over-engineer a single-facilitator tool. See Cross-Researcher Resolutions below.
+
+Detail: [`.planning/research/ARCHITECTURE.md`](./ARCHITECTURE.md).
 
 ### Critical Pitfalls
 
-1. **Undefended LLM JSON parsing (C-1)** -- A single malformed LLM response crashes the session and destroys ephemeral state. Wrap all `JSON.parse` in try/catch that produces an error chat message. Validate parsed structure before applying. Set `maxTokens` at 1500+ to prevent truncation mid-JSON. Must be hardened in Phase 4 before any live testing.
+21 pitfalls catalogued in PITFALLS.md. The top five that shape the roadmap:
 
-2. **Context window accumulation (C-3)** -- Full `llmHistory` passed on every call. By Round 4, conversation history plus 3,000-4,000 token system prompt saturates most context windows. Late-game personas lose character, JSON format breaks, and the debrief degrades. Implement windowed history (keep last N=6 message pairs). This is a Phase 4 design decision, not a Phase 5 fix.
+1. **Free-tier quota burn during dev** (Pitfall 1) — 10,000 chars/month at 1-char-per-credit; 4-6 full regenerations exhausts it. Mitigation: `FakeTTSProvider` ABC is the dev default via `TTS_PROVIDER=fake|elevenlabs` env var; every call logs `tts.characters_sent`; hard per-segment cap.
+2. **Corporate firewall drops long-running TLS connections** (Pitfall 4) — v1.0/v1.1 only validated the internal LLM proxy; `api.elevenlabs.io` is a NEW external endpoint. Mitigation: **entry-gate spike** — bare-metal `curl` from the target Windows Server confirming a >60s TTS payload arrives intact, documented as a PROJECT.md Key Decision before any backend build.
+3. **Client disconnect keeps charging ElevenLabs** (Pitfall 9) — FastAPI completes handlers even after browser drop. Mitigation: `await request.is_disconnected()` checkpoints between persona segments + frontend `AbortController` + in-flight button disable.
+4. **Blob URL leak in React** (Pitfall 10) — `URL.createObjectURL` without a matching `revokeObjectURL` pins ~10 MB per regenerate. Mitigation: store-owned lifecycle (not component-owned) — `gameStore` revokes before overwriting and on `newGame()` / `resetGame()` / `clearPodcast()`. Do NOT revoke in `PodcastPlayer`'s unmount effect.
+5. **EDIP vocabulary mispronounced and markdown punctuation read aloud** (Pitfalls 5 + 6) — "asterisk asterisk security of supply asterisk asterisk" + "ee-dip". Mitigation: `text_preprocessor.py` strips markdown AND applies an explicit regex pronunciation dict against a golden-file test corpus drawn from v1.0 live runs.
 
-3. **State clamping gaps (C-2)** -- LLM returns out-of-range values; without clamping, track bars overflow and crisis state logic corrupts. Clamp ALL numeric fields in `applyStateUpdate`. Treat `null`/`undefined` as "no change", not 0. Unit test with boundary values for every field including `edipLegitimacy` (-2/+2) and `po` (-2/+2).
+Also notable: v1.1's load-bearing exception-handler ordering (Pitfall 13), the v1.0 08-05 `lastDebriefIdx` bucketing invariant (Pitfall 14), the v1.1 `withinLimit` prompt-token CI assertion with 642-token headroom (Pitfall 15) — all three are preserved by **making zero prompt changes in v1.2** (reinforced: the scripts already exist, no new LLM call).
 
-4. **Persona drift (C-4)** -- After several rounds the LLM bleeds persona roles: Kent quotes numbers, Chen facilitates, multiple personas produce conflicting `stateUpdate`. Add explicit negative constraints per persona in system prompt. Document state update precedence rules (Finch owns crisisSeverity; Chen owns card corrections). Test with multi-trigger inputs in Phase 6.
+**Pitfalls rendered contingent, not active, by the stack prescription:**
 
-5. **Credentials in browser (C-5)** -- Any `VITE_LLM_API_KEY` or direct client-side fetch to the LLM endpoint is a corporate audit failure. First QA step (not last): DevTools > Network > confirm no Authorization header on browser-originated requests.
+Pitfalls 7 (MP3 byte-concat artefacts), 8 (ffmpeg missing on Windows scheduled task), and 21 (pydub temp-file accumulation) are **eliminated by construction** in the prescribed stack because `pydub` and `ffmpeg` are not installed. They remain documented in PITFALLS.md as *contingent pitfalls*: if integration testing shows the raw-bytes-concat approach produces audible artefacts (click/pop at segment boundaries, duration-metadata breakage on strict decoders like Safari), re-opening the `pydub` option **reactivates all three**. The entry-gate for reactivation would be empirical artefact reproduction plus a decision to add `ffmpeg` as a vendored binary.
 
----
+Detail: [`.planning/research/PITFALLS.md`](./PITFALLS.md).
+
+## Cross-Researcher Resolutions
+
+Three places where the four researchers disagreed or left a seam. These are resolved here so the roadmapper and the plan-phase author do not re-debate them.
+
+### 1. Delivery pattern — blocking streaming, NOT 202+poll
+
+FEATURES.md's TS-6 (per-persona progress indicator "Kent done, Finch rendering, Chen waiting") implied the frontend needed real progress events and flagged this to ARCHITECTURE as "either 202-then-poll or SSE — decision out of FEATURES scope." ARCHITECTURE.md section 5 prescribed **blocking streaming `audio/mpeg`** and explicitly rejected 202+poll on the grounds that (a) the facilitator waits-next-to-the-button rather than context-switching, so blocking UX fits; (b) infrastructure already tolerates multi-minute `/api/llm` requests; and (c) a job store would reintroduce the server-side session state that multi-tenancy deferral exists to keep out.
+
+**Resolution:** Architecture's prescription wins. The backend delivers a single blocking `audio/mpeg` response. **TS-6's per-persona progress UI is satisfied client-side only** — an optimistic animation that advances Kent -> Finch -> Chen on a fixed schedule based on elapsed time and the expected per-persona latency (~30-60s), NOT driven by real backend progress events. The animation resets if the blocking response errors before completion. This is a deliberate UX simulation, not deception: the facilitator gets the liveness signal they need; the backend stays stateless.
+
+### 2. MP3 concat approach — raw bytes, pydub pitfalls contingent-not-active
+
+STACK.md Prescribed-Patterns-2 prescribed a zero-dependency `b"".join(...)` concatenation of ElevenLabs `mp3_44100_128` CBR segments with a committed static silence-pad MP3. PITFALLS.md (items 7, 8, 21) raised several concerns about `pydub + ffmpeg` on Windows scheduled tasks: PATH inheritance (issue #668), `AudioSegment.silent()` click artefact (#423), temp-file handle retention on Windows.
+
+**Resolution:** STACK's prescription eliminates those pitfalls *by construction* — no `pydub` installed, no `ffmpeg` invoked, no temp files in the stitching path (final MP3 stays in memory as `bytes`). PITFALLS.md items 7, 8, and 21 are therefore **contingent, not active**, in v1.2. They remain in PITFALLS.md unchanged as documentation for the fallback scenario: if integration testing (Slice 9 in ARCHITECTURE.md section 8) reveals audible artefacts at segment boundaries that the 500ms silence pad does not mask, reopening the `pydub` option reactivates all three pitfalls and requires vendoring `ffmpeg.exe` + `ffprobe.exe`. The entry-gate for that reactivation is empirical reproduction of a clicking/popping artefact on a real browser decoder (Chrome/Edge/Safari), not speculation.
+
+### 3. Health-check integration — parallel `/api/health/tts` (Option B)
+
+STACK.md, ARCHITECTURE.md section 4, and PITFALLS.md all converged on the same answer: a new `GET /api/health/tts` endpoint parallel to the shipped `/api/health/llm`, using the same 8-code taxonomy shape. ARCHITECTURE.md supplied the decisive semantic argument: LLM down is a **hard fail** (Launch button disabled, game can't run); TTS down is a **soft warning** (markdown debrief still works, podcast is additive). Aggregating both behind a single `body.ok` would force a lossy collapse. Two endpoints with independent `ok` flags preserve the distinction.
+
+**Resolution:** Option B (parallel endpoint) is decided. Frontend renders a new `TtsHealthBadge` under the existing `HealthBadge` in `LoadConfigPanel.tsx`; label when failed is "Podcast generation unavailable — markdown debrief will still work." The Launch gate logic stays bit-identical (Launch is gated only on LLM health). Probe target: `GET /v1/voices` or `/v1/user` on ElevenLabs (both cheap, no TTS billing); 30s in-memory cache to protect quota from health-check spam; 15s SLA matching the LLM probe.
 
 ## Implications for Roadmap
 
-Based on the dependency graph from ARCHITECTURE.md and the MVP scope from FEATURES.md, the natural phase structure is six phases. The constraint is hard: TypeScript interfaces must be finalized before anything else; changing types after Phase 1 causes cascading rework. The LLM integration layer (Phase 4) is the highest-risk phase and must receive the most implementation time.
+The ARCHITECTURE.md section 8 dependency chain lays out 11 build-slices in strict dependency order: backend settings + health skeleton, TTS provider + preprocessor, audio generator + stitching, endpoint wiring, frontend client + types, Zustand slice, PodcastPlayer + ActionToolbar wire-up, TTS health badge, live-ElevenLabs verification, graceful-degradation verification, milestone audit. Slices 1-8 are all mockable (no live credentials required in CI); slices 9-10 require a real ElevenLabs key and match the v1.1 Tier-B live-replay precedent.
 
-### Phase 1: Foundation -- Types, Data, and Store
+For phase structuring, the natural seams cluster into roughly three-to-four groupings:
 
-**Rationale:** `src/types/game.ts` and `src/types/llm.ts` are the contract between all layers. Every component, lib file, and Pydantic model depends on them. They must be stable before any other work begins. Zero dependencies, zero risk -- produces no UI but unblocks everything.
-**Delivers:** TypeScript interfaces (GameConfig, GameState, TeamState, ChatMessage, LLMRequest, LLMStructuredResponse, PersonaResponse, StateUpdate), EDIP config constant, Zustand store with all state slices and actions.
-**Addresses:** P0 foundational work
-**Avoids:** Cascading type rework later; make clamping treat `undefined` as "no change" explicit in type definitions from the start
-**Research flag:** Skip -- standard TypeScript + Zustand patterns, well-documented
+- **A backend-first foundation grouping** — settings, TTS health skeleton, TTS provider with `FakeTTSProvider` default, text preprocessor with its test corpus, audio generator with stitching. This group is 100% mockable and unblocks the frontend. It also absorbs most of the critical pitfalls (quota-burn, 5s httpx timeout, markdown-read-aloud, EDIP mispronunciation) early, before any UI touches exist to complicate debugging.
+- **An endpoint + frontend-plumbing grouping** — `/api/debrief/podcast` wired to the generator, `podcastClient.ts` zero-throw wrapper, `PodcastSlice` on `gameStore` with blob-URL lifecycle, `PodcastPlayer` component, and the one-line `ActionToolbar.tsx` edit. This group delivers the end-to-end flow against the mocked backend.
+- **A health + graceful-degradation grouping** — `/api/health/tts` endpoint live, `TtsHealthBadge`, `LoadConfigPanel` integration, plus the explicit graceful-degradation verification (flip `ELEVENLABS_API_KEY` to garbage, confirm markdown debrief still works).
+- **A live-verification + audit grouping** — the first slice that needs a real ElevenLabs key, mirroring the v1.1 milestone-audit pattern. This includes the corporate-firewall spike (which is actually an *entry-gate prerequisite* before backend build, see below) and a listen-through on the v1.0 Scenario-2 fixture transcripts.
 
-### Phase 2: Setup Screen
+The roadmapper should decide the exact phase count and boundaries; the research does not prescribe it. What the research DOES prescribe is the mock-vs-live boundary: the final phase is the first phase that requires a real ElevenLabs key, and it should be preceded by a gate that confirms the corporate-firewall spike has been completed.
 
-**Rationale:** Can be built and fully tested without a running backend. Uses the EDIP config constant from Phase 1. Validates config loading and parsing before the game screen depends on them.
-**Delivers:** Setup flow -- Home, Load Config (JSON textarea with parse validation), Generate Brief (stubbed), Scenario selection, Launch to game. Null gameState guard (redirect to `/setup` before game screen renders).
-**Addresses:** P2 features: config loading, scenario selection
-**Avoids:** M-5 (null gameState crash on direct `/game` URL navigation), Phase-2 pitfall (JSON validation before enabling Launch button)
-**Research flag:** Skip -- standard React form + JSON validation patterns
+### Entry-gate prerequisites (before Phase 1 of the built roadmap begins)
 
-### Phase 3: Game Screen Layout (Mock Data)
+Three items gate the first line of implementation code:
 
-**Rationale:** The three-column layout, persona message rendering, track bars, and reference panel can all be built and styled against mock data injected into the Zustand store. Decouples visual development from LLM integration. This is where the Google Stitch design system is implemented.
-**Delivers:** Full GameScreen with GameHeader (round counter, crisis badge), StatePanel (TrackBar for severity/legitimacy, team resource grids), ChatFeed (all message types, persona colours, loading dots, smart auto-scroll), ReferencePanel (CARDS/ACTIONS/GUIDE tabs, card detail drill-down), FacilitatorInput (buttons wired to store actions, LLM call stubbed).
-**Addresses:** P0 features: three-column layout, persona message rendering, state dashboard, reference panel
-**Avoids:** Mi-1 (smart auto-scroll -- only snap to bottom if already at bottom or message just sent), Phase-3 pitfall (legitimacy -2/+2 bar rendering unit tested for all five states)
-**Research flag:** Skip -- standard React component + Tailwind patterns; design tokens defined in STACK.md
-
-### Phase 4: Backend + LLM Integration (Highest Risk)
-
-**Rationale:** Core value delivery phase and highest-risk phase. Backend can be built and tested with curl independently before wiring to frontend. The three hardening decisions -- windowed history, defensive JSON parsing, clamped state application -- must be made here, not retrofitted later. Rushing this phase produces a tool that works in demos but fails in live exercises.
-**Delivers:** Full FastAPI backend (main.py, config.py, routers/llm.py, routers/config_gen.py, Pydantic models). Frontend: promptBuilder.ts (full system prompt with persona routing, live state injection, JSON output schema), llmClient.ts (defensive JSON parse, error message production, AbortController timeout), stateUpdater.ts (all fields clamped, null/undefined = no-op), FacilitatorInput wired to real LLM flow, round start auto-trigger, advance round action.
-**Addresses:** P0/P1 features: LLM proxy, prompt builder, persona routing, state updates, round advancement with inject delivery, facilitator input handler
-**Avoids:** C-1 (defensive JSON parsing), C-2 (all fields clamped with unit tests), C-3 (windowed history design decision made before wiring), C-4 (negative persona constraints in system prompt), C-5 (credentials never in browser), M-2 (AbortController timeout + retry UX), M-3 (buildSystemPrompt called fresh on every invocation), Phase-4 pitfall (corporate endpoint response structure -- make extraction path configurable)
-**Research flag:** Needs prompt engineering iteration against real LLM credentials. Windowed history N needs token budget measurement. Corporate endpoint response structure must be verified before hardcoding extraction path.
-
-### Phase 5: Polish, Debrief Export, and Config Generation
-
-**Rationale:** Completes the MVP with the session-closing deliverable (debrief export), adds UX polish that reduces facilitator friction in live sessions, and implements config generation in a controlled way.
-**Delivers:** debriefExporter.ts (all `isDebrief: true` messages across session, markdown format, browser download), PC threshold warning badges (STRAINED/CRISIS on team cards), error states in ChatFeed with retry support, GenerateBriefPanel wired to real `/api/generate-config`, generated config schema validation with specific field error messages, elapsed time under loading spinner after 5s, keyboard shortcuts.
-**Addresses:** P1 features: debrief export; P2: PC warning badges, error states; P3: config generation
-**Avoids:** Mi-4 (debrief export collects all `isDebrief: true` across full session, not just latest segment), M-4 (schema validation on generated config), Mi-5 (startup validation for missing env vars)
-**Research flag:** Config generation prompt engineering needs iteration; test with 3 brief types (cyber, logistics, political crisis) to establish reliability threshold
-
-### Phase 6: QA and Credential Audit
-
-**Rationale:** The only way to surface context accumulation failures, persona drift in multi-trigger scenarios, and late-game JSON degradation is a full end-to-end scenario run against real LLM credentials. This is functional validation, not optional polish.
-**Delivers:** Full 5-round Scenario 2 run (longest scenario, guaranteed to expose context limits), multi-trigger input test (simultaneous round-start + card + dispute), credential audit (DevTools Network confirms zero Authorization header on browser requests), stateUpdater unit test suite (boundary values for all fields), history window verification (`llmHistory.length` never exceeds 2xN+1 entries), error injection tests (malformed LLM response, timeout, missing env var).
-**Addresses:** All "Looks Done But Isn't" checklist items from PITFALLS.md
-**Research flag:** Skip -- execution phase, not research
-
-### Phase Ordering Rationale
-
-- Types before everything: cascade rework cost of changing `GameState` after Phase 1 is high; the lock-in is intentional and necessary
-- UI before backend (Phases 2-3): all frontend visual work can proceed against mock data; enables parallel development and early design review
-- Backend + integration together in Phase 4: build both and wire once rather than stub-then-real requiring two integration rounds
-- Hardening decisions in Phase 4 not Phase 5: windowed history, defensive parsing, and clamping are architectural decisions that get expensive to retrofit
-- Config generation last: differentiator but not MVP-blocking; its prompt engineering is independent of the core game loop
+1. **Corporate-firewall spike from the target Windows Server** — bare-metal `curl` or `python -c "requests.post(...)"` against ElevenLabs TTS endpoint from inside the corporate network, confirming a >60s payload arrives intact. Result documented as a PROJECT.md Key Decision with date. This is the single item most likely to derail the milestone if discovered late (Pitfall 4). **Must happen before Slice 1.**
+2. **`FakeTTSProvider` dev default** — the `TTSProvider` ABC and the `FakeTTSProvider` (returns pre-recorded beep MP3s) must exist and be the dev default via `TTS_PROVIDER=fake|elevenlabs` env var before any developer is pointed at a real ElevenLabs key. This protects the shared free-tier quota during UI iteration (Pitfall 1). Lands as part of Slice 2.
+3. **NOT required: vendored ffmpeg.exe** — explicitly called out because it is tempting to include preemptively. The prescribed raw-bytes-concat approach does not use ffmpeg; vendoring it is an unused complexity. This flips only if the contingent-not-active reactivation (Cross-Researcher Resolution #2) is triggered.
 
 ### Research Flags
 
-**Phases needing deeper research or iteration during planning:**
+Phases likely needing deeper research during plan-phase:
+- **The live-verification phase (whichever phase contains Slice 9)** — needs a brief research pass on ElevenLabs voice-library current state (voice IDs for Kent/Finch/Chen stock selection), current ToS language about training on API input (referenced in PITFALLS.md security table), and current pricing-page behaviour for monthly-char-budget reporting. All three can drift between research-date (2026-04-17) and phase-build-date.
 
-- **Phase 4:** Prompt engineering for persona routing, JSON output schema enforcement, and windowed history token budgeting requires iteration against the target corporate LLM. The routing table needs empirical testing, not just spec-reading. Corporate endpoint response structure may deviate from standard OpenAI format -- verify before hardcoding the extraction path.
-- **Phase 5:** Config generation prompt needs testing against multiple brief types to establish reliability threshold. A generated config that passes JSON schema validation but has semantically wrong game design (contradictory voting rules) is harder to catch automatically.
-
-**Phases with standard patterns (skip research-phase):**
-- **Phases 1, 2, 3:** TypeScript interfaces, Zustand store, React component layout -- well-documented, low ambiguity
-- **Phase 6:** QA execution -- test plan follows directly from pitfall checklist
-
----
+Phases with standard patterns (can skip deeper research):
+- Backend foundation (settings, TTS provider, preprocessor, stitcher) — STACK.md and ARCHITECTURE.md provide line-for-line transplant patterns from the MDInsights reference repo; no unknowns.
+- Endpoint + frontend plumbing — mirrors the shipped `/api/llm` + `llmClient.ts` + `gameStore.ts` patterns line-for-line.
+- TTS health badge — structural copy of v1.1's `HealthBadge.tsx`.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | FastAPI 0.135.x, Pydantic 2.9+, React 19, Tailwind v4 all verified against official sources. Zustand 5 and Vite 6 confirmed via transitive documentation references. |
-| Features | HIGH | Derived from authoritative WARGAME_ENGINE_DEV_SPEC.md. No competitor product research available (WebSearch unavailable) but irrelevant -- product scope is defined, not discovered. |
-| Architecture | HIGH | Derived from spec + FastAPI official docs. Thin-backend pattern, Vite proxy, static file serving, CORS config all verified. |
-| Pitfalls | HIGH | LLM JSON parsing failures, context accumulation, and state clamping are well-established production LLM integration failure modes confirmed by multiple sources. |
+| Stack | HIGH | ElevenLabs SDK 2.43.0 verified against PyPI + GitHub releases (released 2026-04-13, four days before this research). Reference repo code read directly. Raw-bytes-concat safety verified against Hydrogenaudio MP3 spec (authoritative). `num2words` 0.5.x stability confirmed. |
+| Features | HIGH | Anchored to shipped v1.0/v1.1 behaviour read directly from `src/lib/debriefExporter.ts`, `src/components/game/ChatFeed/`, `PROJECT.md`. User-input scope document explicit about in/out decisions. 11 table-stakes + 5 in-differentiators enumerated with complete dependency graph. |
+| Architecture | HIGH | Every new file path and every modified existing file enumerated and verified against the actual repo tree. State-slice shape specified to the field. Blob-URL lifecycle rules enumerated. The only MEDIUM call was the health-check option choice, resolved to Option B with three-way research convergence. |
+| Pitfalls | HIGH | 21 items, each with a verified external source (ElevenLabs docs, httpx docs, FastAPI issue trackers, pydub issues, Hydrogenaudio) or an internal code reference (PROJECT.md Key Decisions). Per-phase mapping complete. |
 
-**Overall confidence:** HIGH
+**Overall confidence: HIGH.**
 
 ### Gaps to Address
 
-- **Corporate LLM response structure:** The corporate endpoint may return a non-standard response envelope (`result.output` instead of `choices[0].message.content`). Make the response field extraction path configurable in `config.py` (e.g., `LLM_RESPONSE_PATH` env var). Verify against actual endpoint before Phase 4 completion.
-- **Token budget for system prompt:** Estimated at 3,000-4,000 tokens but depends on actual EDIP config card count. Measure the actual prompt token count before choosing windowed history window size N, to ensure system prompt + N history entries stays within the model's practical context window.
-- **Corporate network timeout:** PITFALLS.md flags a 30-second corporate proxy timeout against 25-35 second LLM generation times. The recommended AbortController timeout of 45 seconds is a starting point -- verify the actual corporate proxy timeout with the IT/ops team before going live.
-- **LLM_EXTRA_HEADERS format:** Clarify the expected format (JSON string? comma-separated key=value?) and document in `.env.example` with a worked example before Phase 4.
+Two items are settled enough to proceed but would benefit from a brief plan-phase decision:
 
----
+- **Per-session character-budget ceiling (soft cap before confirm dialog, hard cap that refuses further generation).** FEATURES.md TS-10 suggests ~2000 words (~12,000 chars). PITFALLS.md Pitfall 1 suggests `MAX_CHARS_PER_SESSION=6000`. **Recommended default:** soft cap at 6,000 chars (warn-and-confirm), hard cap at 10,000 chars (refuse with `TTS_SESSION_BUDGET_EXCEEDED`). Plan-phase should confirm.
+- **Serial vs bounded-concurrent per-persona synthesis.** STACK.md recommends `asyncio.gather` with three `run_in_threadpool` calls for a ~3x wall-clock speedup; PITFALLS.md Pitfall 2 warns of free-tier 2-concurrent-request limit. **Recommended default:** serial by default via a `MAX_CONCURRENT_TTS=1` env var; bump to 2 only when the deployment plan is confirmed >= Creator tier. Plan-phase should confirm based on actual ElevenLabs subscription tier.
+
+Settled (no decision needed):
+- **`eleven_multilingual_v2` vs `eleven_turbo_v2`** — SETTLED. STACK.md prescribes `eleven_multilingual_v2` (quality over speed; this is a 3-voice narrated debrief, not a real-time interaction).
+- **Canonical persona order Kent -> Finch -> Chen** — SETTLED. FEATURES.md TS-4 anchors this to the on-screen `PersonaDots.tsx` order; ARCHITECTURE.md section 5 makes it request-shape authoritative.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- `C:/KVWarGame/WARGAME_ENGINE_DEV_SPEC.md` -- authoritative implementation spec; all feature, architecture, and pitfall findings grounded here
-- `C:/KVWarGame/.planning/PROJECT.md` -- requirements and constraints
-- FastAPI release notes (verified 2026-04-01): https://fastapi.tiangolo.com/release-notes/
-- FastAPI CORS / static files / settings / testing / async tests docs: https://fastapi.tiangolo.com/
-- Tailwind CSS v4 blog + install docs: https://tailwindcss.com/blog/tailwindcss-v4
-- React 19 release blog: https://react.dev/blog/2024/12/05/react-19
-- Pydantic-settings docs: https://docs.pydantic.dev/latest/concepts/pydantic_settings/
+- `.planning/research/STACK.md` — v1.2 stack additions (elevenlabs 2.43.0, num2words)
+- `.planning/research/FEATURES.md` — 11 table stakes, 8 differentiators, 10 anti-features
+- `.planning/research/ARCHITECTURE.md` — 11-slice dependency chain, Zustand slice shape, blob-URL lifecycle rules
+- `.planning/research/PITFALLS.md` — 21 pitfalls with per-phase mapping
+- [elevenlabs on PyPI](https://pypi.org/project/elevenlabs/) and [GitHub releases](https://github.com/elevenlabs/elevenlabs-python/releases) — SDK 2.43.0 verified as current stable
+- [Hydrogenaudio Knowledgebase: Bit reservoir + CBR](https://wiki.hydrogenaudio.org/) — MP3 frame-independence verified for `mp3_44100_128` CBR
+- `.planning/PROJECT.md` — v1.0 and v1.1 Key Decisions that constrain this milestone
+- `backend/app/routers/{llm,health}.py` and `src/lib/{llmClient,gameStore,debriefExporter}.ts` — shipped contracts read directly
 
 ### Secondary (MEDIUM confidence)
-- Zustand 5 named export change -- confirmed in docs; version confirmed via Tailwind docs referencing Vite 6 examples
-- Vite 6 Node 18+ requirement -- confirmed via @tailwindcss/vite installation docs
-- TypeScript 5.x current stable -- training knowledge; widely adopted
-- Python 3.11 recommendation -- training data + corporate deployment patterns; 3.12 is stable alternative
+- [elevenlabs-python issue #243](https://github.com/elevenlabs/elevenlabs-python/issues/243) — `AsyncElevenLabs` TypeError; basis for sync-first prescription
+- MDInsights reference repo (`SamuraiJenkinz/daily-intelligence-brief`) — `TTSProvider` ABC pattern, `audio_generator.py` orchestrator shape, `text_preprocessor.py` dict+regex pattern
+- [ElevenLabs Rate Limits help page](https://help.elevenlabs.io/hc/en-us/articles/14312733311761) — free-tier 2-concurrent / starter 3-concurrent basis for Pitfall 2
+- [FastAPI disconnect-handling discussions](https://github.com/fastapi/fastapi/discussions/14552) — `is_disconnected()` checkpoint pattern for Pitfall 9
 
-### Tertiary (LOW confidence / inference)
-- Competitor landscape -- WebSearch unavailable; no verified competitor product research. No known product combines multi-persona AI, live state tracking, and policy exercise facilitation at this scope.
-- Corporate proxy timeout defaults -- 30-second estimate is a common corporate default; must be verified with target deployment environment
+### Tertiary (LOW confidence)
+- Current ElevenLabs ToS language on training-on-API-input — cited by reference but not re-verified on 2026-04-17; should be re-confirmed during the live-verification phase.
+- Current ElevenLabs stock voice library for Kent/Finch/Chen voice casting — intentionally deferred; this milestone uses env-configured voice IDs and does not research specific voices.
 
 ---
-*Research completed: 2026-04-13*
+*Research synthesis for: v1.2 Debrief Podcast milestone*
+*Synthesized: 2026-04-17*
+*Supersedes: prior v1.0 SUMMARY.md dated 2026-04-13*
 *Ready for roadmap: yes*

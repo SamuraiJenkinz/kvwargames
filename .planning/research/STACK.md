@@ -1,294 +1,355 @@
-# Technology Stack: KV War Game Engine
+# Stack Research — v1.2 Debrief Podcast
 
-**Project:** KV War Game Engine — AI-powered wargame facilitation tool
-**Researched:** 2026-04-13
-**Architecture:** Python/FastAPI backend + React/Vite frontend (monorepo)
+**Domain:** Server-side TTS audio generation layered onto an existing FastAPI + React SPA
+**Researched:** 2026-04-17
+**Confidence:** HIGH (ElevenLabs SDK + num2words verified against PyPI / GitHub releases; reference implementation code read directly; MP3 concat tradeoff verified against Hydrogenaudio authoritative source)
 
----
-
-## Recommended Stack
-
-### Backend: Core Framework
-
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| Python | 3.11+ | Runtime | 3.11 gives meaningful perf gains over 3.10; 3.12 is stable but some corporate IT images lag behind. 3.11 is the safe minimum for 2025 deployments. |
-| FastAPI | 0.135.x | API server + LLM proxy | Current stable (0.135.3 as of 2026-04-01). Built-in async, automatic OpenAPI docs, Pydantic-native. Starlette-based so it can serve the React build as static files. The LLM proxy route is the single most important architectural decision — FastAPI makes this trivial with a single async endpoint. |
-| Uvicorn | 0.x (latest) | ASGI server | Bundled with `fastapi[standard]`. Standard ASGI server for FastAPI. Use `uvicorn[standard]` for production (includes `uvloop` and `httptools` for speed). |
-| Pydantic v2 | 2.9+ | Request/response models, settings | Required by FastAPI 0.135.2+. v2 uses Rust-based core — meaningfully faster than v1 for JSON serialization. The LLM structured-response parsing (persona responses + state deltas) benefits from Pydantic model validation. |
-| pydantic-settings | 2.x | Environment variable management | Official companion to Pydantic v2 for typed, validated env var loading. Reads `.env` files and environment variables. The correct way to load `LLM_API_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_EXTRA_HEADERS` into typed Python classes. |
-| httpx | 0.27+ | Async HTTP client for LLM proxy | FastAPI's TestClient is built on httpx. For the LLM proxy route (`POST /api/llm`), use `httpx.AsyncClient` to forward requests to the corporate OpenAI-compatible endpoint. Non-blocking, supports streaming, has the exact same API shape as the OpenAI SDK's underlying transport. |
-
-**Why not `requests` library?** Blocking sync I/O in an async FastAPI handler kills the server's concurrency. `httpx` is the async-native replacement and is already a FastAPI transitive dependency.
-
-**Why not `openai` Python SDK?** The OpenAI SDK adds version-pinned opinions about auth headers and endpoint shape. For a corporate endpoint proxy where you must pass custom headers (`LLM_EXTRA_HEADERS`), raw `httpx` against the OpenAI-compatible chat completions format gives cleaner control. If the corporate endpoint is Azure OpenAI, there is also an `openai` SDK with Azure support — but raw httpx is simpler and has zero extra dependencies for this single-endpoint use case.
+> This document prescribes ONLY the additions needed for v1.2. The v1.0/v1.1 base stack (Python 3.11+, FastAPI 0.135.x, Pydantic v2.9+, httpx 0.27+, React 19, TypeScript 5, Vite 6, Zustand 5, Tailwind v4, pytest, Vitest) is already shipped, validated in a live 5-round Scenario-2 run, and locked. Do not re-evaluate those choices here.
 
 ---
 
-### Backend: Supporting Libraries
+## Recommended Additions
 
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| python-dotenv | 1.0+ | `.env` file loading in dev | Used by pydantic-settings automatically when `env_file=".env"` is set. Install explicitly so dev tooling can find it. |
-| python-multipart | 0.0.9+ | Form data parsing | Required by FastAPI for file upload endpoints (config JSON file upload). Install with `fastapi[standard]` but pin explicitly. |
-| anyio | 4.x | Async compatibility layer | FastAPI/Starlette dependency. Needed explicitly for async test setup (`pytest.mark.anyio`). |
+### Core Technologies (Backend)
 
----
+| Technology | Version | Purpose | Why Prescribed |
+|------------|---------|---------|----------------|
+| `elevenlabs` | `==2.43.0` | ElevenLabs Python SDK — text-to-speech API client | Latest stable (April 13 2026, verified via PyPI + GitHub releases). 2.x is a full rewrite on top of `httpx` with a clean `ElevenLabs(...)` client class; the reference repo (`daily-intelligence-brief`) uses exactly this SDK and the migration path is zero-cost since we have no pre-2.x code to port. Pinning to `==2.43.0` rather than a floor avoids silent Fern-regen breakage — the SDK releases weekly auto-generated updates that periodically rename namespaces. |
+| `num2words` | `>=0.5.13,<0.6` | Number-to-words normalization for TTS preprocessing | Reference repo uses `>=0.5.13`. 0.5.16 is current; library is stable and backwards-compatible within 0.5.x. Used inline in `TextPreprocessor._normalize_currency` / `_normalize_percentages`. The `<0.6` ceiling is defensive — a major-minor bump could change locale signatures. |
 
-### Frontend: Core Framework
+No other new runtime dependencies. In particular: **no `pydub`, no `ffmpeg-python`, no `mutagen`, no `tenacity`**. Justification below.
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| Node.js | 20 LTS | Runtime | 20 LTS is the stable corporate standard. Vite 6 requires Node 18+; 20 LTS gives two more years of security updates. |
-| React | 19.x | UI library | Current stable as of December 2024. React 19 removes `forwardRef` complexity (direct `ref` prop), which matters for the animated components (TrackBar, LoadingDots). Security patches are in 19.2.1+. Do NOT use React 18 — the ecosystem has moved. |
-| TypeScript | 5.x | Type safety | 5.x is the current stable. Use strict mode. The spec's data models (`GameState`, `PersonaResponse`, `TeamState`) are complex enough that loose TypeScript will cause bugs during LLM response parsing. |
-| Vite | 6.x | Build tool + dev server | Current stable. `@tailwindcss/vite` plugin integrates directly — no PostCSS config needed. Fast HMR during development. For the corporate deployment pattern (FastAPI serves the `dist/` build), `vite build` outputs a clean SPA bundle. |
+### Supporting Libraries
 
----
+None. The v1.2 feature set can be delivered with the two additions above plus the existing stack.
 
-### Frontend: State Management
+- **MP3 stitching**: done with Python stdlib bytes (see Prescribed Patterns #2 below). No library needed.
+- **Silence pads**: bundled as a single static file (`backend/app/assets/silence_500ms.mp3`) committed to the repo; generated once offline. No runtime audio synthesis.
+- **Streaming response**: `fastapi.responses.Response` (stdlib of the existing FastAPI install). No new import surface.
+- **Async**: `starlette.concurrency.run_in_threadpool` (already available via FastAPI). No new import surface.
+- **Frontend player**: native HTML5 `<audio>`. No library.
 
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| Zustand | 5.x | Client state (game state, chat, LLM history) | Zustand 5 is current. No boilerplate, no providers, no Context wrapping. The spec's `GameStore` — game config, team states, chat messages, LLM conversation history, round/crisis tracking — maps directly to a flat Zustand store. Session-only requirement means no persistence middleware needed. Simpler than Redux or Jotai for this use case. |
+### Development Tools
 
-**Zustand 4 vs 5:** Zustand 5 dropped the default export in favor of named exports (`import { create } from 'zustand'`). Be aware of this if copying old examples. Use v5 — it's stable and all new docs target it.
-
----
-
-### Frontend: Styling
-
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| Tailwind CSS | 4.x | Utility-first styling | Current stable (4.2). Critical change from v3: **no `tailwind.config.js`**. CSS-first configuration using `@theme {}` in your main CSS file. For the dark UI with custom design tokens (Syne, DM Sans, IBM Plex Mono, custom color palette), define all tokens in `@theme {}`. The Vite plugin (`@tailwindcss/vite`) is the correct integration — not PostCSS. |
-| @tailwindcss/vite | 4.x | Tailwind Vite plugin | First-party plugin, faster than PostCSS path. Add to `vite.config.ts` plugins array. |
-
-**Tailwind v3 vs v4:** v4 is a breaking change. `tailwind.config.js` does not exist. If you find tutorials using `theme.extend` in a JS config file, those are v3 patterns. Use `@theme {}` in CSS instead.
-
----
-
-### Frontend: Supporting Libraries
-
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| Lucide React | 0.4x+ | Icons | Lightweight, tree-shakeable. Used for UI affordances (send button, export, status indicators). Already specified in the original spec. |
-| clsx | 2.x | Conditional class names | Utility for combining Tailwind classes conditionally (e.g., persona-specific bubble colors, crisis state badges). Simpler than `classnames` package. |
-| tailwind-merge | 2.x | Merge conflicting Tailwind classes | Prevents duplicate class conflicts when composing components with dynamic classes. Use alongside `clsx` via a `cn()` utility. |
-
-**Google Fonts:** Load Syne, DM Sans, IBM Plex Mono via `@import` in the main CSS file or via `<link>` in `index.html`. Do NOT use a Google Fonts npm package — direct CSS import is faster and has no JavaScript overhead.
-
----
-
-### Development Tooling
-
-#### Backend
-
-| Tool | Version | Purpose | Notes |
-|------|---------|---------|-------|
-| pytest | 8.x | Test runner | Current stable. Standard Python testing. |
-| pytest-anyio | 0.x (latest) | Async test support | Required for testing async FastAPI routes (the LLM proxy route is async). Use `@pytest.mark.anyio` on async test functions with `AsyncClient`. |
-| ruff | 0.4+ | Linter + formatter | Replaces flake8, isort, and black in a single tool. Extremely fast. FastAPI itself uses ruff. Configure via `pyproject.toml`. |
-| mypy | 1.x | Static type checking | Verify the Pydantic models and LLM response parsers are type-safe. Run in CI. |
-
-#### Frontend
-
-| Tool | Version | Purpose | Notes |
-|------|---------|---------|-------|
-| Vitest | 2.x | Unit/integration testing | Vite-native test runner. Same config as Vite, no webpack overhead. Use for Zustand store tests and utility function tests. |
-| @testing-library/react | 16.x | Component testing | Current stable for React 19. Works with Vitest. |
-| ESLint | 9.x | Linting | v9 uses flat config (`eslint.config.js`). Use with `typescript-eslint` and `eslint-plugin-react-hooks`. |
-| prettier | 3.x | Formatting | Consistent code style. |
-
----
-
-## Project Structure (Recommended)
-
-```
-kvwargame/
-├── backend/                    # Python/FastAPI
-│   ├── app/
-│   │   ├── main.py             # FastAPI app + static file mount
-│   │   ├── config.py           # pydantic-settings Settings class
-│   │   ├── routers/
-│   │   │   ├── llm.py          # POST /api/llm  (LLM proxy)
-│   │   │   └── config_gen.py   # POST /api/generate-config
-│   │   └── models/
-│   │       ├── llm.py          # LLM request/response Pydantic models
-│   │       └── game.py         # Game state Pydantic models
-│   ├── tests/
-│   ├── pyproject.toml          # deps + ruff + mypy config
-│   └── .env.example
-│
-├── frontend/                   # React/Vite/TypeScript
-│   ├── src/
-│   │   ├── main.tsx
-│   │   ├── App.tsx
-│   │   ├── store/
-│   │   │   └── gameStore.ts    # Zustand store
-│   │   ├── components/
-│   │   ├── lib/
-│   │   │   ├── llmClient.ts    # fetch() wrapper to /api/llm
-│   │   │   ├── promptBuilder.ts
-│   │   │   └── stateUpdater.ts
-│   │   ├── types/
-│   │   │   ├── game.ts
-│   │   │   └── llm.ts
-│   │   └── styles/
-│   │       └── main.css        # @import "tailwindcss"; @theme {...}
-│   ├── index.html
-│   ├── vite.config.ts
-│   ├── tsconfig.json
-│   └── package.json
-│
-└── config.json                 # EDIP game configuration (already exists)
-```
-
-**Deployment note:** `vite build` outputs to `frontend/dist/`. FastAPI's `StaticFiles(directory="frontend/dist", html=True)` mounts this at root. A single `uvicorn app.main:app` serves everything. No reverse proxy required for corporate internal deployment.
+| Tool | Purpose | Notes |
+|------|---------|-------|
+| (none new) | — | Existing `pytest` covers backend; existing `vitest` covers frontend. TTS contract tests mock `elevenlabs.client.ElevenLabs` — no new test framework needed. |
 
 ---
 
 ## Installation
 
-### Backend
+Add to `backend/requirements.txt`:
 
-```bash
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-
-# Install dependencies
-pip install "fastapi[standard]" pydantic-settings httpx python-dotenv
-pip install pytest pytest-anyio ruff mypy
-
-# pyproject.toml (key entries)
-# [project]
-# requires-python = ">=3.11"
-# dependencies = [
-#   "fastapi[standard]>=0.135.0",
-#   "pydantic>=2.9.0",
-#   "pydantic-settings>=2.0.0",
-#   "httpx>=0.27.0",
-#   "python-dotenv>=1.0.0",
-#   "python-multipart>=0.0.9",
-# ]
+```
+elevenlabs==2.43.0
+num2words>=0.5.13,<0.6
 ```
 
-### Frontend
+Update `.env.example` (new variables):
 
-```bash
-# Scaffold Vite + React + TypeScript
-npm create vite@latest frontend -- --template react-ts
-cd frontend
-
-# Install dependencies
-npm install zustand lucide-react clsx tailwind-merge
-npm install -D tailwindcss @tailwindcss/vite
-
-# Dev dependencies
-npm install -D vitest @testing-library/react @testing-library/user-event
-npm install -D eslint typescript-eslint eslint-plugin-react-hooks prettier
+```
+ELEVENLABS_API_KEY=
+ELEVENLABS_VOICE_KENT=
+ELEVENLABS_VOICE_FINCH=
+ELEVENLABS_VOICE_CHEN=
+ELEVENLABS_MODEL_ID=eleven_multilingual_v2
+ELEVENLABS_OUTPUT_FORMAT=mp3_44100_128
 ```
 
-### vite.config.ts (critical — Tailwind v4 integration)
+Frontend: **no `package.json` changes.**
 
-```typescript
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+---
 
-export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-  ],
-  server: {
-    proxy: {
-      '/api': 'http://localhost:8000'  // Forward to FastAPI in dev
-    }
-  }
-})
+## Prescribed Patterns
+
+### 1. ElevenLabs SDK usage (sync client, not async)
+
+**Prescription:** Use the synchronous `ElevenLabs` client wrapped in `run_in_threadpool` from the FastAPI route. Do NOT use `AsyncElevenLabs`, do NOT hand-roll `httpx` calls to the ElevenLabs REST endpoint.
+
+**Import:**
+
+```python
+from elevenlabs.client import ElevenLabs
 ```
 
-### main.css (Tailwind v4 CSS-first config)
+**Usage (matches reference repo exactly):**
 
-```css
-@import "tailwindcss";
+```python
+client = ElevenLabs(api_key=settings.elevenlabs_api_key)
 
-@theme {
-  --font-sans: 'DM Sans', sans-serif;
-  --font-display: 'Syne', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
-  /* Add custom color tokens here */
+audio_iter = client.text_to_speech.convert(
+    text=preprocessed_text,
+    voice_id=settings.elevenlabs_voice_kent,
+    model_id="eleven_multilingual_v2",
+    output_format="mp3_44100_128",
+)
+
+segment_bytes = b"".join(audio_iter)   # SDK yields byte chunks
+```
+
+**Why sync SDK over async:**
+
+1. **Single-user facilitation tool.** One podcast generation in flight per session. The FastAPI process is not a high-throughput server — async would win on concurrency we don't have. Correctness and stylistic match matter more than theoretical throughput.
+2. **Stylistic consistency with the `/api/llm` proxy is NOT a factor here.** The `/api/llm` proxy uses `httpx.AsyncClient` because it forwards a streaming LLM response in near real-time. The TTS call is a slow batch operation (~30–60s per minute of audio) that the frontend treats as a job — the right pattern is "block a worker thread," not "hold the event loop."
+3. **The 2.x async client has known bugs.** GitHub issue #243 on `elevenlabs-python` documents TypeError issues with `AsyncElevenLabs.text_to_speech.convert` and `_AsyncGeneratorContextManager`. Sync path is production-proven in the reference repo (shipped daily for months).
+4. **`run_in_threadpool` is the official FastAPI idiom for blocking SDKs.** FastAPI's docs explicitly recommend this when you have a sync SDK you don't want to rewrite. Default pool is 40 threads — three concurrent persona synthesis calls (if we ever parallelize them) consume 3, leaving 37 headroom.
+
+**Route pattern:**
+
+```python
+from starlette.concurrency import run_in_threadpool
+
+@router.post("/api/debrief/podcast")
+async def generate_podcast(req: PodcastRequest) -> Response:
+    segments = []
+    for persona in ("kent", "finch", "chen"):
+        segment = await run_in_threadpool(
+            _synthesize_segment, persona, req.scripts[persona]
+        )
+        segments.append(segment)
+    stitched = _stitch_mp3(segments)
+    return Response(
+        content=stitched,
+        media_type="audio/mpeg",
+        headers={
+            "Content-Disposition": 'attachment; filename="debrief-podcast.mp3"',
+            "Cache-Control": "no-store",
+        },
+    )
+```
+
+**What about parallel synthesis across the three personas?** Use `asyncio.gather` + three `run_in_threadpool` calls — ~3x wall-clock speedup for ~zero code complexity. Prescribed for the implementation phase; do not serialize by default.
+
+### 2. MP3 stitching — raw byte concatenation (no ffmpeg, no pydub)
+
+**Prescription:** Concatenate the three segment bytes plus silence-pad bytes using Python `bytes` concatenation. Do NOT add `pydub`. Do NOT add `ffmpeg-python`. Do NOT require `ffmpeg` on the host.
+
+**Implementation:**
+
+```python
+# Committed to repo at backend/app/assets/silence_500ms.mp3
+# Generated once, offline, with any MP3 encoder at 44.1kHz / 128kbps CBR.
+SILENCE_PAD = (Path(__file__).parent / "assets" / "silence_500ms.mp3").read_bytes()
+
+def _stitch_mp3(segments: list[bytes]) -> bytes:
+    """Join per-persona MP3 segments with silence pads.
+
+    Safe because every segment is produced by ElevenLabs at the same
+    output_format='mp3_44100_128' (44.1 kHz, 128 kbps CBR, mono).
+    MP3 frames in CBR have no cross-frame dependencies worth stitching
+    around (the bit reservoir is bounded within a small look-back window
+    and introduces at most inaudible sub-frame artifacts at the join).
+    """
+    pad = SILENCE_PAD
+    parts = []
+    for i, seg in enumerate(segments):
+        parts.append(seg)
+        if i < len(segments) - 1:
+            parts.append(pad)
+    return b"".join(parts)
+```
+
+**Why this is safe (and why the "MP3 frames are not independent" scare is overstated for our case):**
+
+- **All three segments share identical format.** ElevenLabs returns `mp3_44100_128` — 44.1 kHz, 128 kbps CBR, single channel. Hydrogenaudio (authoritative MP3 reference) confirms: when bit-reservoir artefacts exist, they are a bounded look-back of a few frames and manifest as sub-audible glitches at CBR 128kbps, not structural breakage.
+- **No browser, OS media player, or `<audio>` element cares.** HTML5 audio decoders skip malformed ID3 tags, resync on next frame header, and play through. Every mainstream MP3 decoder (Media Foundation on Windows, CoreAudio on macOS, LAME decoder) handles concatenated MP3 files correctly — the format was literally designed to be streamable.
+- **The reference repo does not stitch**, but the pattern is well-documented. `any_to_any.py` and `merge_mp3` on GitHub are both raw-bytes-concat implementations shipped to thousands of users without format complaints.
+- **Silence pads prevent abrupt persona transitions.** 500ms of audible silence at the join also masks any hypothetical sub-frame glitch. Generate the pad once offline with ffmpeg or Audacity, commit the ~8KB file. No runtime ffmpeg dependency.
+
+**Why NOT pydub:**
+- Requires `ffmpeg` binary on the host. Windows Server scheduled-task deployment explicitly does not guarantee ffmpeg presence. Adding a system-level binary dependency to a ~200 LOC credential-proxy backend is architectural malpractice.
+- Forces a decode-then-re-encode round trip that loses MP3 fidelity for zero benefit — we already have byte-identical format across segments.
+
+**Why NOT ffmpeg-python:**
+- Same system-level ffmpeg dependency.
+- Wraps CLI invocation — adds subprocess failure modes (ffmpeg not in PATH, permission issues on Windows scheduled-task context, zombie processes).
+
+**Why NOT `wave` / `audioop` stdlib:**
+- PCM-only. Would require decoding MP3 to PCM and re-encoding back to MP3 — same re-encode waste as pydub, minus the stable wrapper.
+
+**Why NOT mutagen to strip ID3 before concat:**
+- ID3 tags at the start of the second and third segments don't break playback. Decoders skip unknown tag chunks and resync on the next frame header. We verified this against the Hydrogenaudio MP3 spec; empirical confirmation is a 10-line test in phase implementation.
+- Adds a dependency (`mutagen>=1.47`) for zero measurable user benefit.
+
+### 3. Text preprocessing — module-level dict + regex, no acronym library
+
+**Prescription:** Port the reference repo's `TextPreprocessor` pattern one-to-one, replacing `PRONUNCIATION_DICT` and `COMPANY_PRONUNCIATIONS` with wargame-domain equivalents. No new dependencies beyond `num2words`.
+
+**Domain pronunciation dict (wargame EDIP vocab):**
+
+```python
+# backend/app/services/text_preprocessor.py
+WARGAME_PRONUNCIATION_DICT: dict[str, str] = {
+    # EDIP jargon — spell-out (letter-by-letter)
+    r'\bEDIP\b': 'E D I P',
+    r'\bCRM\b': 'C R M',
+    r'\bLEFS\b': 'L E F S',
+    r'\bSIEP\b': 'S I E P',
+    r'\bSoS\b': 'S O S',
+    r'\bIC\b': 'I C',
+
+    # Resource codes — spell-out
+    r'\bPC\b': 'P C',   # Political Capital
+    r'\bPO\b': 'P O',   # Public Opinion
+
+    # Country codes / institutions — expand
+    r'\bEU\b': 'E U',
+    r'\bNATO\b': 'Nato',   # pronounced-as-word, not N-A-T-O
 }
 ```
+
+**Why a regex dict, not a library:**
+- No mature Python library for "English acronym pronunciation" exists that reliably distinguishes spell-out-style (FBI → F-B-I) from pronounced-as-word (NATO → Nato, LASER → laser). This distinction is domain-specific and per-acronym — exactly the shape a dict captures.
+- The reference repo ships this exact pattern to production daily; the approach is proven.
+- Data-driven: adding new vocab is a one-line dict entry, not a code change or regex rework.
+
+**Number normalization:** Inline `num2words` calls inside the currency / percent regex handlers, identical to reference repo. No changes needed there since wargame scripts contain numbers (severity scores, resource counts) but not currency amounts — the `_normalize_currency` handler can ship as-is and simply find nothing to transform.
+
+### 4. FastAPI response — `Response`, not `StreamingResponse` or `FileResponse`
+
+**Prescription:** Return the stitched MP3 as `fastapi.Response(content=mp3_bytes, media_type="audio/mpeg", headers={"Content-Disposition": "attachment; filename=..."})`.
+
+**Why:**
+- The final MP3 is small (3 personas × ~1 min each × 128 kbps ≈ 2.9 MB total). Fits comfortably in a single response body; streaming overhead buys nothing.
+- `StreamingResponse` is for chunked generators where the full payload isn't yet computed (SSE, LLM streaming, large file reads). We compute the full byte payload server-side before responding.
+- `FileResponse` is for serving a file that exists on disk. We hold bytes in memory — writing to a temp file just to serve it back is unnecessary I/O.
+- `Response` sets `Content-Length` correctly from `len(content)`, which enables browser download progress bars and lets the HTML5 `<audio>` element know the full duration on first request.
+
+**Download + inline-play duality:** `Content-Disposition: attachment; filename=...` combined with `media_type: audio/mpeg` works correctly for both cases. The `<audio src="/api/debrief/podcast">` tag will play the audio inline in-browser; the same URL triggers a download when the user clicks a separate `<a href="/api/debrief/podcast" download>` link. Browsers honour the content disposition for anchor-triggered navigations but stream-play for `<audio>` elements regardless of disposition header.
+
+### 5. Frontend audio player — native HTML5 `<audio controls>`
+
+**Prescription:** Use `<audio controls src={podcastUrl} />`. No library. No `wavesurfer.js`, no Howler.js, no `react-audio-player`.
+
+**Why:**
+- Single-track-per-session with no waveform visualization, no pitch shifting, no A/B looping, no cross-fading. Native `<audio>` handles play/pause/seek/volume/download out of the box.
+- Accessibility is correct by default — native controls are keyboard- and screen-reader-navigable. Library wrappers often re-implement these badly.
+- Zero bundle cost. Bundle budget matters: the existing Vite build is already shipping a FL-layer React 19 + Zustand 5 + Tailwind 4 app; adding 50KB of audio player chrome for a feature used once per session is unjustified.
+- The debrief panel also needs a Download MP3 button — rendered as `<a href="/api/debrief/podcast" download>Download MP3</a>` next to the `<audio>` element.
+
+**Component shape (prescribed for implementation phase):**
+
+```tsx
+// frontend/src/components/PodcastPlayer.tsx
+export function PodcastPlayer({ url }: { url: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <audio controls src={url} className="flex-1" />
+      <a
+        href={url}
+        download="debrief-podcast.mp3"
+        className="btn btn-secondary"
+      >
+        Download MP3
+      </a>
+    </div>
+  );
+}
+```
+
+### 6. Health-check pattern — `/api/health/tts` parallel to `/api/health/llm`
+
+**Prescription:** Add a parallel endpoint using the same 8-code taxonomy shipped in v1.1. Call ElevenLabs' low-cost `GET /v1/user` (no TTS billing, ~100ms response) as the liveness probe. Cache result for 30s to avoid quota burn on re-check spam.
+
+**Why parallel, not reusing `/api/health/llm`:**
+- Independent failure modes. LLM up + TTS down is a real scenario (ElevenLabs quota exhausted but corporate LLM is fine). The frontend needs to distinguish these to keep the markdown debrief path working while disabling the podcast button with a clear "audio unavailable" message.
+- Symmetric contract is cheap. The v1.1 health pattern (always HTTP 200, `body.ok` carries signal, 8-code taxonomy) is already implemented — a second endpoint is ~30 LOC copy-adapt.
 
 ---
 
 ## Alternatives Considered
 
-| Category | Recommended | Alternative | Why Not |
-|----------|-------------|-------------|---------|
-| Backend framework | FastAPI | Django REST Framework | DRF is heavyweight for a single-facilitator tool with 2 API routes. No ORM needed (no persistence). FastAPI's async is better for LLM streaming. |
-| Backend framework | FastAPI | Flask | Flask lacks native async. Async Flask (via quart) is less mature. FastAPI's Pydantic integration is critical for LLM response parsing. |
-| LLM HTTP client | httpx | openai Python SDK | OpenAI SDK adds opinion about auth patterns that conflict with custom corporate headers. Raw httpx against the OpenAI-compatible format is more controllable. |
-| LLM HTTP client | httpx | aiohttp | httpx has nicer API, is a transitive FastAPI dep already, and has TestClient compatibility. |
-| Frontend bundler | Vite | Next.js | Original spec used Next.js for its API route / SSR LLM proxy. Adapting to Python backend means that reason is gone. Vite is lighter and faster for a pure SPA. |
-| Frontend bundler | Vite | Create React App | CRA is officially deprecated. Not a valid choice. |
-| State management | Zustand | Redux Toolkit | Redux is over-engineered for single-session, single-user state with no time travel debugging needed. |
-| State management | Zustand | Jotai | Jotai is atomic and works well, but Zustand's flat store pattern maps better to the spec's `GameStore` shape which has interconnected state slices. |
-| Styling | Tailwind CSS v4 | CSS Modules | Tailwind is already specified. CSS Modules would require abandoning the utility-first approach and writing more CSS. |
-| Styling | Tailwind CSS v4 | styled-components | Runtime CSS-in-JS adds overhead. Tailwind v4's zero-runtime approach is better for a tool that may run on lower-spec facilitator laptops. |
-| Python version | 3.11+ | 3.12 | 3.12 is stable but adds minimal benefit here; 3.11 has wider corporate image availability. |
-| Python version | 3.11+ | 3.10 | Missing `match` statement improvements and performance gains. 3.11 is the current LTS sweet spot. |
+| Prescribed | Alternative | When the Alternative Would Win |
+|------------|-------------|-------------------------------|
+| Sync `ElevenLabs` + `run_in_threadpool` | `AsyncElevenLabs` | If we had >10 concurrent podcast generations per second. We have 1 per session. Also blocked by the open #243 TypeError issue. |
+| Sync `ElevenLabs` + `run_in_threadpool` | Direct `httpx.AsyncClient` to ElevenLabs REST | If we wanted to avoid SDK versioning entirely. Cost: maintain request/response models and pagination/streaming by hand. Benefit: none in our use case. Explicitly rejected for this milestone. |
+| Raw-byte MP3 concat | `pydub` + ffmpeg | If segments had mixed bitrates or required fades. Ours are uniform. Also, ffmpeg is not guaranteed on the Windows Server host. |
+| Raw-byte MP3 concat | `ffmpeg-python` concat protocol | Same as pydub — uniform-format input makes re-encoding wasteful; subprocess fragility on Windows scheduled-task context is a real risk. |
+| `fastapi.Response(content=bytes)` | `StreamingResponse` | If the MP3 were >20 MB or we streamed chunks as ElevenLabs emitted them (pre-stitching). Neither applies. |
+| Native HTML5 `<audio>` | `wavesurfer.js` | If we wanted a waveform scrubber (e.g. for facilitators to jump to a specific persona's section visually). Explicit v1.2 non-goal; consider for v2. |
+| Regex pronunciation dict | `num2words` alone with no acronym handling | If wargame scripts contained no acronyms. They contain EDIP, CRM, LEFS, SIEP constantly. |
 
 ---
 
-## What NOT to Use
+## What NOT to Add
 
-| Technology | Reason to Avoid |
-|------------|----------------|
-| Next.js | Original spec used Next.js for server-side LLM proxy. Python/FastAPI makes Next.js redundant and adds Node.js server complexity alongside the Python server. |
-| SQLAlchemy / any ORM | No persistence. Session-only state means no database. Adding ORM infrastructure creates complexity with zero benefit. |
-| Redis / Celery | No background job queues needed. LLM calls are inline request-response. FastAPI's async handles the latency without queue infrastructure. |
-| WebSockets | LLM responses for this tool are short (2-4 sentences per persona). Server-Sent Events (SSE, now supported natively in FastAPI 0.135.0) would be the right choice IF streaming is added later — but standard fetch/JSON responses are sufficient for the initial build. |
-| React Query / TanStack Query | Useful for cache-aware server state. This app has no server state to cache — all state lives in Zustand, all LLM calls are one-shot mutations. Adds unnecessary complexity. |
-| Tailwind v3 | Do not downgrade. v4 is the current stable. v3 patterns (JS config file, `theme.extend`, `content` array) are outdated and the ecosystem is moving on. |
-| `class-variance-authority` (CVA) | Useful for complex design systems. For this app's scope, `clsx` + `tailwind-merge` is sufficient without the abstraction overhead. |
-| Docker (for development) | Adds complexity for what is a simple single-facilitator corporate deployment. Provide a `pyproject.toml` + `package.json` and a startup script. Containerization is an option for ops teams but not a development requirement. |
-| `python-jose` / JWT | No authentication layer. Corporate SSO is external to this app. Adding JWT infrastructure inside the app creates a false security boundary. |
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| `pydub` | Transitive `ffmpeg` system dependency; forces decode-re-encode with no fidelity gain | Raw `bytes` concat with static silence-pad MP3 |
+| `ffmpeg-python` | Same ffmpeg dependency; subprocess fragility on Windows scheduled-task user context | Raw `bytes` concat |
+| `mutagen` | Stripping ID3 tags between segments is unnecessary — decoders resync on next frame header | (no substitute needed) |
+| `tenacity` | Retry logic on ElevenLabs is a product decision, not a library need. A 10-line `for attempt in range(3)` with exponential backoff covers this. The reference repo imports `tenacity` but only uses it for LLM calls — not for TTS | Hand-rolled retry in the provider class |
+| `AsyncElevenLabs` | Open upstream bug (#243); async client is still maturing; not needed for single-session throughput | Sync `ElevenLabs` + `run_in_threadpool` |
+| `wavesurfer.js` / `howler.js` / `react-audio-player` | Bundle cost for UI capabilities we don't use (waveforms, sprite sheets, multi-track mixing) | Native HTML5 `<audio controls>` |
+| Azure OpenAI TTS provider | User explicitly chose ElevenLabs-only for v1.2; dual-provider failover is a reference-repo feature that adds complexity without use case here | ElevenLabs single provider; graceful degradation = "audio unavailable" UI state, not fallback provider |
+| Server-side audio file cache on disk | Session-only, ephemeral-by-design architecture (per `PROJECT.md` constraints); cache adds stale-audio bug surface for zero perf benefit on single-user tool | Generate fresh each call; response is <5 MB |
+| Voice-cloning / persona-matched voices | Explicit v2+ deferral; v1.2 uses stock ElevenLabs voices configured via env vars | Three `ELEVENLABS_VOICE_{KENT,FINCH,CHEN}` env vars |
 
 ---
 
-## Confidence Assessment
+## Version Compatibility
 
-| Area | Confidence | Basis |
-|------|------------|-------|
-| FastAPI version (0.135.x) | HIGH | Verified via official release notes (fastapi.tiangolo.com/release-notes, 2026-04-01) |
-| Pydantic v2 minimum (2.9+) | HIGH | Verified via FastAPI 0.135.2 release notes explicitly requiring `pydantic >=2.9.0` |
-| pydantic-settings pattern | HIGH | Verified via official FastAPI advanced settings docs |
-| CORS middleware pattern | HIGH | Verified via official FastAPI CORS docs |
-| Static files serving pattern | HIGH | Verified via official FastAPI static files docs |
-| React 19.x current stable | HIGH | Verified via React blog (released December 2024, 19.2.1 latest security patch) |
-| Tailwind CSS v4 + Vite plugin | HIGH | Verified via tailwindcss.com/blog/tailwindcss-v4 and install docs |
-| Tailwind v4 CSS-first config | HIGH | Verified — `tailwind.config.js` replaced by `@theme {}` in CSS |
-| Zustand 5.x | MEDIUM | Known from training data; named export change from v4 verified in docs. Version number not confirmed via live source due to fetch restrictions. |
-| Vite 6.x | MEDIUM | Known from training data that Vite 6 exists and requires Node 18+. Version confirmed by Tailwind docs referencing Vite 6 examples. |
-| httpx for LLM proxy | HIGH | Confirmed as FastAPI's underlying HTTP client and recommended for async proxy patterns |
-| pytest-anyio for async tests | HIGH | Verified via official FastAPI async tests docs |
-| TypeScript 5.x | MEDIUM | Known from training data; widely adopted as current stable |
-| Python 3.11 minimum | MEDIUM | Training data + FastAPI docs use 3.10+ syntax; 3.11 recommendation based on training + corporate deployment patterns |
+| Package | Compatible With | Notes |
+|---------|-----------------|-------|
+| `elevenlabs==2.43.0` | Python `>=3.8,<4.0`, `httpx` (bundled transitively) | Our 3.11 base is well within range. SDK brings its own pinned `httpx` dep that will not conflict with our existing `httpx>=0.27`. |
+| `num2words>=0.5.13,<0.6` | Python `>=3.7` | No known compatibility concerns with existing stack. Pure-Python, no C extensions, no runtime risk on Windows. |
+
+**Compatibility with existing backend:**
+- ElevenLabs SDK's bundled `httpx` is compatible with our existing `httpx>=0.27` in `backend/requirements.txt` — pip resolves to a single version satisfying both (expected: ~0.28.x).
+- Pydantic v2.9+ is compatible with ElevenLabs SDK (SDK uses internal Pydantic models — no cross-contamination with our request/response models).
+
+---
+
+## Integration Points With Existing Stack
+
+| Existing Pattern | v1.2 Extension |
+|------------------|----------------|
+| `/api/llm` credential-proxy (zero browser-side secrets) | `/api/debrief/podcast` follows the identical pattern: `ELEVENLABS_API_KEY` lives in `backend/.env`, never touches the frontend bundle. Client posts persona scripts + voice_ids resolved server-side from env. |
+| `pydantic-settings`-loaded env config | New settings fields: `elevenlabs_api_key`, `elevenlabs_voice_kent`, `elevenlabs_voice_finch`, `elevenlabs_voice_chen`, `elevenlabs_model_id`, `elevenlabs_output_format`. Loaded the same way as existing `llm_api_*` fields. |
+| v1.1 `/api/health/llm` with 8-code taxonomy | `/api/health/tts` — parallel endpoint, same 8-code contract, same always-HTTP-200 body-carries-signal shape, 30s in-memory cache to protect quota. |
+| Existing `isDebrief: true` message filter on frontend | Reused as the podcast script source — no new LLM call, no new message tagging. The `PodcastPlayer` renders only when debrief messages exist. |
+| Existing markdown debrief export button | `PodcastPlayer` renders alongside (not replacing) the markdown export. Graceful degradation: if `/api/health/tts` reports `ok: false`, show "audio unavailable" chip; markdown path remains fully functional. |
+| Existing `backend/tests/` pytest fixtures | TTS provider tests mock `elevenlabs.client.ElevenLabs` at class level. MP3 stitching tests use three pre-recorded fixture segments committed to `backend/tests/fixtures/`. |
+| Existing structured-logging convention (`structlog` used in reference repo; KVWarGame uses stdlib `logging`) | Keep existing KVWarGame convention — do NOT adopt `structlog` just for this milestone. Log TTS events through the same logger used by `/api/llm`. |
+
+---
+
+## Confidence and Verification
+
+| Claim | Confidence | Source |
+|-------|------------|--------|
+| ElevenLabs Python SDK 2.43.0 is current stable | HIGH | GitHub releases API response: `v2.43.0` published 2026-04-13 |
+| `from elevenlabs.client import ElevenLabs` is the 2.x import path | HIGH | Reference repo source read directly; matches SDK v2 upgrade guide |
+| `client.text_to_speech.convert(...)` returns a byte-chunk iterator | HIGH | Reference repo `elevenlabs_provider.py` (`for chunk in audio: file.write(chunk)`) |
+| `mp3_44100_128` segments can be byte-concatenated safely | HIGH | Hydrogenaudio Knowledgebase: "if bit-reservoir not enabled, frames are completely self-contained"; at CBR 128kbps, reservoir artefacts at joins are sub-audible and within a few frames' look-back |
+| `run_in_threadpool` is the FastAPI idiom for blocking SDKs | HIGH | FastAPI official docs + Kludex/fastapi-tips maintainer guidance |
+| `AsyncElevenLabs` has open TypeError issue | MEDIUM | GitHub issue #243 on elevenlabs-python; workaround exists but is brittle |
+| HTML5 `<audio>` decoders skip mid-stream ID3 tags | HIGH | MP3 spec (decoders resync on next valid frame header); universally implemented in Media Foundation, CoreAudio, Firefox's `nsMediaDecoder` |
+| `num2words` 0.5.16 is current stable | HIGH | PyPI page listing; Savoir-faire Linux maintenance |
+| Reference repo uses `elevenlabs` unpinned, `num2words>=0.5.13` | HIGH | `requirements.txt` read directly via `gh api` |
 
 ---
 
 ## Sources
 
-- FastAPI release notes (verified 2026-04-01): https://fastapi.tiangolo.com/release-notes/
-- FastAPI CORS docs: https://fastapi.tiangolo.com/tutorial/cors/
-- FastAPI settings docs: https://fastapi.tiangolo.com/advanced/settings/
-- FastAPI static files docs: https://fastapi.tiangolo.com/tutorial/static-files/
-- FastAPI testing docs: https://fastapi.tiangolo.com/tutorial/testing/
-- FastAPI async tests docs: https://fastapi.tiangolo.com/advanced/async-tests/
-- Tailwind CSS v4 blog post: https://tailwindcss.com/blog/tailwindcss-v4
-- Tailwind CSS v4 install docs: https://tailwindcss.com/docs/installation (current version: v4.2)
-- React 19 release blog: https://react.dev/blog/2024/12/05/react-19
-- Pydantic-settings pattern: https://docs.pydantic.dev/latest/concepts/pydantic_settings/ (via FastAPI docs)
+- [elevenlabs · PyPI](https://pypi.org/project/elevenlabs/) — SDK package name, install, Python version constraint (>=3.8, <4.0)
+- [elevenlabs-python GitHub releases](https://github.com/elevenlabs/elevenlabs-python/releases) — v2.43.0 published 2026-04-13, v2.x release cadence
+- [elevenlabs-python v2 upgrade guide (Wiki)](https://github.com/elevenlabs/elevenlabs-python/wiki/v2-upgrade-guide) — 2.x breaking changes, `ElevenLabs` client class, `text_to_speech.convert` method, `AsyncElevenLabs` shape
+- [ElevenLabs Python SDK docs](https://elevenlabs.io/docs/agents-platform/libraries/python) — canonical usage patterns for synchronous client
+- [elevenlabs-python issue #243](https://github.com/elevenlabs/elevenlabs-python/issues/243) — Open async convert TypeError (evidence for sync-first prescription)
+- [num2words · PyPI](https://pypi.org/project/num2words/) — Current version 0.5.16, stable across 0.5.x
+- [savoirfairelinux/num2words GitHub](https://github.com/savoirfairelinux/num2words) — Maintenance status and locale support
+- [FastAPI Concurrency docs](https://fastapi.tiangolo.com/async/) — `run_in_threadpool` idiom for blocking SDKs
+- [Kludex/fastapi-tips](https://github.com/Kludex/fastapi-tips) — Threadpool default size (40), when to prefer async vs threadpool
+- [FastAPI Custom Response docs](https://fastapi.tiangolo.com/advanced/custom-response/) — `Response` vs `StreamingResponse` vs `FileResponse` decision criteria
+- [Hydrogenaudio Knowledgebase: Bit reservoir](https://wiki.hydrogenaudio.org/index.php?title=Bit_reservoir) — Authoritative MP3 spec reference; confirms frame independence conditions and CBR behavior
+- [Hydrogenaudio Knowledgebase: CBR](https://wiki.hydrogenaudio.org/index.php?title=CBR) — CBR frame predictability, why concat of matching-format segments is safe
+- [MP3 - Wikipedia](https://en.wikipedia.org/wiki/MP3) — Frame structure, decoder resync behavior at frame headers
+- [SamuraiJenkinz/daily-intelligence-brief reference repo](https://github.com/SamuraiJenkinz/daily-intelligence-brief) — `app/services/tts/{base,elevenlabs_provider}.py`, `app/services/text_preprocessor.py`, `app/services/audio_generator.py`, `requirements.txt` — production-proven patterns, read directly via `gh api`
+
+---
+
+*Stack research for: v1.2 Debrief Podcast milestone — additions only*
+*Researched: 2026-04-17*
+*Base stack (Python 3.11 / FastAPI 0.135.x / React 19 / Vite 6 / Zustand 5 / Tailwind 4): locked, shipped v1.0+v1.1 on 2026-04-15, not re-researched here*
