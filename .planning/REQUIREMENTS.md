@@ -40,7 +40,7 @@ Requirements for the Debrief Podcast milestone. Each maps to roadmap phases (pop
 
 ### Deployment Readiness (PODDEP)
 
-- [ ] **PODDEP-01**: ElevenLabs endpoint (`api.elevenlabs.io`) is confirmed reachable from the target Windows Server deployment host before any production TTS code is merged (corporate-firewall spike)
+- [x] **PODDEP-01**: ElevenLabs endpoint (`api.elevenlabs.io`) is confirmed reachable from the target Windows Server deployment host before any production TTS code is merged (corporate-firewall spike)
 - [ ] **PODDEP-02**: A `FakeTTSProvider` is available in non-production environments (selected via `TTS_PROVIDER` env var) so development and CI never consume ElevenLabs quota
 
 ## Future Requirements (v1.3+)
@@ -101,7 +101,7 @@ Every v1.2 requirement maps to exactly one phase. Phase 16 is a verification pha
 | PODRES-01 | Phase 15 | Pending |
 | PODRES-02 | Phase 15 | Pending |
 | PODRES-03 | Phase 15 | Pending |
-| PODDEP-01 | Phase 13 | Pending |
+| PODDEP-01 | Phase 13 | Complete |
 | PODDEP-02 | Phase 13 | Pending |
 
 **Coverage:**
