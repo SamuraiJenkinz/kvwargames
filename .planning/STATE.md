@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-17 after v1.2 milestone kickoff)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** v1.2 Debrief Podcast — Phase 13 ready to plan
+**Current focus:** v1.2 Debrief Podcast — Phase 13 complete, Phase 14 next
 
 ## Current Position
 
-Phase: 13 of 16 (Firewall Spike + Mockable Backend Foundation)
-Plan: 1 of 3 in current phase
-Status: In progress
-Last activity: 2026-04-17 — Completed 13-01-PLAN.md (PODDEP-01 firewall spike — cleared via operational precedent + preflight; formal TTS probe superseded)
+Phase: 13 of 16 (Firewall Spike + Mockable Backend Foundation) — COMPLETE
+Plan: 3 of 3 in current phase — all plans shipped
+Status: Phase complete — ready for Phase 14
+Last activity: 2026-04-17 — Completed 13-03-PLAN.md (text preprocessor — preprocess() pipeline, golden-file corpus, 52 passing tests; closes PODGEN-05)
 
-Progress: [████████████░░░░] 47/57 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plan 13-01 (1) shipped; v1.2 plans remaining: 13-02, 13-03, 14-01/02/03, 15-01/02, 16-01/02
+Progress: [█████████████░░░] 49/57 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 (3) shipped; v1.2 plans remaining: 14-01/02/03, 15-01/02, 16-01/02
 
 ## Performance Metrics
 
@@ -60,6 +60,6 @@ None. v1.1 technical-debt items are tracked in PROJECT.md and v1.1-MILESTONE-AUD
 
 ## Session Continuity
 
-Last session: 2026-04-17
-Stopped at: Completed 13-01-PLAN.md — PODDEP-01 cleared, spike script committed, evidence file written, PROJECT.md + REQUIREMENTS.md updated. Next step: execute 13-02-PLAN.md (TTSProvider ABC + FakeTTSProvider + ElevenLabsTTSProvider + TTS_PROVIDER env switch).
-Resume file: None — ready for plan 13-02.
+Last session: 2026-04-17T23:14Z
+Stopped at: Completed 13-03-PLAN.md — preprocess() module, golden-file corpus, 52 tests, num2words==0.5.14 pinned. Phase 13 all 3 plans complete. Next step: Phase 14 plan 14-01 (audio_generator.py orchestrator + POST /api/debrief/podcast endpoint).
+Resume file: None — ready for Phase 14.
