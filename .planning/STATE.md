@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-17 after v1.2 milestone kickoff)
 ## Current Position
 
 Phase: 13 of 16 (Firewall Spike + Mockable Backend Foundation)
-Plan: — (Phase 13 not yet planned)
-Status: Roadmap approved; ready to plan Phase 13
-Last activity: 2026-04-17 — v1.2 roadmap created; 21/21 requirements mapped to Phases 13–16; PODDEP-01 firewall spike scheduled as first task of Phase 13
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-04-17 — Completed 13-01-PLAN.md (PODDEP-01 firewall spike — cleared via operational precedent + preflight; formal TTS probe superseded)
 
-Progress: [████████████░░░░] 46/56 plans complete — v1.0 (39) + v1.1 (7) shipped; v1.2 planned at ~10 plans across 4 phases (3+3+2+2)
+Progress: [████████████░░░░] 47/57 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plan 13-01 (1) shipped; v1.2 plans remaining: 13-02, 13-03, 14-01/02/03, 15-01/02, 16-01/02
 
 ## Performance Metrics
 
@@ -56,10 +56,10 @@ None. v1.1 technical-debt items are tracked in PROJECT.md and v1.1-MILESTONE-AUD
 
 ### Blockers/Concerns
 
-- **PODDEP-01 (corporate firewall)** is the single highest-risk item in v1.2. Must clear in plan 13-01 before plan 13-02 is merged. Failure here reactivates the deferred pitfall of vendoring a proxy / tunnel and could push Phase 16 to a different network.
+- **PODDEP-01 (corporate firewall)** — CLEARED 2026-04-17. Operational precedent (existing production app on MC211APT2AS5AHG calls api.elevenlabs.io today) + HTTP 200 preflight. Plans 13-02 and 13-03 unblocked. Formal TTS streaming-payload verification deferred to Phase 16 Tier-B replay.
 
 ## Session Continuity
 
-Last session: 2026-04-17 (v1.2 roadmap creation)
-Stopped at: ROADMAP.md, REQUIREMENTS.md traceability, STATE.md all written; 21/21 v1.2 requirements mapped. Next step: `/gsd:plan-phase 13` to decompose Phase 13 (Firewall Spike + Mockable Backend Foundation) into executable plans, starting with the PODDEP-01 firewall spike.
-Resume file: None — ready for Phase 13 planning.
+Last session: 2026-04-17
+Stopped at: Completed 13-01-PLAN.md — PODDEP-01 cleared, spike script committed, evidence file written, PROJECT.md + REQUIREMENTS.md updated. Next step: execute 13-02-PLAN.md (TTSProvider ABC + FakeTTSProvider + ElevenLabsTTSProvider + TTS_PROVIDER env switch).
+Resume file: None — ready for plan 13-02.

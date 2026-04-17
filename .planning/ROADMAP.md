@@ -39,7 +39,7 @@
 **Plans**: 3 plans
 
 Plans:
-- [ ] 13-01: Firewall spike + ElevenLabs-reachability evidence + PROJECT.md Key Decision (PODDEP-01)
+- [x] 13-01: Firewall spike + ElevenLabs-reachability evidence + PROJECT.md Key Decision (PODDEP-01) — completed 2026-04-17 (operational precedent + preflight; TTS probe superseded)
 - [ ] 13-02: TTSProvider ABC + FakeTTSProvider + ElevenLabsTTSProvider (concrete, not yet exercised) + `TTS_PROVIDER` env switch (PODDEP-02)
 - [ ] 13-03: `text_preprocessor.py` with pronunciation dict + `num2words` integration + golden-file test corpus from Scenario-2 debriefs (PODGEN-05)
 
@@ -110,7 +110,7 @@ Phases execute in numeric order: 13 → 14 → 15 → 16
 | 10. LLM Health Check — Frontend | v1.1 | 2/2 | Complete | 2026-04-15 |
 | 11. Polish Bug Fixes | v1.1 | 1/1 | Complete | 2026-04-15 |
 | 12. Crisis State Prompt Engineering | v1.1 | 2/2 | Complete | 2026-04-15 |
-| 13. Firewall Spike + Mockable Backend Foundation | v1.2 | 0/3 | Not started | - |
+| 13. Firewall Spike + Mockable Backend Foundation | v1.2 | 1/3 | In progress | - |
 | 14. Podcast Endpoint + Player (End-to-End on Fake) | v1.2 | 0/3 | Not started | - |
 | 15. TTS Health + Graceful Degradation | v1.2 | 0/2 | Not started | - |
 | 16. Live ElevenLabs Verification + Milestone Audit | v1.2 | 0/2 | Not started | - |
