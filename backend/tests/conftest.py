@@ -46,3 +46,22 @@ def env_tts_fake(monkeypatch):
     """
     monkeypatch.setenv("TTS_PROVIDER", "fake")
     monkeypatch.setenv("FAKE_TTS_DELAY_SECONDS", "0.0")
+
+
+@pytest.fixture
+def env_tts_elevenlabs(monkeypatch):
+    """Set TTS_PROVIDER=elevenlabs with dummy API key + voice IDs — for TTS
+    health endpoint tests.
+
+    The four ELEVENLABS_* vars are all required by Settings'
+    validate_elevenlabs_config model_validator, even though the health endpoint
+    itself only reads ELEVENLABS_API_KEY. Dummy voice IDs satisfy the validator
+    without any real ElevenLabs usage (tests mock httpx transport).
+
+    Must be combined with env_base so LLM_* required vars are present.
+    """
+    monkeypatch.setenv("TTS_PROVIDER", "elevenlabs")
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "test-el-key-abc")
+    monkeypatch.setenv("ELEVENLABS_VOICE_KENT", "fake-voice-kent")
+    monkeypatch.setenv("ELEVENLABS_VOICE_FINCH", "fake-voice-finch")
+    monkeypatch.setenv("ELEVENLABS_VOICE_CHEN", "fake-voice-chen")

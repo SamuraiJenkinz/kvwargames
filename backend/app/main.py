@@ -33,7 +33,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import get_settings
-from .routers import config_gen, debrief, health, llm
+from .routers import config_gen, debrief, health, health_tts, llm
 from .services.audio_generator import PodcastCache, TokenStore
 
 
@@ -115,6 +115,7 @@ async def validation_error_handler(request, exc: RequestValidationError) -> JSON
 # catch-all static handler will shadow them and return index.html for API paths.
 app.include_router(llm.router)
 app.include_router(health.router)
+app.include_router(health_tts.router)
 app.include_router(config_gen.router)
 app.include_router(debrief.router)
 
