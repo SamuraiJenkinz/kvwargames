@@ -13,7 +13,7 @@ Requirements for the Debrief Podcast milestone. Each maps to roadmap phases (pop
 - [ ] **PODGEN-02**: Generated MP3 contains three voice segments in fixed order — Kent Valentina → Dr. Alistair Finch → Dr. Michael Chen — matching the on-screen `PersonaDots` order
 - [ ] **PODGEN-03**: Each persona's source text is that persona's existing `isDebrief: true` message, consumed verbatim — no new LLM call is introduced
 - [ ] **PODGEN-04**: Persona segments are separated by ~700 ms of silence, with no pad before Kent's opening or after Chen's closing
-- [ ] **PODGEN-05**: Wargame-specific vocabulary (EDIP, PC, PO, CRM, IC, LEFS, SIEP, SoS) is pronounced correctly by the TTS — letter-spelled for acronyms that are read letter-by-letter, phonetic expansion for acronyms pronounced as words; numbers are normalised to words
+- [x] **PODGEN-05**: Wargame-specific vocabulary (EDIP, PC, PO, CRM, IC, LEFS, SIEP, SoS) is pronounced correctly by the TTS — letter-spelled for acronyms that are read letter-by-letter, phonetic expansion for acronyms pronounced as words; numbers are normalised to words
 - [ ] **PODGEN-06**: When the combined debrief word count exceeds the soft ceiling (~2000 words), the Generate button surfaces a confirmation showing word count and estimated audio length before calling ElevenLabs
 - [ ] **PODGEN-07**: When facilitator clicks Generate a second time within the same session and the debrief text is unchanged, the previously generated MP3 is served from in-memory cache — no second ElevenLabs call
 - [ ] **PODGEN-08**: Facilitator can re-generate after a successful generation via a "Re-generate" button that invalidates the cache and prompts for confirmation before re-hitting ElevenLabs quota
@@ -41,7 +41,7 @@ Requirements for the Debrief Podcast milestone. Each maps to roadmap phases (pop
 ### Deployment Readiness (PODDEP)
 
 - [x] **PODDEP-01**: ElevenLabs endpoint (`api.elevenlabs.io`) is confirmed reachable from the target Windows Server deployment host before any production TTS code is merged (corporate-firewall spike)
-- [ ] **PODDEP-02**: A `FakeTTSProvider` is available in non-production environments (selected via `TTS_PROVIDER` env var) so development and CI never consume ElevenLabs quota
+- [x] **PODDEP-02**: A `FakeTTSProvider` is available in non-production environments (selected via `TTS_PROVIDER` env var) so development and CI never consume ElevenLabs quota
 
 ## Future Requirements (v1.3+)
 
@@ -86,7 +86,7 @@ Every v1.2 requirement maps to exactly one phase. Phase 16 is a verification pha
 | PODGEN-02 | Phase 14 | Pending |
 | PODGEN-03 | Phase 14 | Pending |
 | PODGEN-04 | Phase 14 | Pending |
-| PODGEN-05 | Phase 13 | Pending |
+| PODGEN-05 | Phase 13 | Complete |
 | PODGEN-06 | Phase 14 | Pending |
 | PODGEN-07 | Phase 14 | Pending |
 | PODGEN-08 | Phase 14 | Pending |
@@ -102,7 +102,7 @@ Every v1.2 requirement maps to exactly one phase. Phase 16 is a verification pha
 | PODRES-02 | Phase 15 | Pending |
 | PODRES-03 | Phase 15 | Pending |
 | PODDEP-01 | Phase 13 | Complete |
-| PODDEP-02 | Phase 13 | Pending |
+| PODDEP-02 | Phase 13 | Complete |
 
 **Coverage:**
 - v1.2 requirements: 21 total
@@ -117,4 +117,4 @@ Every v1.2 requirement maps to exactly one phase. Phase 16 is a verification pha
 
 ---
 *Requirements defined: 2026-04-17*
-*Last updated: 2026-04-17 after roadmap creation — 21/21 mapped to Phases 13–16*
+*Last updated: 2026-04-18 — Phase 13 complete (PODDEP-01, PODDEP-02, PODGEN-05 marked Complete); 3/21 requirements delivered*

@@ -20,7 +20,7 @@
 
 ## Phases (v1.2)
 
-- [ ] **Phase 13: Firewall Spike + Mockable Backend Foundation** — PODDEP-01 corporate-firewall proof, FakeTTSProvider dev default, TTSProvider ABC, ElevenLabs concrete provider (not exercised yet), and the wargame-vocabulary TTS preprocessor.
+- [x] **Phase 13: Firewall Spike + Mockable Backend Foundation** — PODDEP-01 corporate-firewall proof, FakeTTSProvider dev default, TTSProvider ABC, ElevenLabs concrete provider (not exercised yet), and the wargame-vocabulary TTS preprocessor. ✅ 2026-04-18
 - [ ] **Phase 14: Podcast Endpoint + Player (End-to-End on Fake)** — `POST /api/debrief/podcast`, blob-URL-safe PodcastSlice, PodcastPlayer component, cache / cancel / re-generate / skip-to-persona / word-count soft-ceiling, all verified against FakeTTSProvider.
 - [ ] **Phase 15: TTS Health + Graceful Degradation** — `GET /api/health/tts`, setup-screen TtsHealthBadge (informational, does NOT gate Launch), and empirical proof that ElevenLabs-down leaves the markdown debrief fully functional.
 - [ ] **Phase 16: Live ElevenLabs Verification + Milestone Audit** — First phase that calls a real ElevenLabs key. Tier-B replay against a Scenario-2 debrief fixture, listen-through, raw MP3 committed as evidence, milestone audit.
@@ -40,8 +40,8 @@
 
 Plans:
 - [x] 13-01: Firewall spike + ElevenLabs-reachability evidence + PROJECT.md Key Decision (PODDEP-01) — completed 2026-04-17 (operational precedent + preflight; TTS probe superseded)
-- [ ] 13-02: TTSProvider ABC + FakeTTSProvider + ElevenLabsTTSProvider (concrete, not yet exercised) + `TTS_PROVIDER` env switch (PODDEP-02)
-- [ ] 13-03: `text_preprocessor.py` with pronunciation dict + `num2words` integration + golden-file test corpus from Scenario-2 debriefs (PODGEN-05)
+- [x] 13-02: TTSProvider ABC + FakeTTSProvider + ElevenLabsTTSProvider (concrete, not yet exercised) + `TTS_PROVIDER` env switch (PODDEP-02) — completed 2026-04-17
+- [x] 13-03: `text_preprocessor.py` with pronunciation dict + `num2words` integration + golden-file test corpus from Scenario-2 debriefs (PODGEN-05) — completed 2026-04-17
 
 ### Phase 14: Podcast Endpoint + Player (End-to-End on Fake)
 **Goal**: A facilitator sitting at the app can click Generate Podcast after a full game and — with `TTS_PROVIDER=fake` — hear a three-voice stitched MP3 play inline, download it with the correct filename, skip between persona segments, see a progress indicator update, cancel mid-generation, and re-generate from cache or force a fresh run, all without any live ElevenLabs traffic.
@@ -110,7 +110,7 @@ Phases execute in numeric order: 13 → 14 → 15 → 16
 | 10. LLM Health Check — Frontend | v1.1 | 2/2 | Complete | 2026-04-15 |
 | 11. Polish Bug Fixes | v1.1 | 1/1 | Complete | 2026-04-15 |
 | 12. Crisis State Prompt Engineering | v1.1 | 2/2 | Complete | 2026-04-15 |
-| 13. Firewall Spike + Mockable Backend Foundation | v1.2 | 1/3 | In progress | - |
+| 13. Firewall Spike + Mockable Backend Foundation | v1.2 | 3/3 | Complete | 2026-04-18 |
 | 14. Podcast Endpoint + Player (End-to-End on Fake) | v1.2 | 0/3 | Not started | - |
 | 15. TTS Health + Graceful Degradation | v1.2 | 0/2 | Not started | - |
 | 16. Live ElevenLabs Verification + Milestone Audit | v1.2 | 0/2 | Not started | - |
