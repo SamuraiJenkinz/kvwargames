@@ -17,17 +17,29 @@ export interface PersonaTexts {
 
 /**
  * Extract the latest debrief text for each of the three personas from the
- * chat message history. Uses isDebrief: true as the filter (PODGEN-03
- * contract — persona debrief messages are marked by gameStore.endGame /
- * triggerDebrief paths).
+ * chat message history. The LAST `debrief_divider` message anchors the
+ * debrief region: every persona message after that divider is a debrief
+ * message (gameStore pushes the divider from triggerDebrief / endGame
+ * immediately before firing the debrief LLM turn).
  *
- * Returns the LAST debrief message per persona (a session may have multiple
- * debriefs if triggerDebrief was invoked interim and then endGame finalised).
+ * If a session contains multiple dividers (interim `triggerDebrief` followed
+ * by final `endGame`), we return the texts from the FINAL debrief.
  */
 export function extractPersonaTexts(messages: ChatMessage[]): PersonaTexts {
+  let lastDividerIdx = -1
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i]?.type === 'debrief_divider') {
+      lastDividerIdx = i
+      break
+    }
+  }
+  if (lastDividerIdx === -1) {
+    return { kent: '', finch: '', chen: '' }
+  }
   const latest: Partial<PersonaTexts> = {}
-  for (const m of messages) {
-    if (m.type !== 'persona' || !m.isDebrief || !m.text) continue
+  for (let i = lastDividerIdx + 1; i < messages.length; i++) {
+    const m = messages[i]
+    if (!m || m.type !== 'persona' || !m.text) continue
     if (m.speaker === 'kent' || m.speaker === 'finch' || m.speaker === 'chen') {
       latest[m.speaker] = m.text
     }

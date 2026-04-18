@@ -12,7 +12,6 @@ import {
 function makePersonaMsg(
   speaker: 'kent' | 'finch' | 'chen' | 'facilitator',
   text: string,
-  isDebrief: boolean,
 ): ChatMessage {
   return {
     id: `msg-${Math.random()}`,
@@ -20,7 +19,6 @@ function makePersonaMsg(
     speaker,
     text,
     timestamp: new Date().toISOString(),
-    isDebrief,
   }
 }
 
@@ -49,32 +47,53 @@ describe('extractPersonaTexts', () => {
     expect(result).toEqual({ kent: '', finch: '', chen: '' })
   })
 
-  it('picks the latest debrief message per persona', () => {
+  it('returns empty strings when no debrief_divider is present', () => {
     const messages: ChatMessage[] = [
-      makePersonaMsg('kent', 'first kent debrief', true),
-      makePersonaMsg('kent', 'second kent debrief', true),
-      makePersonaMsg('finch', 'finch debrief', true),
-    ]
-    const result = extractPersonaTexts(messages)
-    expect(result.kent).toBe('second kent debrief')
-    expect(result.finch).toBe('finch debrief')
-    expect(result.chen).toBe('')
-  })
-
-  it('ignores non-debrief persona messages', () => {
-    const messages: ChatMessage[] = [
-      makePersonaMsg('kent', 'regular game message', false),
-      makePersonaMsg('finch', 'another regular message', false),
+      makePersonaMsg('kent', 'regular game message'),
+      makePersonaMsg('finch', 'another regular message'),
     ]
     const result = extractPersonaTexts(messages)
     expect(result).toEqual({ kent: '', finch: '', chen: '' })
   })
 
-  it('ignores facilitator messages and debrief dividers', () => {
+  it('picks the latest persona message after the last debrief_divider', () => {
     const messages: ChatMessage[] = [
-      makeFacilitatorMsg('facilitator text'),
+      makePersonaMsg('kent', 'pre-debrief kent'),
       makeDividerMsg(),
-      makePersonaMsg('chen', 'chen debrief', true),
+      makePersonaMsg('kent', 'first debrief kent'),
+      makePersonaMsg('kent', 'second debrief kent'),
+      makePersonaMsg('finch', 'debrief finch'),
+    ]
+    const result = extractPersonaTexts(messages)
+    expect(result.kent).toBe('second debrief kent')
+    expect(result.finch).toBe('debrief finch')
+    expect(result.chen).toBe('')
+  })
+
+  it('uses only the FINAL divider when multiple are present', () => {
+    const messages: ChatMessage[] = [
+      makeDividerMsg(),
+      makePersonaMsg('kent', 'interim kent'),
+      makePersonaMsg('finch', 'interim finch'),
+      makePersonaMsg('chen', 'interim chen'),
+      makeDividerMsg(),
+      makePersonaMsg('kent', 'final kent'),
+      makePersonaMsg('finch', 'final finch'),
+      makePersonaMsg('chen', 'final chen'),
+    ]
+    const result = extractPersonaTexts(messages)
+    expect(result).toEqual({
+      kent: 'final kent',
+      finch: 'final finch',
+      chen: 'final chen',
+    })
+  })
+
+  it('ignores facilitator messages between divider and personas', () => {
+    const messages: ChatMessage[] = [
+      makeDividerMsg(),
+      makeFacilitatorMsg('facilitator text'),
+      makePersonaMsg('chen', 'chen debrief'),
     ]
     const result = extractPersonaTexts(messages)
     expect(result.kent).toBe('')
@@ -83,15 +102,17 @@ describe('extractPersonaTexts', () => {
   })
 
   it('ignores persona messages with no text', () => {
-    const msg: ChatMessage = {
-      id: 'no-text',
-      type: 'persona',
-      speaker: 'kent',
-      timestamp: new Date().toISOString(),
-      isDebrief: true,
-      // text intentionally omitted
-    }
-    const result = extractPersonaTexts([msg])
+    const messages: ChatMessage[] = [
+      makeDividerMsg(),
+      {
+        id: 'no-text',
+        type: 'persona',
+        speaker: 'kent',
+        timestamp: new Date().toISOString(),
+        // text intentionally omitted
+      },
+    ]
+    const result = extractPersonaTexts(messages)
     expect(result.kent).toBe('')
   })
 })
