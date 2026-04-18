@@ -70,11 +70,12 @@ Plans:
   2. The setup screen shows a TtsHealthBadge adjacent to the existing LLM HealthBadge with the same auto-check-on-mount + Re-check button shape; when TTS health is red the Launch button remains enabled (unlike the LLM gate) and the badge shows the message "Podcast generation unavailable — markdown debrief will still work."
   3. Setting `ELEVENLABS_API_KEY` to a garbage value and running a full game to end-of-debrief produces a clear error status in the podcast area (with reason code) while the adjacent "Download Debrief (.md)" button still downloads the complete session markdown with no regressions — verified by empirical run.
   4. Mid-generation network interruption (simulated by killing the FakeTTSProvider mid-call or mocking a `RequestError`) surfaces the same structured error status in the podcast area; the markdown download remains unaffected.
-**Plans**: 2 plans (TBD)
+**Plans**: 3 plans
 
 Plans:
-- [ ] 15-01: `GET /api/health/tts` backend endpoint (8-code taxonomy, 15s SLA, 30s in-memory cache, probe-cheap endpoint `/v1/voices` or `/v1/user`, always HTTP 200) (PODRES-03)
-- [ ] 15-02: `TtsHealthBadge.tsx` setup-screen integration + graceful-degradation empirical verification (garbage-key run + mid-gen failure injection, both proving markdown export path survives) (PODRES-01, PODRES-02)
+- [ ] 15-01-PLAN.md — Backend `GET /api/health/tts` router (8-code taxonomy, 15s SLA, 30s cache, /v1/user probe, TTS_PROVIDER=fake short-circuit, env_tts_elevenlabs conftest fixture, full pytest coverage) (PODRES-03)
+- [ ] 15-02-PLAN.md — Frontend TtsHealthBadge (amber failed-state, locked copy, informational-only, Launch-never-blocked) + formatLatency extract + mid-gen failure vitest safety net (PODRES-02 + engineering-layer PODRES-01)
+- [ ] 15-03-PLAN.md — Empirical verification: garbage-key run end-to-end, 15-VERIFICATION.md evidence bundle with screenshots + SHA-256 of downloaded debrief.md (PODRES-01 empirical)
 
 ### Phase 16: Live ElevenLabs Verification + Milestone Audit
 **Goal**: With a real ElevenLabs API key configured and the Phase 13 firewall spike cleared, generating a podcast from a Scenario-2 debrief fixture produces an audibly correct three-voice MP3 end-to-end on the target deployment host — and the v1.2 milestone is audited complete.
