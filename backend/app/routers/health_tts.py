@@ -81,6 +81,20 @@ _cache: "tuple[float, dict] | None" = None  # (monotonic_timestamp, response_bod
 
 
 # ---------------------------------------------------------------------------
+# Client factory — isolated so pytest can monkeypatch it narrowly
+# ---------------------------------------------------------------------------
+
+
+def _make_http_client() -> httpx.AsyncClient:
+    """Return a fresh AsyncClient with the 15s probe timeout.
+
+    Tests monkeypatch this function to return a MockTransport-backed client
+    without touching main.py's lifespan client or the global httpx module.
+    """
+    return httpx.AsyncClient(timeout=httpx.Timeout(_HEALTH_TIMEOUT_SECONDS))
+
+
+# ---------------------------------------------------------------------------
 # Endpoint
 # ---------------------------------------------------------------------------
 
@@ -135,7 +149,7 @@ async def tts_health_check(force: bool = False) -> JSONResponse:
     t0 = time.monotonic()
 
     try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(_HEALTH_TIMEOUT_SECONDS)) as client:
+        async with _make_http_client() as client:
             response = await client.get(
                 _PROBE_URL,
                 headers={"xi-api-key": settings.elevenlabs_api_key or ""},
