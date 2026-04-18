@@ -7,6 +7,7 @@ import { validateGameConfig, type ValidationError } from '@/lib/configValidator'
 import JsonEditor from './JsonEditor'
 import ScenarioSummary from './ScenarioSummary'
 import HealthBadge from './HealthBadge'
+import TtsHealthBadge from './TtsHealthBadge'
 import type { HealthStatus } from '@/types/health'
 
 // ─── LoadConfigPanel ──────────────────────────────────────────────────────────
@@ -205,6 +206,10 @@ export default function LoadConfigPanel() {
               Sits directly above Launch buttons so the status + hint are
               the explanation for a disabled button (no tooltip duplication). */}
           <HealthBadge onStatusChange={setHealthStatus} />
+          {/* TTS health indicator — informational only, does NOT gate Launch.
+              onStatusChange is a no-op: PODRES-02 invariant — TTS badge status
+              must NOT be wired into launchDisabled or setHealthStatus. */}
+          <TtsHealthBadge onStatusChange={() => { /* TTS status is informational only — does NOT gate Launch per PODRES-02 */ }} />
 
           {/* Launch buttons — always rendered once scenarioCount is known;
               disabled (not hidden) when JSON is invalid */}
