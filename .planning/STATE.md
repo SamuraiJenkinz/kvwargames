@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-04-17 after v1.2 milestone kickoff)
 ## Current Position
 
 Phase: 15 of 16 (TTS Health + Graceful Degradation) — In progress
-Plan: 1 of 3 in current phase — 15-01 (TTS health endpoint + tests) shipped
-Status: Phase 15 plan 1 complete — GET /api/health/tts live; 14/14 TTS tests + 139/139 total backend tests passing
-Last activity: 2026-04-18 — Completed 15-01-PLAN.md (backend TTS health endpoint: health_tts router, 14 pytest tests, env_tts_elevenlabs fixture)
+Plan: 2 of 3 in current phase — 15-02 (frontend TTS health badge) shipped
+Status: Phase 15 plan 2 complete — TtsHealthBadge live; 625 frontend tests passing; launchDisabled invariant preserved
+Last activity: 2026-04-18 — Completed 15-02-PLAN.md (TtsHealthBadge, formatLatency extraction, TTSHealthResponse types, 17 new tests, SC4 mid-gen safety net)
 
-Progress: [█████████████████░] 55/57 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 + 14-01/02/03 + 15-01 (7) shipped; v1.2 plans remaining: 15-02, 16-01/02
+Progress: [██████████████████░] 56/58 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 + 14-01/02/03 + 15-01/02 (8) shipped; v1.2 plans remaining: 15-03, 16-01/02
 
 ## Performance Metrics
 
@@ -68,6 +68,12 @@ v1.2 plan 14-03 decisions (podcast player UI):
 - **MP3 duration display quirk (cosmetic)** — raw-bytes stitching without pydub/ffmpeg causes WMP to read duration from first frame header only; Chrome/VLC scan all frames and report correct duration. Full audio plays correctly. Expected outcome of no-pydub decision.
 - **No `<dialog>` element for confirm dialogs** — jsdom lacks `showModal()` support; plain div overlay with role=dialog keeps components testable without API mocking
 
+v1.2 plan 15-02 decisions (TTS health frontend badge):
+
+- **Separate test file for mid-gen store-level tests** — `podcastMidGenFailure.test.ts` not appended to `podcastClient.test.ts`: `vi.mock` in vitest hoists to file top, which would replace real `generatePodcast` for all 11 transport-level tests → 8 failures. Separate file isolates mock scope. Pattern: one `vi.mock` scope per test file.
+- **9 TtsHealthBadge tests** (plan specified "8+"): test_9 (auto-check URL has no force param) is the counter-assertion to test_6 (Re-check uses force=true). Both sides of URL-fork tested.
+- **TtsHealthBadge onStatusChange wired to no-op in LoadConfigPanel** — critical PODRES-02 invariant: TTS badge must never gate Launch. `setHealthStatus` is owned exclusively by the LLM `HealthBadge`.
+
 v1.2 plan 15-01 decisions (TTS health endpoint):
 
 - **`_make_http_client()` factory for testability** — patching `httpx.AsyncClient` globally caused RecursionError (factory called the patched class) and broke `main.py` lifespan's `aclose()`. Narrow `_make_http_client()` factory is the correct patch target for per-request client tests.
@@ -89,6 +95,6 @@ None. v1.1 technical-debt items are tracked in PROJECT.md and v1.1-MILESTONE-AUD
 
 ## Session Continuity
 
-Last session: 2026-04-18 — Completed 15-01-PLAN.md (TTS health endpoint); GET /api/health/tts live; 139/139 backend tests passing
-Stopped at: Phase 15 / Plan 1 complete. Next: 15-02 (frontend TTS badge + setup-screen gate) then 16-01/02 (live ElevenLabs verification).
-Resume file: None — ready for 15-02.
+Last session: 2026-04-18 — Completed 15-02-PLAN.md (frontend TTS health badge); 625/625 frontend tests passing
+Stopped at: Phase 15 / Plan 2 complete. Next: 15-03 (empirical graceful degradation verification) then 16-01/02 (live ElevenLabs verification).
+Resume file: None — ready for 15-03.
