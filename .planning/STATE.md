@@ -45,6 +45,13 @@ v1.2 roadmap-level decisions worth carrying into Phase 13 planning:
 - **Parallel `/api/health/tts`, not extended `/api/health/llm`.** LLM-down hard-fails Launch; TTS-down is a soft warning — one `body.ok` cannot carry both signals.
 - **Graceful degradation is load-bearing.** Phase 15 proves the markdown debrief path survives ElevenLabs failure by empirical flip-the-key-to-garbage run.
 
+v1.2 plan 14-01 decisions (podcast backend endpoint):
+
+- **ServerSentEvent raw_data= not data=** — data= causes double-JSON-encoding on the wire; raw_data= passes pre-serialized JSON string through unchanged
+- **Async generator endpoint pattern** — FastAPI's is_sse_stream detection requires the endpoint to be a gen callable; wrapping EventSourceResponse(gen()) bypasses this
+- **generate_podcast_sse yields plain dicts, not ServerSentEvent** — keeps audio_generator.py HTTP-framework-agnostic and unit-testable
+- **anyio_backend constrained to asyncio** — trio not installed; per-file fixture prevents anyio from generating failing [trio] parametrizations
+
 v1.2 plan 14-02 decisions (frontend data layer):
 
 - **fetch+ReadableStream over EventSource** — EventSource lacks POST body support; podcast endpoint requires body with persona texts, voices, game name (SC4 reconciliation)
