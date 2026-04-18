@@ -1,13 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Loader2, RefreshCw } from 'lucide-react'
 import type { HealthStatus, LLMHealthResponse } from '@/types/health'
-
-// Formats a latency value for display.
-// Decision locked in CONTEXT.md: under 1s → "820ms", at/over 1s → "1.2s".
-function formatLatency(ms: number): string {
-  if (ms < 1000) return `${ms}ms`
-  return `${(ms / 1000).toFixed(1)}s`
-}
+import { formatLatency } from '@/lib/formatLatency'
 
 interface HealthBadgeProps {
   onStatusChange: (status: HealthStatus) => void

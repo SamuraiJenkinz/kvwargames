@@ -28,3 +28,25 @@ export interface LLMHealthFail {
 }
 
 export type LLMHealthResponse = LLMHealthOk | LLMHealthFail
+
+// Backend authority: backend/app/routers/health_tts.py (Phase 15 — plan 15-01)
+// The endpoint always returns HTTP 200; ok flag carries the signal.
+// 8-code taxonomy is IDENTICAL to LLMHealthErrorCode — both health endpoints
+// share the same reason codes. Reusing the alias keeps divergence impossible.
+
+export type TTSHealthErrorCode = LLMHealthErrorCode
+
+export interface TTSHealthOk {
+  ok: true
+  latencyMs: number
+}
+
+export interface TTSHealthFail {
+  ok: false
+  code: TTSHealthErrorCode
+  status: number | null
+  hint: string
+  latencyMs: number
+}
+
+export type TTSHealthResponse = TTSHealthOk | TTSHealthFail
