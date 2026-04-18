@@ -3,6 +3,7 @@ import { useGameStore } from '@/lib/gameStore'
 import ActionToolbar from './ActionToolbar'
 import ControlBanner from './ControlBanner'
 import MessageInput from './MessageInput'
+import PodcastSection from '../Podcast/PodcastSection'
 
 export default function FacilitatorInput() {
   const loading = useGameStore((s) => s.loading)
@@ -29,6 +30,7 @@ export default function FacilitatorInput() {
       */}
       <ControlBanner />
       <ActionToolbar disabled={loading} onInsert={handleInsert} />
+      <PodcastSection />
       <MessageInput disabled={loading} gameEnded={gameEnded} registerInsert={registerInsert} />
       {gameEnded && (
         <p className="text-xs text-text-secondary/70 mt-1">
