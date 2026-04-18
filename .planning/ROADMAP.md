@@ -21,7 +21,7 @@
 ## Phases (v1.2)
 
 - [x] **Phase 13: Firewall Spike + Mockable Backend Foundation** — PODDEP-01 corporate-firewall proof, FakeTTSProvider dev default, TTSProvider ABC, ElevenLabs concrete provider (not exercised yet), and the wargame-vocabulary TTS preprocessor. ✅ 2026-04-18
-- [ ] **Phase 14: Podcast Endpoint + Player (End-to-End on Fake)** — `POST /api/debrief/podcast`, blob-URL-safe PodcastSlice, PodcastPlayer component, cache / cancel / re-generate / skip-to-persona / word-count soft-ceiling, all verified against FakeTTSProvider.
+- [x] **Phase 14: Podcast Endpoint + Player (End-to-End on Fake)** — `POST /api/debrief/podcast` (SSE), `GET /api/debrief/podcast/audio?token=...`, podcastStore (Zustand) with blob-URL lifecycle, PodcastPlayer component, cache / cancel / re-generate / skip-to-persona / word-count soft-ceiling, all verified against FakeTTSProvider. ✅ 2026-04-18
 - [ ] **Phase 15: TTS Health + Graceful Degradation** — `GET /api/health/tts`, setup-screen TtsHealthBadge (informational, does NOT gate Launch), and empirical proof that ElevenLabs-down leaves the markdown debrief fully functional.
 - [ ] **Phase 16: Live ElevenLabs Verification + Milestone Audit** — First phase that calls a real ElevenLabs key. Tier-B replay against a Scenario-2 debrief fixture, listen-through, raw MP3 committed as evidence, milestone audit.
 
@@ -54,12 +54,12 @@ Plans:
   4. While generation is in flight, the facilitator sees a per-persona status line ("Kent ✓ · Finch rendering… · Chen waiting") plus an overall progress bar with percentage, can click Cancel to abort the fetch and return the UI to the pre-generation state with no partial MP3 offered, and — if the combined debrief exceeds the ~2000-word soft ceiling — sees a word-count + estimated-audio-length confirmation dialog before any provider call.
   5. Clicking Generate a second time with unchanged debrief text returns the previously-generated MP3 instantly from in-memory cache with zero additional provider calls, and a dedicated "Re-generate" button invalidates that cache and prompts for confirmation before re-hitting the provider.
   6. An expandable panel below the player renders the markdown debrief transcript inline (collapsed by default) using the existing markdown rendering path — no new markdown dependency added.
-**Plans**: 3 plans (TBD — backend endpoint + stitcher, frontend slice + client, player component + UX)
+**Plans**: 3 plans
 
 Plans:
-- [ ] 14-01: `POST /api/debrief/podcast` router + `audio_generator.py` orchestrator (serial provider calls, raw-bytes stitching with 500ms silence pad, per-segment offsets, client-disconnect checkpoints) (PODGEN-02, PODGEN-03, PODGEN-04)
-- [ ] 14-02: `podcastClient.ts` zero-throw wrapper + `PodcastSlice` on `gameStore` with store-owned blob-URL lifecycle + word-count soft-ceiling + in-memory cache keyed on debrief-text-hash (PODGEN-06, PODGEN-07, PODGEN-08, PODUX-03)
-- [ ] 14-03: `PodcastPlayer` component + `ActionToolbar` one-line edit + transcript panel + skip-to-persona + now-playing label + per-persona progress animation + progress bar (PODGEN-01, PODPLAY-01, PODPLAY-02, PODPLAY-03, PODPLAY-04, PODPLAY-05, PODUX-01, PODUX-02)
+- [x] 14-01: Backend SSE sidecar endpoint (`POST /api/debrief/podcast` text/event-stream) + paired audio-by-token endpoint + `audio_generator.py` orchestrator (raw-bytes stitching with committed 700ms silence pad fixture, CBR per-segment offsets, in-process cache + token store, client-disconnect abort between personas) (PODGEN-02, PODGEN-03, PODGEN-04, PODGEN-07 backend) — completed 2026-04-18
+- [x] 14-02: Frontend data layer: `podcastClient.ts` (fetch + ReadableStream SSE consumer, NOT EventSource) + standalone `podcastStore` (Zustand) with blob-URL lifecycle, FSM (idle/generating/done/error), abort plumbing + `mp3Filename.ts` (local-time kebab filename) + `wordCountEstimate.ts` (150 wpm + 3×delay math) + extended jsdom test harness (PODGEN-06 math, PODGEN-07 UX, PODGEN-08 wiring, PODUX-03) — completed 2026-04-18
+- [x] 14-03: Visible UI: `PodcastSection` orchestrator + `GenerationPanel` + `PodcastPlayer` + `TranscriptPanel` + two `ConfirmDialog`-based modals + `ActionToolbar` three-state button row + human-verify checkpoint on dev server (PODGEN-01, PODPLAY-01..05, PODUX-01/02, UX halves of PODGEN-06/07/08) — completed 2026-04-18
 
 ### Phase 15: TTS Health + Graceful Degradation
 **Goal**: The facilitator sees TTS connectivity status on the setup screen before launching — informational only, never gating Launch — and if ElevenLabs is unreachable or broken mid-session, the markdown debrief path continues to work unchanged.
@@ -111,6 +111,6 @@ Phases execute in numeric order: 13 → 14 → 15 → 16
 | 11. Polish Bug Fixes | v1.1 | 1/1 | Complete | 2026-04-15 |
 | 12. Crisis State Prompt Engineering | v1.1 | 2/2 | Complete | 2026-04-15 |
 | 13. Firewall Spike + Mockable Backend Foundation | v1.2 | 3/3 | Complete | 2026-04-18 |
-| 14. Podcast Endpoint + Player (End-to-End on Fake) | v1.2 | 0/3 | Not started | - |
+| 14. Podcast Endpoint + Player (End-to-End on Fake) | v1.2 | 3/3 | Complete | 2026-04-18 |
 | 15. TTS Health + Graceful Degradation | v1.2 | 0/2 | Not started | - |
 | 16. Live ElevenLabs Verification + Milestone Audit | v1.2 | 0/2 | Not started | - |

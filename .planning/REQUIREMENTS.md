@@ -9,28 +9,28 @@ Requirements for the Debrief Podcast milestone. Each maps to roadmap phases (pop
 
 ### Podcast Generation (PODGEN)
 
-- [ ] **PODGEN-01**: Facilitator can trigger podcast generation from a "Generate Podcast" button in the debrief area, adjacent to the existing "Download Debrief (.md)" button
-- [ ] **PODGEN-02**: Generated MP3 contains three voice segments in fixed order — Kent Valentina → Dr. Alistair Finch → Dr. Michael Chen — matching the on-screen `PersonaDots` order
-- [ ] **PODGEN-03**: Each persona's source text is that persona's existing `isDebrief: true` message, consumed verbatim — no new LLM call is introduced
-- [ ] **PODGEN-04**: Persona segments are separated by ~700 ms of silence, with no pad before Kent's opening or after Chen's closing
+- [x] **PODGEN-01**: Facilitator can trigger podcast generation from a "Generate Podcast" button in the debrief area, adjacent to the existing "Download Debrief (.md)" button
+- [x] **PODGEN-02**: Generated MP3 contains three voice segments in fixed order — Kent Valentina → Dr. Alistair Finch → Dr. Michael Chen — matching the on-screen `PersonaDots` order
+- [x] **PODGEN-03**: Each persona's source text is that persona's existing `isDebrief: true` message, consumed verbatim — no new LLM call is introduced
+- [x] **PODGEN-04**: Persona segments are separated by ~700 ms of silence, with no pad before Kent's opening or after Chen's closing
 - [x] **PODGEN-05**: Wargame-specific vocabulary (EDIP, PC, PO, CRM, IC, LEFS, SIEP, SoS) is pronounced correctly by the TTS — letter-spelled for acronyms that are read letter-by-letter, phonetic expansion for acronyms pronounced as words; numbers are normalised to words
-- [ ] **PODGEN-06**: When the combined debrief word count exceeds the soft ceiling (~2000 words), the Generate button surfaces a confirmation showing word count and estimated audio length before calling ElevenLabs
-- [ ] **PODGEN-07**: When facilitator clicks Generate a second time within the same session and the debrief text is unchanged, the previously generated MP3 is served from in-memory cache — no second ElevenLabs call
-- [ ] **PODGEN-08**: Facilitator can re-generate after a successful generation via a "Re-generate" button that invalidates the cache and prompts for confirmation before re-hitting ElevenLabs quota
+- [x] **PODGEN-06**: When the combined debrief word count exceeds the soft ceiling (~2000 words), the Generate button surfaces a confirmation showing word count and estimated audio length before calling ElevenLabs
+- [x] **PODGEN-07**: When facilitator clicks Generate a second time within the same session and the debrief text is unchanged, the previously generated MP3 is served from in-memory cache — no second ElevenLabs call
+- [x] **PODGEN-08**: Facilitator can re-generate after a successful generation via a "Re-generate" button that invalidates the cache and prompts for confirmation before re-hitting ElevenLabs quota
 
 ### Podcast Playback (PODPLAY)
 
-- [ ] **PODPLAY-01**: Once generation completes, an inline HTML5 `<audio controls>` element appears in the debrief area, pre-loaded with the stitched MP3 as a blob URL; audio loads in paused state (no auto-play)
-- [ ] **PODPLAY-02**: A "Download MP3" button saves the MP3 with filename `debrief-{kebab-game-name}-{YYYY-MM-DD-HHmm}.mp3`, matching the existing markdown download convention (Blob + anchor + deferred `URL.revokeObjectURL`)
-- [ ] **PODPLAY-03**: Below the player, an expandable panel renders the markdown debrief transcript inline, collapsed by default, using the existing markdown rendering path
-- [ ] **PODPLAY-04**: Three "Skip to Kent / Skip to Finch / Skip to Chen" buttons seek the audio element to the start of each persona's segment using offsets returned by the backend alongside the MP3
-- [ ] **PODPLAY-05**: While audio is playing, a label below the player reads "Now playing: {Persona name}" and updates at segment boundaries as `audio.currentTime` crosses the backend-provided offsets
+- [x] **PODPLAY-01**: Once generation completes, an inline HTML5 `<audio controls>` element appears in the debrief area, pre-loaded with the stitched MP3 as a blob URL; audio loads in paused state (no auto-play)
+- [x] **PODPLAY-02**: A "Download MP3" button saves the MP3 with filename `debrief-{kebab-game-name}-{YYYY-MM-DD-HHmm}.mp3`, matching the existing markdown download convention (Blob + anchor + deferred `URL.revokeObjectURL`)
+- [x] **PODPLAY-03**: Below the player, an expandable panel renders the markdown debrief transcript inline, collapsed by default, using the existing markdown rendering path
+- [x] **PODPLAY-04**: Three "Skip to Kent / Skip to Finch / Skip to Chen" buttons seek the audio element to the start of each persona's segment using offsets returned by the backend alongside the MP3
+- [x] **PODPLAY-05**: While audio is playing, a label below the player reads "Now playing: {Persona name}" and updates at segment boundaries as `audio.currentTime` crosses the backend-provided offsets
 
 ### Generation UX (PODUX)
 
-- [ ] **PODUX-01**: During generation, a non-blocking progress indicator displays per-persona status in the form "Kent ✓ · Finch rendering… · Chen waiting" — driven client-side by optimistic state transitions, since the backend returns one blocking streamed MP3 rather than progress events
-- [ ] **PODUX-02**: A progress bar with overall percentage is visible alongside the per-persona status during generation
-- [ ] **PODUX-03**: Facilitator can cancel an in-flight generation via a "Cancel" button; cancelling aborts the fetch, frees the UI, and returns to the pre-generation state with no partial MP3 offered
+- [x] **PODUX-01**: During generation, a non-blocking progress indicator displays per-persona status in the form "Kent ✓ · Finch rendering… · Chen waiting" — driven client-side by optimistic state transitions, since the backend returns one blocking streamed MP3 rather than progress events
+- [x] **PODUX-02**: A progress bar with overall percentage is visible alongside the per-persona status during generation
+- [x] **PODUX-03**: Facilitator can cancel an in-flight generation via a "Cancel" button; cancelling aborts the fetch, frees the UI, and returns to the pre-generation state with no partial MP3 offered
 
 ### Resilience (PODRES)
 
@@ -82,22 +82,22 @@ Every v1.2 requirement maps to exactly one phase. Phase 16 is a verification pha
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PODGEN-01 | Phase 14 | Pending |
-| PODGEN-02 | Phase 14 | Pending |
-| PODGEN-03 | Phase 14 | Pending |
-| PODGEN-04 | Phase 14 | Pending |
+| PODGEN-01 | Phase 14 | Complete |
+| PODGEN-02 | Phase 14 | Complete |
+| PODGEN-03 | Phase 14 | Complete |
+| PODGEN-04 | Phase 14 | Complete |
 | PODGEN-05 | Phase 13 | Complete |
-| PODGEN-06 | Phase 14 | Pending |
-| PODGEN-07 | Phase 14 | Pending |
-| PODGEN-08 | Phase 14 | Pending |
-| PODPLAY-01 | Phase 14 | Pending |
-| PODPLAY-02 | Phase 14 | Pending |
-| PODPLAY-03 | Phase 14 | Pending |
-| PODPLAY-04 | Phase 14 | Pending |
-| PODPLAY-05 | Phase 14 | Pending |
-| PODUX-01 | Phase 14 | Pending |
-| PODUX-02 | Phase 14 | Pending |
-| PODUX-03 | Phase 14 | Pending |
+| PODGEN-06 | Phase 14 | Complete |
+| PODGEN-07 | Phase 14 | Complete |
+| PODGEN-08 | Phase 14 | Complete |
+| PODPLAY-01 | Phase 14 | Complete |
+| PODPLAY-02 | Phase 14 | Complete |
+| PODPLAY-03 | Phase 14 | Complete |
+| PODPLAY-04 | Phase 14 | Complete |
+| PODPLAY-05 | Phase 14 | Complete |
+| PODUX-01 | Phase 14 | Complete |
+| PODUX-02 | Phase 14 | Complete |
+| PODUX-03 | Phase 14 | Complete |
 | PODRES-01 | Phase 15 | Pending |
 | PODRES-02 | Phase 15 | Pending |
 | PODRES-03 | Phase 15 | Pending |
