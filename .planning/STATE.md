@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-17 after v1.2 milestone kickoff)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** v1.2 Debrief Podcast — Phase 14 in progress (wave 1: 14-01 + 14-02 shipped)
+**Current focus:** v1.2 Debrief Podcast — Phase 15 in progress (15-01 shipped)
 
 ## Current Position
 
-Phase: 14 of 16 (Podcast Endpoint + Player — End-to-End on Fake) — Complete
-Plan: 3 of 3 in current phase — 14-01 (backend), 14-02 (frontend data layer), 14-03 (player UI) all shipped and human-checkpoint approved
-Status: Phase 14 complete — all three plans landed on 2026-04-18; human checkpoint SC1..SC6 confirmed; 608 frontend tests passing
-Last activity: 2026-04-18 — Completed 14-03-PLAN.md (podcast player UI: 7 components + ActionToolbar/FacilitatorInput edits + orchestrator fix for extractPersonaTexts + SC1..SC6 human-verify approved)
+Phase: 15 of 16 (TTS Health + Graceful Degradation) — In progress
+Plan: 1 of 3 in current phase — 15-01 (TTS health endpoint + tests) shipped
+Status: Phase 15 plan 1 complete — GET /api/health/tts live; 14/14 TTS tests + 139/139 total backend tests passing
+Last activity: 2026-04-18 — Completed 15-01-PLAN.md (backend TTS health endpoint: health_tts router, 14 pytest tests, env_tts_elevenlabs fixture)
 
-Progress: [████████████████░] 54/57 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 + 14-01/02/03 (6) shipped; v1.2 plans remaining: 15-01/02, 16-01/02
+Progress: [█████████████████░] 55/57 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 + 14-01/02/03 + 15-01 (7) shipped; v1.2 plans remaining: 15-02, 16-01/02
 
 ## Performance Metrics
 
@@ -68,6 +68,12 @@ v1.2 plan 14-03 decisions (podcast player UI):
 - **MP3 duration display quirk (cosmetic)** — raw-bytes stitching without pydub/ffmpeg causes WMP to read duration from first frame header only; Chrome/VLC scan all frames and report correct duration. Full audio plays correctly. Expected outcome of no-pydub decision.
 - **No `<dialog>` element for confirm dialogs** — jsdom lacks `showModal()` support; plain div overlay with role=dialog keeps components testable without API mocking
 
+v1.2 plan 15-01 decisions (TTS health endpoint):
+
+- **`_make_http_client()` factory for testability** — patching `httpx.AsyncClient` globally caused RecursionError (factory called the patched class) and broke `main.py` lifespan's `aclose()`. Narrow `_make_http_client()` factory is the correct patch target for per-request client tests.
+- **Per-request `httpx.AsyncClient` for TTS health** — not `app.state.http_client` (LLM client). Confirmed appropriate given 30s cache keeps probe frequency low.
+- **`?force=true` writes back to cache after bypass** — bypasses cache READ only, always writes result on completion (prevents stale cache after manual refresh).
+
 v1.1 decisions still relevant:
 
 - Health endpoint always returns HTTP 200 (body.ok carries signal) — reused verbatim for `/api/health/tts` in Phase 15
@@ -83,6 +89,6 @@ None. v1.1 technical-debt items are tracked in PROJECT.md and v1.1-MILESTONE-AUD
 
 ## Session Continuity
 
-Last session: 2026-04-18 — Completed 14-03-PLAN.md (podcast player UI); all three 14-XX plans shipped; human checkpoint SC1..SC6 approved; 608 frontend tests passing
-Stopped at: Phase 14 complete — 14-01 (backend SSE), 14-02 (frontend data layer), 14-03 (player UI) all shipped. Next: Phase 15 (graceful degradation: health endpoint + empirical TTS failure verification)
-Resume file: None — ready for 15-01.
+Last session: 2026-04-18 — Completed 15-01-PLAN.md (TTS health endpoint); GET /api/health/tts live; 139/139 backend tests passing
+Stopped at: Phase 15 / Plan 1 complete. Next: 15-02 (frontend TTS badge + setup-screen gate) then 16-01/02 (live ElevenLabs verification).
+Resume file: None — ready for 15-02.
