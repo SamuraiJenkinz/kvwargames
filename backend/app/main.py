@@ -33,7 +33,8 @@ from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import get_settings
-from .routers import config_gen, health, llm
+from .routers import config_gen, debrief, health, llm
+from .services.audio_generator import PodcastCache, TokenStore
 
 
 class SPAStaticFiles(StaticFiles):
@@ -74,6 +75,8 @@ async def lifespan(app: FastAPI):
         timeout=httpx.Timeout(settings.llm_timeout_seconds)
     )
     app.state.http_client = http_client
+    app.state.podcast_cache = PodcastCache()
+    app.state.podcast_tokens = TokenStore()
 
     yield
 
@@ -113,6 +116,7 @@ async def validation_error_handler(request, exc: RequestValidationError) -> JSON
 app.include_router(llm.router)
 app.include_router(health.router)
 app.include_router(config_gen.router)
+app.include_router(debrief.router)
 
 # SPA static files — MUST be last so API routes registered above are never swallowed.
 # Only mounted if the React build output exists; skipped in dev mode (no dist/ until pnpm build).
