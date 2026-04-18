@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-17 after v1.2 milestone kickoff)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** v1.2 Debrief Podcast — Phase 13 complete, Phase 14 next
+**Current focus:** v1.2 Debrief Podcast — Phase 14 in progress (wave 1: 14-01 + 14-02 shipped)
 
 ## Current Position
 
-Phase: 13 of 16 (Firewall Spike + Mockable Backend Foundation) — COMPLETE & VERIFIED
-Plan: 3 of 3 in current phase — all plans shipped; next phase is 14
-Status: Phase goal verified (3/4 must_haves auto-verified, MH-1 user-approved 2026-04-18 accepting operational-precedent evidence-form swap for PODDEP-01); 93 backend tests passing on HEAD
-Last activity: 2026-04-18 — Phase 13 verification passed and phase-completion commit bundled (ROADMAP + STATE + REQUIREMENTS + VERIFICATION). Next step: `/gsd:discuss-phase 14` or `/gsd:plan-phase 14`
+Phase: 14 of 16 (Podcast Endpoint + Player — End-to-End on Fake) — In progress
+Plan: 2 of 3 in current phase — 14-01 (backend) + 14-02 (frontend data layer) shipped; 14-03 (player UI) next
+Status: Wave 1 complete — backend SSE endpoint + frontend data layer both shipped on 2026-04-18; 584 frontend tests passing
+Last activity: 2026-04-18 — Completed 14-02-PLAN.md (frontend data layer: podcastClient, podcastStore, mp3Filename, wordCountEstimate, extended jsdom harness)
 
-Progress: [█████████████░░░] 49/57 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 (3) shipped; v1.2 plans remaining: 14-01/02/03, 15-01/02, 16-01/02
+Progress: [██████████████░░] 51/57 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 + 14-01/02 (5) shipped; v1.2 plans remaining: 14-03, 15-01/02, 16-01/02
 
 ## Performance Metrics
 
@@ -45,6 +45,14 @@ v1.2 roadmap-level decisions worth carrying into Phase 13 planning:
 - **Parallel `/api/health/tts`, not extended `/api/health/llm`.** LLM-down hard-fails Launch; TTS-down is a soft warning — one `body.ok` cannot carry both signals.
 - **Graceful degradation is load-bearing.** Phase 15 proves the markdown debrief path survives ElevenLabs failure by empirical flip-the-key-to-garbage run.
 
+v1.2 plan 14-02 decisions (frontend data layer):
+
+- **fetch+ReadableStream over EventSource** — EventSource lacks POST body support; podcast endpoint requires body with persona texts, voices, game name (SC4 reconciliation)
+- **Separate usePodcastStore (not gameStore slice)** — podcast lifecycle is distinct from game state; avoids polluting 700-line gameStore
+- **Local time in buildMp3Filename** — `toISOString()` (UTC) gives AEST facilitators wrong timestamps; `getHours()/getMinutes()` respects locale
+- **'session' fallback for MP3 kebab** — distinct from debriefExporter.ts ('game' fallback); semantically cleaner for MP3 context
+- **Blob URL revoke-before-create invariant** — `revokeObjectURL(prev)` called at top of `startGeneration` and in `reset()`; prevents memory leaks across regenerate cycles
+
 v1.1 decisions still relevant:
 
 - Health endpoint always returns HTTP 200 (body.ok carries signal) — reused verbatim for `/api/health/tts` in Phase 15
@@ -60,6 +68,6 @@ None. v1.1 technical-debt items are tracked in PROJECT.md and v1.1-MILESTONE-AUD
 
 ## Session Continuity
 
-Last session: 2026-04-18 — Phase 13 verification approved, phase-completion commit bundled
-Stopped at: Phase 13 fully closed — verification passed (status: passed in 13-VERIFICATION.md after MH-1 user-approval); ROADMAP/STATE/REQUIREMENTS all reflect completion; PODDEP-01, PODDEP-02, PODGEN-05 flipped Complete. Next step: `/gsd:discuss-phase 14` (preferred — clarify approach first) or `/gsd:plan-phase 14` (skip discussion).
-Resume file: None — ready for Phase 14 (Podcast Endpoint + Player — End-to-End on Fake).
+Last session: 2026-04-18 — Completed 14-02-PLAN.md (frontend data layer, wave 1 of phase 14)
+Stopped at: 14-02 complete — podcastClient, podcastStore, mp3Filename, wordCountEstimate shipped + 47 new tests; 584 frontend tests passing; 14-01 (backend SSE) also complete; next step: execute 14-03-PLAN.md (podcast player UI component)
+Resume file: None — ready for 14-03.
