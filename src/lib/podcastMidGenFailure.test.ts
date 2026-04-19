@@ -28,7 +28,7 @@ vi.mock('@/lib/podcastClient', () => ({
 
 import { generatePodcast, PodcastGenerationError } from '@/lib/podcastClient'
 import { usePodcastStore } from '@/lib/podcastStore'
-import { generateDebriefMarkdown } from '@/lib/debriefExporter'
+import { generateDebriefMarkdown, type DebriefSnapshot } from '@/lib/debriefExporter'
 
 const mockedGeneratePodcast = generatePodcast as ReturnType<typeof vi.fn>
 
@@ -138,7 +138,7 @@ describe('mid-gen failure safety net (SC4 — Phase 15-02)', () => {
       exportedAt: new Date(),
     }
 
-    const md = generateDebriefMarkdown(snapshot)
+    const md = generateDebriefMarkdown(snapshot as unknown as DebriefSnapshot)
 
     expect(md).toBeTruthy()
     expect(typeof md).toBe('string')

@@ -44,7 +44,7 @@ vi.mock('zustand')
 // We can't reference module-level variables in vi.mock() factories (they are hoisted).
 // Instead, use vi.hoisted() to declare the mock fn so it's available in the factory.
 const { mockStartGeneration } = vi.hoisted(() => ({
-  mockStartGeneration: vi.fn(() => Promise.resolve()),
+  mockStartGeneration: vi.fn((_args: { forceFresh: boolean } | unknown) => Promise.resolve()),
 }))
 
 // Podcast store state — mutable so tests can change it
@@ -55,8 +55,13 @@ const podcastStoreState = {
 }
 
 vi.mock('@/lib/podcastStore', () => ({
-  usePodcastStore: (selector: (s: typeof podcastStoreState & { startGeneration: () => Promise<void> }) => unknown) =>
-    selector({ ...podcastStoreState, startGeneration: mockStartGeneration }),
+  usePodcastStore: (
+    selector: (
+      s: typeof podcastStoreState & {
+        startGeneration: (args: { forceFresh?: boolean } | unknown) => Promise<void>
+      },
+    ) => unknown,
+  ) => selector({ ...podcastStoreState, startGeneration: mockStartGeneration }),
 }))
 
 // Import after mocks are declared so vi.mocked() sees the mock functions.
@@ -276,7 +281,7 @@ describe('ActionToolbar', () => {
     await user.click(screen.getByRole('button', { name: /generate podcast/i }))
 
     expect(mockStartGeneration).toHaveBeenCalledTimes(1)
-    const callArg = mockStartGeneration.mock.calls[0][0] as { forceFresh: boolean }
+    const callArg = mockStartGeneration.mock.calls[0]?.[0] as { forceFresh: boolean }
     expect(callArg.forceFresh).toBe(false)
   })
 
@@ -384,7 +389,7 @@ describe('ActionToolbar', () => {
 
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     expect(mockStartGeneration).toHaveBeenCalledTimes(1)
-    const callArg = mockStartGeneration.mock.calls[0][0] as { forceFresh: boolean }
+    const callArg = mockStartGeneration.mock.calls[0]?.[0] as { forceFresh: boolean }
     expect(callArg.forceFresh).toBe(true)
   })
 })

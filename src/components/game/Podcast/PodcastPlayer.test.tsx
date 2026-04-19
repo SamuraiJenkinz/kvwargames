@@ -1,6 +1,5 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { usePodcastStore } from '@/lib/podcastStore'
 import type { PersonaKey } from '@/lib/podcastStore'
 
 // ─── Mock podcasStore ─────────────────────────────────────────────────────────
@@ -79,7 +78,7 @@ describe('PodcastPlayer', () => {
     render(<PodcastPlayer />)
     // The <p> element contains both "Now playing:" and the persona name span.
     // Use a text-match function to verify the full paragraph text.
-    const nowPlayingParagraph = screen.getByText((content, element) => {
+    const nowPlayingParagraph = screen.getByText((_content, element) => {
       return element?.tagName === 'P' && /now playing:/i.test(element.textContent ?? '')
     })
     expect(nowPlayingParagraph).toBeInTheDocument()

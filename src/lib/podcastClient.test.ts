@@ -26,7 +26,7 @@ function mockSSEThenBlob(
     status: 200,
     headers: { 'content-type': 'text/event-stream' },
   })
-  const audioBlob = new Blob([audioBytes], { type: 'audio/mpeg' })
+  const audioBlob = new Blob([audioBytes as unknown as BlobPart], { type: 'audio/mpeg' })
   const audioResp = new Response(audioBlob, {
     status: 200,
     headers: { 'content-type': 'audio/mpeg' },

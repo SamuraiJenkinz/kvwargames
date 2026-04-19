@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect } from 'react'
 import { usePodcastStore } from '@/lib/podcastStore'
 import { PERSONA_META } from '@/lib/personaConfig'
 import type { PersonaKey } from '@/lib/podcastStore'
