@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-04-17 after v1.2 milestone kickoff)
 
 ## Current Position
 
-Phase: 15 of 16 (TTS Health + Graceful Degradation) — Complete
-Plan: 3 of 3 in current phase — 15-03 (empirical graceful degradation verification) shipped
-Status: Phase 15 complete — 15-01 backend health endpoint, 15-02 frontend TtsHealthBadge, 15-03 empirical verification all shipped 2026-04-19; SC1..SC4 confirmed; markdown debrief proven independent of TTS failure path
-Last activity: 2026-04-19 — Completed Phase 15: empirical garbage-key run produced [upstream_error] banner while markdown debrief downloaded successfully (110-line valid .md, SHA-256 b00eda8…)
+Phase: 16 of 16 (Live ElevenLabs Verification + Milestone Audit) — In progress
+Plan: 2 of 2 in current phase — 16-01 complete; 16-02 (v1.2 milestone audit) next
+Status: Phase 16, Plan 16-01 complete (commits 3701198, b851553, af6d525, fd41e6c, 02298a3, 7cd1682); SC1/SC2/SC3 all PASS
+Last activity: 2026-04-19 — Completed 16-01-PLAN.md — Tier-B live ElevenLabs replay complete; 16-LIVE-VERIFICATION.md authored; 16-01-SUMMARY.md written; all 6 evidence artifacts committed
 
-Progress: [███████████████████░] 57/58 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 + 14-01/02/03 + 15-01/02/03 (9) shipped; v1.2 plans remaining: 16-01/02
+Progress: [████████████████████] 58/59 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 + 14-01/02/03 + 15-01/02/03 + 16-01 (10) shipped; v1.2 plans remaining: 16-02
 
 ## Performance Metrics
 
@@ -24,7 +24,7 @@ Progress: [███████████████████░] 57/58 p
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1–8 | 39/39 | ✅ Tagged | 2026-04-15 |
 | v1.1 Pre-live-run hardening | 9–12 | 7/7 | ✅ Tagged | 2026-04-15 |
-| v1.2 Debrief Podcast | 13–16 | 9/~10 | 🚧 In progress (Phases 13 + 14 + 15 complete 2026-04-19) | — |
+| v1.2 Debrief Podcast | 13–16 | 10/11 | 🚧 In progress (Phases 13 + 14 + 15 + 16-01 complete 2026-04-19) | — |
 
 | 15. TTS Health + Graceful Degradation | v1.2 | 3/3 | Complete | 2026-04-19 |
 
@@ -82,6 +82,14 @@ v1.2 plan 15-01 decisions (TTS health endpoint):
 - **Per-request `httpx.AsyncClient` for TTS health** — not `app.state.http_client` (LLM client). Confirmed appropriate given 30s cache keeps probe frequency low.
 - **`?force=true` writes back to cache after bypass** — bypasses cache READ only, always writes result on completion (prevents stale cache after manual refresh).
 
+v1.2 plan 16-01 decisions (live ElevenLabs replay):
+
+- **`/api/config/tts-voices` as dedicated endpoint** — voice-ID dispatch shape is distinct from generic config; dedicated endpoint keeps fake-vs-elevenlabs dispatch isolated
+- **No Tier-A preprocessor fixes needed** — EDIP letter-by-letter confirmed on first pass across all 3 segments; Phase 13 ACRONYMS dict entry was sufficient
+- **~3 s CBR/display duration variance is cosmetic** — ID3/Lavf header bytes in numerator inflate CBR estimate; VLC/Chrome report correct playback duration; no audio missing; expected consequence of no-pydub stitching
+- **SSE parser Rule-3 auto-fix (af6d525)** — initial parser discarded `event:` name lines; consumer dispatch matched nothing; fix: capture event name line and attach as `event` key on yielded dict
+- **No Tier-B deferrals** — all 3 stock voices (Sarah/George/Eric mapped Kent/Finch/Chen) produced distinct intelligible audio on first pass
+
 v1.2 plan 15-03 observations (empirical verification):
 
 - **Two-endpoint code divergence: `/v1/user` → `auth_error`, `/v1/text-to-speech` → `upstream_error`** — the setup-screen health probe hits ElevenLabs `/v1/user` (returned 401/403 → `auth_error`) while TTS generation hits `/v1/text-to-speech/{voice_id}` with dummy voice IDs (ElevenLabs returned HTTP 500 → `upstream_error`). Both codes are valid members of the 8-code taxonomy. Phase 16 Tier-B replay will use real voice IDs so both endpoints succeed. The code-dispatch table handling multiple codes simultaneously is now empirically confirmed.
@@ -102,6 +110,6 @@ None. v1.1 technical-debt items are tracked in PROJECT.md and v1.1-MILESTONE-AUD
 
 ## Session Continuity
 
-Last session: 2026-04-19 — Completed Phase 15: empirical garbage-key run, 15-03-SUMMARY.md, evidence bundle committed
-Stopped at: Phase 15 complete. Next: Phase 16 (Live ElevenLabs Verification + Milestone Audit)
+Last session: 2026-04-19 — Phase 16 plan 16-01 complete; all 3 success criteria PASS; 16-LIVE-VERIFICATION.md + 16-01-SUMMARY.md committed
+Stopped at: Completed 16-01-PLAN.md; 16-02 (v1.2 milestone audit) is next
 Resume file: None
