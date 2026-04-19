@@ -245,20 +245,34 @@ def _parse_sse_lines(response: "requests.Response") -> "dict":
     Minimal inline SSE parser.  Yields parsed event dicts from a streaming
     requests.Response whose content-type is text/event-stream.
 
-    Event shape emitted by backend: data: {json}\n\n
+    Backend emits: `event: <name>\\n` followed by `data: {json}\\n\\n`.  The
+    event name carries the type (persona_done / done / error); the JSON body
+    does not repeat it.  We capture the event name from the `event:` line
+    and attach it to the yielded dict as `event` so the consumer can
+    dispatch on `event.get("event")`.
     """
-    buffer: list[str] = []
+    data_buffer: list[str] = []
+    event_name: str | None = None
     for raw_line in response.iter_lines(decode_unicode=True):
-        if raw_line.startswith("data:"):
-            buffer.append(raw_line[5:].strip())
-        elif raw_line == "" and buffer:
-            payload = " ".join(buffer).strip()
-            buffer = []
+        if raw_line is None:
+            continue
+        if raw_line.startswith("event:"):
+            event_name = raw_line[6:].strip()
+        elif raw_line.startswith("data:"):
+            data_buffer.append(raw_line[5:].strip())
+        elif raw_line == "" and data_buffer:
+            payload = " ".join(data_buffer).strip()
+            data_buffer = []
             if payload:
                 try:
-                    yield json.loads(payload)
+                    parsed = json.loads(payload)
                 except json.JSONDecodeError:
-                    pass  # skip malformed events
+                    event_name = None
+                    continue
+                if event_name is not None:
+                    parsed["event"] = event_name
+                event_name = None
+                yield parsed
 
 
 # ---------------------------------------------------------------------------
