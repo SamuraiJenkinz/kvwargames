@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-04-17 after v1.2 milestone kickoff)
 
 **Core value:** Three AI personas respond in-character to facilitator input with accurate, live game state tracking
-**Current focus:** v1.2 Debrief Podcast — Phase 15 in progress (15-01 shipped)
+**Current focus:** v1.2 Debrief Podcast — Phase 16 next (Live ElevenLabs Verification + Milestone Audit)
 
 ## Current Position
 
