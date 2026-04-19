@@ -30,6 +30,14 @@ vi.mock('@/lib/debriefExporter', () => ({
   buildDebriefFilename: vi.fn(() => 'debrief-mock-2026-04-14-1200.md'),
 }))
 
+// ─── Phase 16-01: mock ttsVoicesClient ───────────────────────────────────────
+// Returns fake-mode sentinels so existing test assertions still hold in fake mode.
+vi.mock('@/lib/ttsVoicesClient', () => ({
+  fetchTtsVoices: vi.fn(() =>
+    Promise.resolve({ kent: '__fake_kent__', finch: '__fake_finch__', chen: '__fake_chen__' }),
+  ),
+}))
+
 vi.mock('zustand')
 
 // ─── Phase 14-03: mock podcast store ─────────────────────────────────────────

@@ -7,6 +7,7 @@ import {
   type DebriefSnapshot,
 } from '@/lib/debriefExporter'
 import { usePodcastStore } from '@/lib/podcastStore'
+import { fetchTtsVoices } from '@/lib/ttsVoicesClient'
 import {
   countDebriefWords,
   estimateAudioMinutes,
@@ -50,7 +51,7 @@ export default function ActionToolbar({ disabled, onInsert }: ActionToolbarProps
 
   // ── Podcast handlers ──────────────────────────────────────────────────────────
 
-  const handleGenerate = (forceFresh: boolean) => {
+  const handleGenerate = async (forceFresh: boolean) => {
     const s = useGameStore.getState()
     if (!s.gameConfig || !s.gameState) return
     const texts = extractPersonaTexts(s.messages)
@@ -60,11 +61,15 @@ export default function ActionToolbar({ disabled, onInsert }: ActionToolbarProps
       setWordCountDialogOpen(true)
       return
     }
-    // Fake-mode sentinels — real voice IDs arrive in Phase 16 via settings
-    const voices = {
-      kent: '__fake_kent__',
-      finch: '__fake_finch__',
-      chen: '__fake_chen__',
+    let voices: { kent: string; finch: string; chen: string }
+    try {
+      voices = await fetchTtsVoices()
+    } catch {
+      usePodcastStore.setState({
+        status: 'error',
+        error: { code: 'network_error', message: 'Could not fetch TTS voice configuration' },
+      })
+      return
     }
     void startPodcast({
       gameName: s.gameConfig.name,
@@ -170,7 +175,7 @@ export default function ActionToolbar({ disabled, onInsert }: ActionToolbarProps
       {hasDebrief && podcastStatus === 'idle' && (
         <button
           type="button"
-          onClick={() => handleGenerate(false)}
+          onClick={() => void handleGenerate(false)}
           className="px-3 py-1.5 rounded-md text-sm font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition-colors disabled:opacity-50"
           disabled={loading}
         >
@@ -206,12 +211,22 @@ export default function ActionToolbar({ disabled, onInsert }: ActionToolbarProps
           const s = useGameStore.getState()
           if (!s.gameConfig) return
           const texts = extractPersonaTexts(s.messages)
-          void startPodcast({
-            gameName: s.gameConfig.name,
-            personaTexts: texts,
-            voices: { kent: '__fake_kent__', finch: '__fake_finch__', chen: '__fake_chen__' },
-            forceFresh: false,
-          })
+          // Fetch real voice IDs from backend (async; errors surface via podcast store error state)
+          void fetchTtsVoices()
+            .then((voices) =>
+              startPodcast({
+                gameName: s.gameConfig!.name,
+                personaTexts: texts,
+                voices,
+                forceFresh: false,
+              }),
+            )
+            .catch(() => {
+              usePodcastStore.setState({
+                status: 'error',
+                error: { code: 'network_error', message: 'Could not fetch TTS voice configuration' },
+              })
+            })
         }}
         onCancel={() => setWordCountDialogOpen(false)}
       />
@@ -222,7 +237,7 @@ export default function ActionToolbar({ disabled, onInsert }: ActionToolbarProps
         generationSeconds={estimateGenerationSeconds()}
         onConfirm={() => {
           setRegenDialogOpen(false)
-          handleGenerate(true)
+          void handleGenerate(true)
         }}
         onCancel={() => setRegenDialogOpen(false)}
       />
