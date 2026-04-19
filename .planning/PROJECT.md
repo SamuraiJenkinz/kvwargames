@@ -2,38 +2,34 @@
 
 ## What This Is
 
-A three-persona AI-powered facilitation tool for structured policy tabletop exercises. It runs alongside a human facilitation team during live wargame sessions — three expert AI personas (Kent Valentina, Dr. Alistair Finch, Dr. Michael Chen) respond in-character to events described by the facilitator, while tracking game state across teams, resources, and crisis escalation. v1.0 shipped 2026-04-15, validated with a full 5-round Scenario 2 run against a real corporate LLM. v1.1 shipped the same day, closing the four operational gaps that run surfaced: the setup screen now gates Launch on a live LLM health check, direct `/game` navigation with no loaded state redirects cleanly to `/setup`, the React setState-during-render warning is gone, and Finch now reliably auto-advances `crisisState` when severity crosses the documented thresholds (verified empirically via Tier B live-LLM replay).
+A three-persona AI-powered facilitation tool for structured policy tabletop exercises. It runs alongside a human facilitation team during live wargame sessions — three expert AI personas (Kent Valentina, Dr. Alistair Finch, Dr. Michael Chen) respond in-character to events described by the facilitator, while tracking game state across teams, resources, and crisis escalation. v1.0 shipped 2026-04-15, validated with a full 5-round Scenario 2 run against a real corporate LLM. v1.1 shipped the same day, closing the four operational gaps that run surfaced: the setup screen gates Launch on a live LLM health check, direct `/game` navigation with no loaded state redirects cleanly to `/setup`, the React setState-during-render warning is gone, and Finch reliably auto-advances `crisisState` when severity crosses the documented thresholds (verified empirically via Tier B live-LLM replay). v1.2 shipped 2026-04-19, adding a three-voice MP3 podcast for the end-of-session debrief — Kent, Finch, and Chen each read their existing `isDebrief: true` messages through distinct ElevenLabs stock voices, stitched into a single session MP3 with an inline player + Download MP3 button adjacent to the existing markdown download, graceful degradation when ElevenLabs is unreachable, and zero browser-side credentials (Tier-B live replay PASS on first call, 782,966-byte stitched MP3).
 
 ## Core Value
 
 Three AI personas respond in-character to facilitator input with accurate, live game state tracking — the tool must enhance the human facilitation team, never slow it down or break immersion.
 
-## Current State (post-v1.1)
+## Current State (post-v1.2)
 
-- **Shipped:** v1.0 MVP + v1.1 Pre-live-run hardening, both on 2026-04-15 (see `.planning/MILESTONES.md`)
-- **v1.1 scope delivered:** 18/18 v1.1 requirements, 7 plans across 4 phases (9–12), Tier B live-LLM replay PASS on the Scenario-2 R3 crisisState transition
-- **Deployment:** Windows Server scheduled-task deployment committed (`4c388e2`); facilitator guides committed (`574efe3`); crypto.randomUUID fallback for HTTP contexts (`474c1f6`)
-- **Codebase:** 11.9K LOC TypeScript/TSX (frontend) + 1.6K LOC Python (backend); 534/534 frontend + 17/17 backend tests green; `tsc -b && vite build` succeeds
-- **Audit status:** v1.1 audit `tech_debt` (non-blocking; sole item was a ROADMAP.md doc-drift line, resolved during milestone completion). Full audit report at `.planning/milestones/v1.1-MILESTONE-AUDIT.md`
-- **Pipeline ready for next live exercise:** health-gate + crisisState rule + clean routing all verified end-to-end
+- **Shipped:** v1.0 MVP + v1.1 Pre-live-run hardening (both 2026-04-15) + v1.2 Debrief Podcast (2026-04-19) (see `.planning/MILESTONES.md`)
+- **v1.2 scope delivered:** 21/21 v1.2 requirements, 11 plans across 4 phases (13–16), Tier-B live ElevenLabs replay PASS on first call against Scenario-2 fixture (782,966-byte stitched MP3, three distinct voices, EDIP letter-by-letter confirmed)
+- **Codebase:** TypeScript/TSX frontend + Python backend (incorporates v1.2 additions — TTSProvider ABC, FakeTTSProvider, ElevenLabsTTSProvider, text preprocessor, `POST /api/debrief/podcast` SSE endpoint, `GET /api/health/tts` health endpoint, seven React Podcast components, `usePodcastStore` Zustand, `podcastClient.ts` fetch+ReadableStream SSE consumer); 627/627 frontend (Vitest, 33 test files) + 142/142 backend (pytest) tests green; `tsc -b && vite build` succeeds
+- **Audit status:** v1.2 audit `tech_debt` (non-blocking; two Low-severity items — TD-v1.2-01 WMP cosmetic duration display quirk expected consequence of no-pydub stitching with zero audio impact; TD-v1.2-02 v1.1 inherited doc-drift already resolved during v1.2 kickoff). Full audit report at `.planning/milestones/v1.2-MILESTONE-AUDIT.md`
+- **Live-endpoint evidence:** Tier-B replay artifacts committed at `.planning/phases/16-live-elevenlabs-verification/16-LIVE-VERIFICATION.md` (stitched MP3 binary, per-segment offsets JSON, player screenshot, 8-row acronym deviation table)
+- **Pipeline ready for next live exercise:** LLM health-gate + crisisState rule + clean routing + three-voice debrief podcast + graceful degradation + TTS health informational badge all verified end-to-end
 
-## Current Milestone: v1.2 Debrief Podcast
+## Next Milestone: TBD
 
-**Goal:** Convert the end-of-session debrief into a three-voice MP3 podcast — Kent, Finch, and Chen each read their own debrief messages through distinct ElevenLabs voices, stitched into a single MP3 facilitators can play in-app and download.
+**Candidate backlog** (carried forward from v1.2 deferred items):
 
-**Target features:**
+- **VOICE-01** — Persona-matched custom voice audition (replaces stock defaults); no new inputs from v1.2 listen-through (all three stock voices delivered distinct intelligible audio on first pass)
+- **PLAYER-01** — Download-by-persona MP3 buttons (Kent alone / Finch alone / Chen alone)
+- **PLAYER-02** — Media Session API chapter metadata for OS-level media-control integration
+- **PLAYER-03** — Custom playback-speed selector (if native browser right-click menu proves undiscoverable)
+- **Error-banner UX polish** — truncate verbose ElevenLabs response dump in GenerationPanel (noted during Phase 15 empirical verification)
+- **Dev-mode Zustand store exposure** — optionally attach stores to `window.__STORES__` for verification ergonomics (noted during Phase 15)
+- Observability hardening, streaming LLM responses (SSE), session analytics dashboard, visual config editor — original v2+ candidates still available
 
-- ElevenLabs TTS integration via server-side proxy (zero browser-side credentials, same pattern as `/api/llm`)
-- Three persona voices — one ElevenLabs stock voice per persona (Kent, Finch, Chen). Voice IDs configured via `.env`; selection deferred to runtime config, not auditioned in this milestone
-- Script source: existing `isDebrief: true` persona messages (no new LLM call — the in-character scripts already exist at end-of-game)
-- TTS preprocessing for wargame vocabulary (EDIP, PC, PO, CRM, IC, LEFS, SIEP → phonetic expansion; numbers → num2words)
-- Audio segment stitching — three per-persona MP3 segments joined with brief silence pads into a single session MP3
-- Backend endpoint `POST /api/debrief/podcast` returning the stitched MP3 (streaming or 202-then-poll pattern, TBD during planning)
-- Frontend `PodcastPlayer` component in the debrief panel — inline `<audio>` player + Download MP3 button, side by side; appears alongside the existing markdown debrief download
-- Health-check parity — ElevenLabs availability surfaced through the existing `/api/health/llm` pattern (same 8-code taxonomy reused, or a parallel `/api/health/tts` — decision during research)
-- Graceful degradation — ElevenLabs down must not block the markdown debrief; UI shows "audio unavailable" and keeps the existing export path working
-
-**Reference implementation:** MDInsights (`SamuraiJenkinz/daily-intelligence-brief`) — the `TTSProvider` abstract base, `ElevenLabsTTSProvider`, atomic file writes, structured logging, and `api_events` audit pattern are known-good shapes that transplant directly into this stack.
+Start next milestone with `/gsd:new-milestone`.
 
 ## Requirements
 
@@ -62,19 +58,34 @@ Three AI personas respond in-character to facilitator input with accurate, live 
 - ✓ DEBRIEF-01 regression guard — R1 facilitator input first-character preserved in debrief export (browser/OS artifact confirmed; pure-function pipeline clean) — v1.1
 - ✓ crisisState auto-advance rule encoded (Block 7 Finch MUST + Block 9 subsection) — v1.1
 - ✓ crisisState rule empirically verified via Tier B live-LLM replay — Finch emitted transition at severity=4 on Scenario 2 R3 — v1.1
+- ✓ Generate Podcast button adjacent to Download Debrief (.md); inline `<audio controls>` loaded paused (no auto-play) — v1.2
+- ✓ Three-voice MP3 in Kent → Finch → Chen order reading existing `isDebrief: true` messages verbatim (no new LLM call) — v1.2
+- ✓ ~700ms silence between persona segments, no leading/trailing pad — v1.2
+- ✓ Wargame-vocabulary TTS preprocessor (EDIP/PC/PO/CRM/IC/LEFS/SIEP/SoS acronyms + num2words number normalisation + markdown stripping) — v1.2
+- ✓ Word-count soft ceiling confirmation dialog + in-memory cache on unchanged debrief + Re-generate button with force-fresh confirmation — v1.2
+- ✓ Download MP3 filename `debrief-{kebab}-{YYYY-MM-DD-HHmm}.mp3` + collapsible transcript panel reusing existing markdown renderer — v1.2
+- ✓ Three Skip-to-persona buttons + Now-playing label updating at segment boundaries via backend-returned offsets — v1.2
+- ✓ Per-persona progress rows + overall progress bar + Cancel aborting in-flight generation — v1.2
+- ✓ `GET /api/health/tts` parallel endpoint (8-code taxonomy, 15s SLA, always HTTP 200) + informational TtsHealthBadge never gating Launch — v1.2
+- ✓ Graceful degradation empirically verified — ElevenLabs-down leaves markdown debrief fully functional (SHA-256 `b00eda86…` proof) — v1.2
+- ✓ Corporate-firewall reachability proven via operational precedent + HTTP 200 preflight + Tier-B live streaming-payload evidence — v1.2
+- ✓ `FakeTTSProvider` via `TTS_PROVIDER` env switch so dev and CI never consume ElevenLabs quota — v1.2
 
 ### Active
 
-Requirements being refined during v1.2 research + requirements phase. Scope committed at the milestone level (see Current Milestone above); per-requirement REQ-IDs land in `.planning/REQUIREMENTS.md` after research.
+None — no current milestone. Next milestone candidates listed under "Next Milestone: TBD" above. Start with `/gsd:new-milestone` to scope and define requirements.
 
-### Deferred (v2+ candidates)
+### Deferred (v1.3+ candidates)
 
 - Streaming LLM responses token-by-token (if corporate endpoint supports SSE)
 - Session analytics dashboard (response times, token usage, persona distribution)
 - Visual config editor (form-based, not raw JSON)
 - HTTPS deployment on target server (infrastructure, not app code — handled outside GSD cycle)
 - Observability hardening (structured logging of 8-code health taxonomy over time, stale-localStorage detection)
-- Voice-audition phase for ElevenLabs (pick persona-matched voices instead of stock defaults — explicitly deferred from v1.2 per user direction)
+- **VOICE-01** — Voice-audition phase for ElevenLabs (persona-matched voices replacing stock defaults; Phase 16 listen-through delivered clean first pass, so no new inputs from v1.2 — original scope carried forward)
+- **PLAYER-01/02/03** — Per-persona MP3 download buttons + Media Session API chapter metadata + custom playback-speed selector
+- Error-banner UX polish — truncate verbose ElevenLabs response dump in GenerationPanel (flagged during Phase 15 empirical verification)
+- Dev-mode Zustand store exposure at `window.__STORES__` — ergonomics for future verification work
 - Multi-language debrief audio (ElevenLabs `eleven_multilingual_v2` supports it; scope this only when a non-English EDIP exercise is planned)
 - **Multi-tenancy / session isolation.** Current architecture: each browser's Zustand store is in-memory-only, so two users on separate browsers run independent games by accident rather than by design. What's missing for a real multi-user deployment: (a) server-side session IDs so the backend can attribute LLM calls to a specific game session, (b) optional session persistence so a mid-game refresh doesn't lose state, (c) access control (corporate SSO or a shared-secret token) so the LAN URL isn't openly addressable, (d) proxy-level rate limiting if concurrent sessions grow beyond ~10. For the parallel-facilitation use case (two tables at one workshop) the current model is sufficient; this item is only needed if the tool moves toward broader deployment or senior-facilitator review workflows.
 
@@ -139,4 +150,4 @@ Requirements being refined during v1.2 research + requirements phase. Scope comm
 | v1.2 Debrief Podcast milestone shipped 2026-04-19 — 21/21 requirements validated against real ElevenLabs endpoint | Tier-B evidence bundle (`16-LIVE-VERIFICATION.md`) demonstrates end-to-end three-voice MP3 generation from Scenario-2 fixture using real v0.10 voice IDs on deployment host MC211APT2AS5AHG; graceful degradation empirically verified in Phase 15 (garbage-key run, SHA-256 `b00eda86…`); firewall reachability empirically verified in Phase 13; 142 pytest + 627 vitest green at audit time | ✓ Good (with 2 low-severity tech-debt deferrals — cosmetic WMP duration display + v1.1 inherited doc-drift TD-v1.1-01 already resolved; see [milestones/v1.2-MILESTONE-AUDIT.md](milestones/v1.2-MILESTONE-AUDIT.md)) |
 
 ---
-*Last updated: 2026-04-17 after v1.2 milestone kickoff*
+*Last updated: 2026-04-19 after v1.2 milestone completion*

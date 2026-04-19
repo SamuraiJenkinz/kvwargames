@@ -1,5 +1,40 @@
 # Project Milestones: War Game Engine
 
+## v1.2 Debrief Podcast (Shipped: 2026-04-19)
+
+**Delivered:** Three-voice MP3 podcast for end-of-session debriefs — Kent, Finch, and Chen each read their existing `isDebrief: true` messages through distinct ElevenLabs stock voices, stitched into a single session MP3 with an inline player + Download MP3 button adjacent to the existing markdown download, graceful degradation when ElevenLabs is unreachable, and zero browser-side credentials.
+
+**Phases completed:** 13–16 (11 plans total)
+
+**Key accomplishments:**
+
+- Mock-first, live-last execution — `FakeTTSProvider` as `TTS_PROVIDER=fake` dev default (zero network, verified by httpx spy) plus concrete `ElevenLabsTTSProvider` with the full 8-code error taxonomy; Phases 13/14/15 debugged every UX surface against the fake before any ElevenLabs quota was spent
+- Corporate-firewall reachability proven via operational precedent (existing production app on MC211APT2AS5AHG calls `api.elevenlabs.io` daily) plus HTTP 200 `/v1/voices` preflight on 2026-04-17; streaming-payload evidence delivered by the Phase 16 Tier-B replay
+- `POST /api/debrief/podcast` as SSE (blocking streaming `audio/mpeg`, not 202-then-poll) + paired `GET /api/debrief/podcast/audio?token=` + `audio_generator.py` orchestrator with raw-bytes stitching (no pydub/ffmpeg — all segments are `mp3_44100_128` CBR, frames are self-contained), committed 700ms silence pad fixture, in-process cache keyed on `(texts + voice_ids)` SHA-256, client-disconnect abort between personas
+- Frontend: `podcastClient.ts` (fetch + ReadableStream SSE consumer), standalone `usePodcastStore` Zustand FSM with blob-URL revoke-before-create invariant, seven React components wiring GenerationPanel (per-persona status + discrete 0/33/66/100% progress bar + Cancel) → PodcastPlayer (`<audio controls>` no-autoplay + Skip-to-persona offsets + Now-playing label + collapsible transcript) → ActionToolbar three-state podcast button row with two confirm dialogs
+- Wargame-vocabulary preprocessor — fixed-order pipeline `markdown_strip → acronym_expand → number_normalize`, 14-entry acronym dict (EDIP/PC/PO/CRM/IC/LEFS/SIEP/SoS + plurals, word-boundary case-sensitive longest-first), `num2words==0.5.14` for years/ordinals/percentages/plain integers, 12-entry golden-file corpus sourced verbatim from Scenario-2 injects, 52-test parametrized pytest suite
+- TTS health parity — `GET /api/health/tts` as a parallel endpoint to `/api/health/llm` (explicitly not extended — LLM-down hard-fails Launch but TTS-down is informational; one `body.ok` cannot carry both signals), 30s cache with `?force=true` bypass, `TtsHealthBadge` informational amber state with locked copy "Podcast generation unavailable — markdown debrief will still work.", Launch button never gated on TTS health (PODRES-02 invariant)
+- Graceful degradation empirically verified — garbage-key browser run produced `[upstream_error]` banner in GenerationPanel while the adjacent Download Debrief (.md) button still delivered a valid 7,466-byte markdown file (SHA-256 `b00eda86ee230d4058783548c2104d9e374f7b037ee9d914ccc9e916329057ec`); two-endpoint code divergence (`/v1/user` → `auth_error`, `/v1/text-to-speech/{voice_id}` → `upstream_error`) documented as expected behaviour that strengthens the dispatch-table verification
+- Tier-B live ElevenLabs replay PASSED on first call — 782,966-byte stitched MP3 generated against Scenario-2 debrief fixture with real v0.10 voice IDs on the target deployment host; three distinct intelligible voices in Kent → Finch → Chen order with ~700ms silence pads between segments (offsets `[0.0, 17.3949375, 35.756437500000004]` monotonically increasing); EDIP letter-by-letter pronunciation confirmed on first pass across all 3 segments (no Tier-A preprocessor fixes needed; no Tier-B voice deferrals seeded into v1.3 VOICE-01)
+- v1.2 milestone audit PASSED — 21/21 requirements SATISFIED, 4/4 phases, 4/4 integration, 3/3 E2E flows; status `tech_debt` with two Low-severity non-blocking items (TD-v1.2-01 WMP cosmetic duration display quirk expected consequence of no-pydub stitching; TD-v1.2-02 v1.1 inherited doc-drift already resolved during v1.2 kickoff)
+
+**Stats:**
+
+- 135 files changed (+22,863 / −1,517 lines total) across the v1.2 range
+- 75 commits across 4 phases / 11 plans
+- Timeline: 2026-04-15 → 2026-04-19 (~4 days, starting same day as v1.0/v1.1 ship)
+- Test suites at audit: 627/627 frontend (Vitest, 33 test files) + 142/142 backend (pytest) + `tsc -b && vite build` succeeds
+
+**Git range:** `0f592e8` (v1.1 completion) → `84b0ca8` (build(16): regenerate dist/)
+
+**Milestone audit:** `milestones/v1.2-MILESTONE-AUDIT.md` — 21/21 requirements, 4/4 phases, 4/4 integration, 3/3 flows; `tech_debt` status (non-blocking; two Low-severity items documented).
+
+**Live-endpoint evidence:** `.planning/phases/16-live-elevenlabs-verification/16-LIVE-VERIFICATION.md` — Tier-B replay with committed 782,966-byte stitched MP3 binary, per-segment offsets JSON, player screenshot, and 8-row acronym deviation table.
+
+**What's next:** Next milestone TBD — candidate backlog includes v1.3 VOICE-01 (persona-matched voice audition replacing stock defaults), PLAYER-01/02/03 (per-persona MP3 download + Media Session API chapters + playback-speed selector), error-banner UX polish, and dev-mode Zustand store exposure at `window.__STORES__`. Start with `/gsd:new-milestone`.
+
+---
+
 ## v1.1 Pre-live-run hardening (Shipped: 2026-04-15)
 
 **Delivered:** Operational-gap closure milestone — a full-auth LLM health-check endpoint, a launch-gating setup-screen health badge, removal of the DEV auto-seed path that caused a blank-screen-plus-React-warning on direct `/game` hits, and an empirically-verified `crisisState` auto-advance rule in the Finch persona prompt.
