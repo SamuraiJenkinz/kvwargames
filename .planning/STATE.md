@@ -110,6 +110,6 @@ None. v1.1 technical-debt items are tracked in PROJECT.md and v1.1-MILESTONE-AUD
 
 ## Session Continuity
 
-Last session: 2026-04-19 — Phase 16 plan 16-01 complete; all 3 success criteria PASS; 16-LIVE-VERIFICATION.md + 16-01-SUMMARY.md committed
-Stopped at: Completed 16-01-PLAN.md; 16-02 (v1.2 milestone audit) is next
+Last session: 2026-04-19 — Phase 16 plan 16-02 complete; v1.2-MILESTONE-AUDIT.md authored; all planning docs updated; v1.2 formally shipped
+Stopped at: Completed 16-02-PLAN.md — v1.2 milestone shipped; all 59 plans complete
 Resume file: None
