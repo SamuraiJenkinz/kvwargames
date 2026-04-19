@@ -22,7 +22,7 @@
 
 - [x] **Phase 13: Firewall Spike + Mockable Backend Foundation** — PODDEP-01 corporate-firewall proof, FakeTTSProvider dev default, TTSProvider ABC, ElevenLabs concrete provider (not exercised yet), and the wargame-vocabulary TTS preprocessor. ✅ 2026-04-18
 - [x] **Phase 14: Podcast Endpoint + Player (End-to-End on Fake)** — `POST /api/debrief/podcast` (SSE), `GET /api/debrief/podcast/audio?token=...`, podcastStore (Zustand) with blob-URL lifecycle, PodcastPlayer component, cache / cancel / re-generate / skip-to-persona / word-count soft-ceiling, all verified against FakeTTSProvider. ✅ 2026-04-18
-- [ ] **Phase 15: TTS Health + Graceful Degradation** — `GET /api/health/tts`, setup-screen TtsHealthBadge (informational, does NOT gate Launch), and empirical proof that ElevenLabs-down leaves the markdown debrief fully functional.
+- [x] **Phase 15: TTS Health + Graceful Degradation** — `GET /api/health/tts`, setup-screen TtsHealthBadge (informational, does NOT gate Launch), and empirical proof that ElevenLabs-down leaves the markdown debrief fully functional. ✅ 2026-04-19
 - [ ] **Phase 16: Live ElevenLabs Verification + Milestone Audit** — First phase that calls a real ElevenLabs key. Tier-B replay against a Scenario-2 debrief fixture, listen-through, raw MP3 committed as evidence, milestone audit.
 
 ## Phase Details
@@ -73,9 +73,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 15-01-PLAN.md — Backend `GET /api/health/tts` router (8-code taxonomy, 15s SLA, 30s cache, /v1/user probe, TTS_PROVIDER=fake short-circuit, env_tts_elevenlabs conftest fixture, full pytest coverage) (PODRES-03)
-- [ ] 15-02-PLAN.md — Frontend TtsHealthBadge (amber failed-state, locked copy, informational-only, Launch-never-blocked) + formatLatency extract + mid-gen failure vitest safety net (PODRES-02 + engineering-layer PODRES-01)
-- [ ] 15-03-PLAN.md — Empirical verification: garbage-key run end-to-end, 15-VERIFICATION.md evidence bundle with screenshots + SHA-256 of downloaded debrief.md (PODRES-01 empirical)
+- [x] 15-01: Backend `GET /api/health/tts` router (8-code taxonomy, 15s SLA, 30s cache, /v1/user probe, TTS_PROVIDER=fake short-circuit, env_tts_elevenlabs conftest fixture, 14 pytest tests) (PODRES-03) — completed 2026-04-19
+- [x] 15-02: Frontend TtsHealthBadge (amber failed-state, locked copy, informational-only, Launch-never-blocked) + formatLatency extract + mid-gen failure vitest safety net (PODRES-02 + engineering-layer PODRES-01) — completed 2026-04-19
+- [x] 15-03: Empirical verification: garbage-key run end-to-end, 15-VERIFICATION.md evidence bundle with screenshots + SHA-256 of downloaded debrief.md (PODRES-01 empirical) — completed 2026-04-19
 
 ### Phase 16: Live ElevenLabs Verification + Milestone Audit
 **Goal**: With a real ElevenLabs API key configured and the Phase 13 firewall spike cleared, generating a podcast from a Scenario-2 debrief fixture produces an audibly correct three-voice MP3 end-to-end on the target deployment host — and the v1.2 milestone is audited complete.
@@ -113,5 +113,5 @@ Phases execute in numeric order: 13 → 14 → 15 → 16
 | 12. Crisis State Prompt Engineering | v1.1 | 2/2 | Complete | 2026-04-15 |
 | 13. Firewall Spike + Mockable Backend Foundation | v1.2 | 3/3 | Complete | 2026-04-18 |
 | 14. Podcast Endpoint + Player (End-to-End on Fake) | v1.2 | 3/3 | Complete | 2026-04-18 |
-| 15. TTS Health + Graceful Degradation | v1.2 | 0/2 | Not started | - |
+| 15. TTS Health + Graceful Degradation | v1.2 | 3/3 | Complete | 2026-04-19 |
 | 16. Live ElevenLabs Verification + Milestone Audit | v1.2 | 0/2 | Not started | - |

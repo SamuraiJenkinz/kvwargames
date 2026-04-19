@@ -34,9 +34,9 @@ Requirements for the Debrief Podcast milestone. Each maps to roadmap phases (pop
 
 ### Resilience (PODRES)
 
-- [ ] **PODRES-01**: When ElevenLabs is unreachable, times out, returns an error, or drops mid-generation, the podcast area displays a clear error status (with reason) AND the existing "Download Debrief (.md)" button remains fully functional — the podcast and markdown paths never share a failure boundary
-- [ ] **PODRES-02**: Setup screen shows a TTS health indicator adjacent to the existing LLM health badge, with the same auto-check-on-mount + Re-check button shape; TTS health is informational and does NOT gate the Launch button (unlike LLM health)
-- [ ] **PODRES-03**: Backend exposes `GET /api/health/tts` following the v1.1 health contract — always HTTP 200, `body.ok` carries the signal, structured error-code taxonomy, 15-second SLA
+- [x] **PODRES-01**: When ElevenLabs is unreachable, times out, returns an error, or drops mid-generation, the podcast area displays a clear error status (with reason) AND the existing "Download Debrief (.md)" button remains fully functional — the podcast and markdown paths never share a failure boundary
+- [x] **PODRES-02**: Setup screen shows a TTS health indicator adjacent to the existing LLM health badge, with the same auto-check-on-mount + Re-check button shape; TTS health is informational and does NOT gate the Launch button (unlike LLM health)
+- [x] **PODRES-03**: Backend exposes `GET /api/health/tts` following the v1.1 health contract — always HTTP 200, `body.ok` carries the signal, structured error-code taxonomy, 15-second SLA
 
 ### Deployment Readiness (PODDEP)
 
@@ -98,9 +98,9 @@ Every v1.2 requirement maps to exactly one phase. Phase 16 is a verification pha
 | PODUX-01 | Phase 14 | Complete |
 | PODUX-02 | Phase 14 | Complete |
 | PODUX-03 | Phase 14 | Complete |
-| PODRES-01 | Phase 15 | Pending |
-| PODRES-02 | Phase 15 | Pending |
-| PODRES-03 | Phase 15 | Pending |
+| PODRES-01 | Phase 15 | Complete |
+| PODRES-02 | Phase 15 | Complete |
+| PODRES-03 | Phase 15 | Complete |
 | PODDEP-01 | Phase 13 | Complete |
 | PODDEP-02 | Phase 13 | Complete |
 
