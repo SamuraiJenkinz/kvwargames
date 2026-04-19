@@ -278,13 +278,13 @@
 <header class="wordmark">
   <span>EDIP Council</span>
   <div class="divider"></div>
-  <span>Supply Wargame · v1.0</span>
+  <span>Supply Wargame · v1.2</span>
 </header>
 
 <section class="hero">
   <div class="eyebrow">For Executive Review</div>
   <h1>A facilitation console for policy wargames that actually remembers the conversation.</h1>
-  <p class="hero-body">Three AI advisors respond in character, live game state updates as decisions are made, and every session ends with a downloadable record. Built for the EDIP Council, validated against the production corporate language model under a full five-round scenario.</p>
+  <p class="hero-body">Three AI advisors respond in character, live game state updates as decisions are made, and every session ends with a downloadable record — and, at v1.2, with an optional three-voice audio debrief. Built for the EDIP Council, validated against the production corporate language model under a full five-round scenario and, for the audio path, against the production ElevenLabs endpoint on the deployment host.</p>
 </section>
 
 <section class="section">
@@ -322,13 +322,14 @@
 <section class="section">
   <h2>What leadership receives</h2>
   <p>Every session produces a single downloadable markdown artifact containing session metadata, per-round transcripts with starting-state tables, a debrief section with each advisor's closing reflection, and the final state of play. No screen captures, no manual transcription.</p>
+  <p>At v1.2 the facilitator can also generate a three-voice MP3 podcast of the debrief — each advisor reads their own closing remarks through a distinct voice, stitched into a single audio file with Skip-to-advisor buttons and a Download MP3 action sitting alongside the existing markdown export. The audio path is optional and independent: if the voice service is unavailable for any reason, the markdown debrief still downloads exactly as before.</p>
   <p>The facilitator remains in control at every step. When an advisor suggests advancing the round or calling the debrief, the console surfaces an explicit confirmation. Nothing is auto-applied. The state tracker shows what changed; the chat feed shows why; the debrief export makes both permanent.</p>
 </section>
 
 <section class="section">
   <h2>Trust architecture</h2>
-  <p>Corporate language-model credentials never reach the facilitator's browser. Every request passes through an internal proxy that injects the key server-side; the client sees only application payloads. This is verified by network-trace audit on each release.</p>
-  <p>Malformed responses are caught before they touch game state. A four-layer defensive parser rejects anything that does not conform to the advisor response schema, rendering a clear retry affordance to the facilitator. The session continues without restart, and the incident is captured in the debrief record.</p>
+  <p>Corporate language-model credentials never reach the facilitator's browser. Every request passes through an internal proxy that injects the key server-side; the client sees only application payloads. This is verified by network-trace audit on each release. The v1.2 voice integration extends the same posture to the text-to-speech provider: the voice key lives server-side only, audio travels to the browser as an already-rendered blob, and the outbound call is only made when the feature is explicitly enabled.</p>
+  <p>Malformed responses are caught before they touch game state. A four-layer defensive parser rejects anything that does not conform to the advisor response schema, rendering a clear retry affordance to the facilitator. The session continues without restart, and the incident is captured in the debrief record. The audio path fails independently of the text path — a voice-service outage surfaces a clear error banner while the markdown debrief download remains fully functional, verified under a live failure scenario before release.</p>
 </section>
 
 <section class="section">
@@ -355,17 +356,17 @@
 
 <section class="section">
   <h2>Readiness</h2>
-  <p>Delivered across eight phases and validated under a full five-round Scenario 2 live run against the production language model on 15 April 2026. Persona voices held across all five rounds. Credential isolation was confirmed on every browser-originated request. A malformed-response failure was caught and recovered organically during the run, providing stronger evidence than a synthetic test could have produced. The release passes 515 frontend tests and 12 backend tests, with evidence captured and stored alongside the code.</p>
+  <p>Delivered across sixteen phases in three milestones: the v1.0 MVP validated under a full five-round Scenario 2 live run against the production language model on 15 April 2026; v1.1 (same day) closed four operational gaps uncovered by that run, including a launch-gating connectivity check and an empirically-verified crisis-state escalation rule; v1.2 shipped the three-voice debrief podcast on 19 April 2026, validated against the production ElevenLabs endpoint on the deployment host with the stitched audio evidence committed alongside the code. Credential isolation is confirmed on every browser-originated request across both the language and voice paths. A malformed-response failure was caught and recovered organically during the v1.0 live run, providing stronger evidence than a synthetic test could produce; a voice-service failure scenario was run end-to-end before v1.2 release to prove the markdown debrief path is unaffected. The release passes 627 frontend tests and 142 backend tests, with evidence captured and stored alongside the code.</p>
   <div class="facts">
     <div>
-      <div class="fact-label">Phases Delivered</div>
-      <div class="fact-value">8</div>
-      <div class="fact-unit">all verified</div>
+      <div class="fact-label">Milestones Shipped</div>
+      <div class="fact-value">3</div>
+      <div class="fact-unit">v1.0 · v1.1 · v1.2</div>
     </div>
     <div>
-      <div class="fact-label">Live Rounds Run</div>
-      <div class="fact-value">5</div>
-      <div class="fact-unit">Scenario 2, full depth</div>
+      <div class="fact-label">Live Runs Verified</div>
+      <div class="fact-value">3</div>
+      <div class="fact-unit">LLM · crisis-state · ElevenLabs</div>
     </div>
     <div>
       <div class="fact-label">Credentials Observed</div>
@@ -377,7 +378,7 @@
 
 <footer>
   <span>EDIP Security of Supply Wargame</span>
-  <span>v1.0 · 15 April 2026</span>
+  <span>v1.2 · 19 April 2026</span>
 </footer>
 
 </div>

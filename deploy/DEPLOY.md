@@ -54,6 +54,19 @@ notepad C:\WarGame\.env
 # Keep APP_HOST=0.0.0.0 if you want LAN access, or 127.0.0.1 for local-only
 ```
 
+**Debrief-podcast TTS (v1.2, optional):** the podcast feature ships with `TTS_PROVIDER=fake` as the safe default — deterministic fixtures, zero outbound traffic. Ship to production that way if you do not yet have an ElevenLabs account or haven't confirmed firewall egress. When you're ready to turn real voices on:
+
+```powershell
+# In .env — all four required together:
+TTS_PROVIDER=elevenlabs
+ELEVENLABS_API_KEY=<real-key>
+ELEVENLABS_VOICE_KENT=<voice_id>
+ELEVENLABS_VOICE_FINCH=<voice_id>
+ELEVENLABS_VOICE_CHEN=<voice_id>
+```
+
+The backend refuses to start if `TTS_PROVIDER=elevenlabs` is set with any of the four `ELEVENLABS_*` vars missing — fail-fast, no half-configured state. The key is read server-side only; browser requests carry no ElevenLabs header (same posture as `LLM_API_KEY`). The markdown debrief download path is independent of TTS — if ElevenLabs is down, broken, or throttled, Generate Podcast surfaces a clear error banner but Download Debrief (.md) continues to work.
+
 Then either reboot, or start it immediately without rebooting:
 
 ```powershell
@@ -90,6 +103,8 @@ New-NetFirewallRule -DisplayName 'KV WarGame 8000' `
 ```
 
 Use a different `APP_PORT` in `.env` and the rule, if 8000 is already claimed.
+
+**Outbound (ElevenLabs):** when `TTS_PROVIDER=elevenlabs` is set, the backend calls `https://api.elevenlabs.io` from the deployment host — the same host and credential boundary as the LLM endpoint, plus one new destination. If your corporate egress is allowlist-based, add `api.elevenlabs.io` (TCP 443). Reachability was confirmed on the MMC deployment host (`MC211APT2AS5AHG`) via operational precedent — a separate production application on the same host calls this endpoint daily — plus an `Invoke-WebRequest https://api.elevenlabs.io/v1/voices` HTTP 200 preflight. See `.planning/phases/13-firewall-spike-mockable-backend-foundation/13-01-FIREWALL-SPIKE.md` for the evidence trail. With `TTS_PROVIDER=fake` (default) no outbound ElevenLabs traffic occurs.
 
 ## Updating to a new version
 
@@ -167,7 +182,21 @@ so a restart is required — there is no hot-reload path for credentials.
 
 **Credential boundary sanity check**
 The `.env` ACL is locked to `SYSTEM` + `Administrators` by the installer.
-`LLM_API_KEY` is read server-side only; browser requests carry no
-`Authorization` header (validated in Phase 8 credential audit). If you
-suspect drift, re-run the grep checks in
+`LLM_API_KEY` and (when v1.2 real TTS is enabled) `ELEVENLABS_API_KEY` are
+read server-side only; browser requests carry neither an `Authorization`
+header nor any ElevenLabs credential (validated in Phase 8 credential
+audit and re-audited for the podcast path at v1.2). If you suspect drift,
+re-run the grep checks in
 `.planning\phases\08-qa-credential-audit\08-03-CREDENTIAL-AUDIT.md`.
+
+**Debrief podcast not generating, but LLM works**
+Check two things. First, `GET http://<host>:<port>/api/health/tts` — it
+always returns HTTP 200, but the body tells you whether the provider is
+reachable (`ok: true` with `latencyMs`) or why it isn't (`ok: false` with
+one of eight codes: `timeout`, `auth_error`, `not_found`, `rate_limited`,
+`upstream_error`, `network_error`, `tls_error`, `invalid_response`).
+Second, on the setup screen the **TTS** badge displays the same signal
+with locked copy "Podcast generation unavailable — markdown debrief will
+still work." — it intentionally does NOT gate Launch. The markdown
+debrief download path is fully independent of TTS and continues to work
+regardless of the podcast state (empirically verified in Phase 15).

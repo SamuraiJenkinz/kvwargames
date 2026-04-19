@@ -510,7 +510,7 @@
     </header>
 
     <section class="hero">
-      <p class="eyebrow">Facilitator handbook &middot; Version 1</p>
+      <p class="eyebrow">Facilitator handbook &middot; Version 1.2</p>
       <h1>A quiet instrument for a loud table.</h1>
       <p class="hero-body">
         This guide walks you through everything the tool does, in the order you are
@@ -1007,6 +1007,42 @@
         no autosave, no cloud backup — this is intentional for the sensitivity of
         the content. <strong>Download the debrief before you leave.</strong>
       </aside>
+
+      <h3>Debrief podcast (optional)</h3>
+      <p>
+        After the debrief lands, a <strong>Generate Podcast</strong> button appears in
+        the action toolbar next to Download Debrief. Clicking it has each persona read
+        their own closing remarks through a distinct voice — Kent, then Finch, then
+        Chen — stitched into a single MP3 with ~700 ms of silence between segments.
+        No new AI conversation is started; the personas read the debrief text that is
+        already on the screen.
+      </p>
+      <p>
+        A player appears inline once generation completes. It carries three
+        <strong>Skip to Kent / Finch / Chen</strong> buttons, a <em>Now playing</em>
+        label that updates at segment boundaries, a <strong>Download MP3</strong> button
+        (filename <code>debrief-&lt;game-name&gt;-&lt;date&gt;-&lt;time&gt;.mp3</code>),
+        and an expandable transcript panel below the player for reference. The audio
+        loads paused — nothing auto-plays into the room.
+      </p>
+      <p>
+        Long debriefs (roughly more than two thousand words across all three personas)
+        trigger a confirmation dialog that shows the estimated audio length before the
+        request is sent upstream. Clicking Generate a second time with the same text
+        returns the previously-rendered MP3 from cache with no additional network call.
+        A dedicated <strong>Re-generate</strong> button invalidates the cache after
+        confirming.
+      </p>
+
+      <aside class="note">
+        <span class="note-label">If the podcast is unavailable</span>
+        A small <strong>TTS</strong> badge on the setup screen reports whether the
+        podcast service is reachable — it is informational only and never prevents
+        Launch. If the badge is amber, or if generation fails mid-stream, a red
+        banner names the reason and the adjacent <strong>Download Debrief</strong>
+        button continues to work normally. The two paths do not share a failure
+        boundary by design.
+      </aside>
     </section>
 
     <!-- 11 -->
@@ -1030,9 +1066,21 @@
       </p>
 
       <p>
+        The debrief-podcast feature (v1.2) extends the same posture to ElevenLabs.
+        When real voices are enabled, the <code>ELEVENLABS_API_KEY</code> lives
+        alongside <code>LLM_API_KEY</code> in the server-side environment file and
+        is injected into outbound requests the same way; the browser never sees it.
+        The podcast audio travels from the server to the browser as a blob; no
+        ElevenLabs URL is ever fetched directly by the client. When real voices are
+        not configured, the tool ships with a "fake" TTS provider that uses local
+        audio fixtures and makes zero outbound calls.
+      </p>
+
+      <p>
         The tool stores nothing between sessions. There is no database, no cookie,
-        no localStorage for game content. The exported debrief Markdown file is
-        the only persistent artifact, and it lives wherever you save it.
+        no localStorage for game content. The exported debrief Markdown file (and,
+        if you choose to save it, the stitched MP3) is the only persistent artifact,
+        and it lives wherever you save it.
       </p>
     </section>
 
