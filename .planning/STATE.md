@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-04-17 after v1.2 milestone kickoff)
 
 ## Current Position
 
-Phase: 15 of 16 (TTS Health + Graceful Degradation) — In progress
-Plan: 2 of 3 in current phase — 15-02 (frontend TTS health badge) shipped
-Status: Phase 15 plan 2 complete — TtsHealthBadge live; 625 frontend tests passing; launchDisabled invariant preserved
-Last activity: 2026-04-18 — Completed 15-02-PLAN.md (TtsHealthBadge, formatLatency extraction, TTSHealthResponse types, 17 new tests, SC4 mid-gen safety net)
+Phase: 15 of 16 (TTS Health + Graceful Degradation) — Complete
+Plan: 3 of 3 in current phase — 15-03 (empirical graceful degradation verification) shipped
+Status: Phase 15 complete — 15-01 backend health endpoint, 15-02 frontend TtsHealthBadge, 15-03 empirical verification all shipped 2026-04-19; SC1..SC4 confirmed; markdown debrief proven independent of TTS failure path
+Last activity: 2026-04-19 — Completed Phase 15: empirical garbage-key run produced [upstream_error] banner while markdown debrief downloaded successfully (110-line valid .md, SHA-256 b00eda8…)
 
-Progress: [██████████████████░] 56/58 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 + 14-01/02/03 + 15-01/02 (8) shipped; v1.2 plans remaining: 15-03, 16-01/02
+Progress: [███████████████████░] 57/58 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 + 14-01/02/03 + 15-01/02/03 (9) shipped; v1.2 plans remaining: 16-01/02
 
 ## Performance Metrics
 
@@ -24,7 +24,9 @@ Progress: [██████████████████░] 56/58 plan
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1–8 | 39/39 | ✅ Tagged | 2026-04-15 |
 | v1.1 Pre-live-run hardening | 9–12 | 7/7 | ✅ Tagged | 2026-04-15 |
-| v1.2 Debrief Podcast | 13–16 | 6/~10 | 🚧 In progress (Phases 13 + 14 complete 2026-04-18) | — |
+| v1.2 Debrief Podcast | 13–16 | 9/~10 | 🚧 In progress (Phases 13 + 14 + 15 complete 2026-04-19) | — |
+
+| 15. TTS Health + Graceful Degradation | v1.2 | 3/3 | Complete | 2026-04-19 |
 
 **v1.0 Velocity:** 39 plans across 8 phases over ~2 days (2026-04-13 → 2026-04-15)
 **v1.1 Velocity:** 7 plans across 4 phases in ~4 hours (same day as v1.0 ship)
@@ -80,6 +82,11 @@ v1.2 plan 15-01 decisions (TTS health endpoint):
 - **Per-request `httpx.AsyncClient` for TTS health** — not `app.state.http_client` (LLM client). Confirmed appropriate given 30s cache keeps probe frequency low.
 - **`?force=true` writes back to cache after bypass** — bypasses cache READ only, always writes result on completion (prevents stale cache after manual refresh).
 
+v1.2 plan 15-03 observations (empirical verification):
+
+- **Two-endpoint code divergence: `/v1/user` → `auth_error`, `/v1/text-to-speech` → `upstream_error`** — the setup-screen health probe hits ElevenLabs `/v1/user` (returned 401/403 → `auth_error`) while TTS generation hits `/v1/text-to-speech/{voice_id}` with dummy voice IDs (ElevenLabs returned HTTP 500 → `upstream_error`). Both codes are valid members of the 8-code taxonomy. Phase 16 Tier-B replay will use real voice IDs so both endpoints succeed. The code-dispatch table handling multiple codes simultaneously is now empirically confirmed.
+- **Zustand stores are not on `window`** — `usePodcastStore.getState().error` in DevTools console returns `ReferenceError`. Stores are module-local ES exports. Future v1.3 polish option: expose stores at `window.__STORES__` in dev mode. For Phase 15 verification visual proof from the rendered banner was sufficient (stronger — validates the full SSE → store → component → DOM flow). Phase 16 verifier should use React DevTools component tree if store inspection is needed.
+
 v1.1 decisions still relevant:
 
 - Health endpoint always returns HTTP 200 (body.ok carries signal) — reused verbatim for `/api/health/tts` in Phase 15
@@ -95,6 +102,6 @@ None. v1.1 technical-debt items are tracked in PROJECT.md and v1.1-MILESTONE-AUD
 
 ## Session Continuity
 
-Last session: 2026-04-18 — Completed 15-02-PLAN.md (frontend TTS health badge); 625/625 frontend tests passing
-Stopped at: Phase 15 / Plan 2 complete. Next: 15-03 (empirical graceful degradation verification) then 16-01/02 (live ElevenLabs verification).
-Resume file: None — ready for 15-03.
+Last session: 2026-04-19 — Completed Phase 15: empirical garbage-key run, 15-03-SUMMARY.md, evidence bundle committed
+Stopped at: Phase 15 complete. Next: Phase 16 (Live ElevenLabs Verification + Milestone Audit)
+Resume file: None
