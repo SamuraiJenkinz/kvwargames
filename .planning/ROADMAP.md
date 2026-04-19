@@ -4,11 +4,11 @@
 
 - ✅ **v1.0 MVP** — Phases 1–8 (shipped 2026-04-15) — archived: [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md)
 - ✅ **v1.1 Pre-live-run hardening** — Phases 9–12 (shipped 2026-04-15) — archived: [`milestones/v1.1-ROADMAP.md`](milestones/v1.1-ROADMAP.md)
-- 🚧 **v1.2 Debrief Podcast** — Phases 13–16 (in progress)
+- ✅ **v1.2 Debrief Podcast** — Phases 13–16 (shipped 2026-04-19) — audit: [`milestones/v1.2-MILESTONE-AUDIT.md`](milestones/v1.2-MILESTONE-AUDIT.md)
 
 ## Current Milestone
 
-### 🚧 v1.2 Debrief Podcast (In Progress)
+### ✅ v1.2 Debrief Podcast (Shipped 2026-04-19)
 
 **Milestone Goal:** Convert the end-of-session debrief into a three-voice MP3 podcast — Kent, Finch, and Chen each read their own existing `isDebrief: true` messages through distinct ElevenLabs stock voices, stitched into a single session MP3. Facilitators get an inline player and a Download MP3 button adjacent to the existing markdown download. Zero browser-side credentials; the markdown export path remains the single source of truth for session memory and must never share a failure boundary with the audio path.
 
@@ -23,7 +23,7 @@
 - [x] **Phase 13: Firewall Spike + Mockable Backend Foundation** — PODDEP-01 corporate-firewall proof, FakeTTSProvider dev default, TTSProvider ABC, ElevenLabs concrete provider (not exercised yet), and the wargame-vocabulary TTS preprocessor. ✅ 2026-04-18
 - [x] **Phase 14: Podcast Endpoint + Player (End-to-End on Fake)** — `POST /api/debrief/podcast` (SSE), `GET /api/debrief/podcast/audio?token=...`, podcastStore (Zustand) with blob-URL lifecycle, PodcastPlayer component, cache / cancel / re-generate / skip-to-persona / word-count soft-ceiling, all verified against FakeTTSProvider. ✅ 2026-04-18
 - [x] **Phase 15: TTS Health + Graceful Degradation** — `GET /api/health/tts`, setup-screen TtsHealthBadge (informational, does NOT gate Launch), and empirical proof that ElevenLabs-down leaves the markdown debrief fully functional. ✅ 2026-04-19
-- [ ] **Phase 16: Live ElevenLabs Verification + Milestone Audit** — First phase that calls a real ElevenLabs key. Tier-B replay against a Scenario-2 debrief fixture, listen-through, raw MP3 committed as evidence, milestone audit.
+- [x] **Phase 16: Live ElevenLabs Verification + Milestone Audit** — First phase that calls a real ElevenLabs key. Tier-B replay against a Scenario-2 debrief fixture, listen-through, raw MP3 committed as evidence, milestone audit. ✅ 2026-04-19
 
 ## Phase Details
 
@@ -89,8 +89,8 @@ Plans:
 **Plans**: 2 plans (TBD)
 
 Plans:
-- [ ] 16-01: Live ElevenLabs Tier-B replay against Scenario-2 debrief fixture + commit raw MP3 + per-segment offsets + acronym listen-through notes
-- [ ] 16-02: v1.2 milestone audit + PROJECT.md Key Decisions update + REQUIREMENTS.md status flip to Validated
+- [x] 16-01: Live ElevenLabs Tier-B replay against Scenario-2 debrief fixture + commit raw MP3 + per-segment offsets + acronym listen-through notes — completed 2026-04-19
+- [x] 16-02: v1.2 milestone audit + PROJECT.md Key Decisions update + REQUIREMENTS.md status flip to Validated — completed 2026-04-19
 
 ## Progress
 
@@ -114,4 +114,4 @@ Phases execute in numeric order: 13 → 14 → 15 → 16
 | 13. Firewall Spike + Mockable Backend Foundation | v1.2 | 3/3 | Complete | 2026-04-18 |
 | 14. Podcast Endpoint + Player (End-to-End on Fake) | v1.2 | 3/3 | Complete | 2026-04-18 |
 | 15. TTS Health + Graceful Degradation | v1.2 | 3/3 | Complete | 2026-04-19 |
-| 16. Live ElevenLabs Verification + Milestone Audit | v1.2 | 0/2 | Not started | - |
+| 16. Live ElevenLabs Verification + Milestone Audit | v1.2 | 2/2 | Complete | 2026-04-19 |

@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-04-17 after v1.2 milestone kickoff)
 
 ## Current Position
 
-Phase: 16 of 16 (Live ElevenLabs Verification + Milestone Audit) — In progress
-Plan: 2 of 2 in current phase — 16-01 complete; 16-02 (v1.2 milestone audit) next
-Status: Phase 16, Plan 16-01 complete (commits 3701198, b851553, af6d525, fd41e6c, 02298a3, 7cd1682); SC1/SC2/SC3 all PASS
-Last activity: 2026-04-19 — Completed 16-01-PLAN.md — Tier-B live ElevenLabs replay complete; 16-LIVE-VERIFICATION.md authored; 16-01-SUMMARY.md written; all 6 evidence artifacts committed
+Phase: 16 of 16 (Live ElevenLabs Verification + Milestone Audit) — Complete
+Plan: 2 of 2 in current phase
+Status: v1.2 Debrief Podcast shipped 2026-04-19; Phase 16 Tier-B evidence bundle + milestone audit complete; all 21 requirements validated
+Last activity: 2026-04-19 — Completed 16-02-PLAN.md — v1.2-MILESTONE-AUDIT.md authored; PROJECT.md/REQUIREMENTS.md/ROADMAP.md updated; v1.2 formally shipped
 
-Progress: [████████████████████] 58/59 plans complete — v1.0 (39) + v1.1 (7) + v1.2 plans 13-01/02/03 + 14-01/02/03 + 15-01/02/03 + 16-01 (10) shipped; v1.2 plans remaining: 16-02
+Progress: [████████████████████] 59/59 plans complete — v1.0 (39) + v1.1 (7) + v1.2 (13) shipped
 
 ## Performance Metrics
 
@@ -24,7 +24,7 @@ Progress: [████████████████████] 58/59 p
 |-----------|--------|-------|--------|---------|
 | v1.0 MVP | 1–8 | 39/39 | ✅ Tagged | 2026-04-15 |
 | v1.1 Pre-live-run hardening | 9–12 | 7/7 | ✅ Tagged | 2026-04-15 |
-| v1.2 Debrief Podcast | 13–16 | 10/11 | 🚧 In progress (Phases 13 + 14 + 15 + 16-01 complete 2026-04-19) | — |
+| v1.2 Debrief Podcast | 13–16 | 13/13 | ✅ Tagged | 2026-04-19 |
 
 | 15. TTS Health + Graceful Degradation | v1.2 | 3/3 | Complete | 2026-04-19 |
 

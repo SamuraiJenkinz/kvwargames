@@ -118,3 +118,4 @@ Every v1.2 requirement maps to exactly one phase. Phase 16 is a verification pha
 ---
 *Requirements defined: 2026-04-17*
 *Last updated: 2026-04-18 — Phase 13 complete (PODDEP-01, PODDEP-02, PODGEN-05 marked Complete); 3/21 requirements delivered*
+*Last updated: 2026-04-19 — v1.2 milestone audited tech_debt (non-blocking); all 21 requirements empirically validated against real ElevenLabs endpoint (evidence: `.planning/phases/16-live-elevenlabs-verification/16-LIVE-VERIFICATION.md`)*
